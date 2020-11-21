@@ -2,8 +2,8 @@
 # Vivado v2019.2 (64-bit)
 # SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
 # IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
-# Start of session at: Wed Nov 11 00:07:33 2020
-# Process ID: 10428
+# Start of session at: Sat Nov 21 16:52:50 2020
+# Process ID: 9720
 # Current directory: C:/Users/devin/final_project/final_project.runs/synth_1
 # Command line: vivado.exe -log top_level.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_level.tcl
 # Log file: C:/Users/devin/final_project/final_project.runs/synth_1/top_level.vds
@@ -16,76 +16,104 @@ Attempting to get a license for feature 'Synthesis' and/or device 'xc7a100t'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a100t'
 INFO: [Device 21-403] Loading part xc7a100tcsg324-1
 INFO: Launching helper process for spawning children vivado processes
-INFO: Helper process launched with PID 8012 
+INFO: Helper process launched with PID 9004 
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 820.137 ; gain = 234.297
+Starting RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 820.918 ; gain = 234.496
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-6157] synthesizing module 'top_level' [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:23]
 	Parameter ONE_HZ_PERIOD bound to: 65000000 - type: integer 
 	Parameter DEBOUNCE_COUNT bound to: 1000000 - type: integer 
-INFO: [Synth 8-6157] synthesizing module 'clk_wiz_0' [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-10428-DESKTOP-RNNIHH5/realtime/clk_wiz_0_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_0' (1#1) [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-10428-DESKTOP-RNNIHH5/realtime/clk_wiz_0_stub.v:5]
-INFO: [Synth 8-6157] synthesizing module 'display_8hex' [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:76]
-	Parameter bits bound to: 13 - type: integer 
-INFO: [Synth 8-6155] done synthesizing module 'display_8hex' (2#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:76]
+INFO: [Synth 8-6157] synthesizing module 'clk_wiz_0' [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_0' (1#1) [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/clk_wiz_0_stub.v:5]
 INFO: [Synth 8-6157] synthesizing module 'debounce' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/debounce.sv:7]
 	Parameter DEBOUNCE_COUNT bound to: 1000000 - type: integer 
-INFO: [Synth 8-6155] done synthesizing module 'debounce' (3#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/debounce.sv:7]
+INFO: [Synth 8-6155] done synthesizing module 'debounce' (2#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/debounce.sv:7]
 INFO: [Synth 8-6157] synthesizing module 'timer' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/timer.sv:1]
 	Parameter ONE_HZ_PERIOD bound to: 65000000 - type: integer 
-INFO: [Synth 8-6155] done synthesizing module 'timer' (4#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/timer.sv:1]
-WARNING: [Synth 8-689] width (1) of port connection 'count_out' does not match port width (12) of module 'timer' [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:64]
-WARNING: [Synth 8-3848] Net vga_r in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:26]
-WARNING: [Synth 8-3848] Net vga_b in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:27]
-WARNING: [Synth 8-3848] Net vga_g in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:28]
-WARNING: [Synth 8-3848] Net vga_hs in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:29]
-WARNING: [Synth 8-3848] Net vga_vs in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:30]
+INFO: [Synth 8-6155] done synthesizing module 'timer' (3#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/timer.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'random_num' [C:/Users/devin/final_project/final_project.srcs/sources_1/new/random_num.sv:34]
+INFO: [Synth 8-6155] done synthesizing module 'random_num' (4#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/new/random_num.sv:34]
+INFO: [Synth 8-638] synthesizing module 'TempSensorCtl' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TempSensorCtl.vhd:59]
+	Parameter CLOCKFREQ bound to: 100 - type: integer 
+	Parameter CLOCKFREQ bound to: 100 - type: integer 
+	Parameter ATTEMPT_SLAVE_UNBLOCK bound to: 1 - type: bool 
+INFO: [Synth 8-3491] module 'TWICtl' declared at 'C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:68' bound to instance 'Inst_TWICtl' of component 'TWICtl' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TempSensorCtl.vhd:164]
+INFO: [Synth 8-638] synthesizing module 'TWICtl' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:132]
+	Parameter CLOCKFREQ bound to: 100 - type: integer 
+	Parameter ATTEMPT_SLAVE_UNBLOCK bound to: 1 - type: bool 
+INFO: [Synth 8-5534] Detected attribute (* fsm_encoding = "gray" *) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:144]
+INFO: [Synth 8-226] default block is never used [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:357]
+INFO: [Synth 8-226] default block is never used [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:375]
+INFO: [Synth 8-226] default block is never used [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:393]
+INFO: [Synth 8-226] default block is never used [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:411]
+INFO: [Synth 8-226] default block is never used [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:429]
+INFO: [Synth 8-226] default block is never used [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:447]
+WARNING: [Synth 8-614] signal 'timeOutCnt' is read in the process but is not in the sensitivity list [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:500]
+WARNING: [Synth 8-6014] Unused sequential element errTypeR_reg was removed.  [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:335]
+WARNING: [Synth 8-3936] Found unconnected internal register 'sync_scl_reg' and it is trimmed from '3' to '2' bits. [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:172]
+WARNING: [Synth 8-3848] Net ERRTYPE_O in module/entity TWICtl does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:121]
+INFO: [Synth 8-256] done synthesizing module 'TWICtl' (5#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TWICtl.vhd:132]
+INFO: [Synth 8-226] default block is never used [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TempSensorCtl.vhd:329]
+WARNING: [Synth 8-614] signal 'initA' is read in the process but is not in the sensitivity list [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TempSensorCtl.vhd:324]
+INFO: [Synth 8-256] done synthesizing module 'TempSensorCtl' (6#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/TempSensorCtl.vhd:59]
+INFO: [Synth 8-6157] synthesizing module 'minigame_1' [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:303]
+	Parameter START bound to: 3'b000 
+	Parameter FIRST_SQUARE bound to: 3'b001 
+	Parameter SECOND_SQUARE bound to: 3'b010 
+	Parameter THIRD_SQUARE bound to: 3'b011 
+	Parameter DECODE bound to: 3'b100 
+	Parameter DONE bound to: 3'b101 
+INFO: [Synth 8-6157] synthesizing module 'blob' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/new/blob.sv:28]
+	Parameter WIDTH bound to: 64 - type: integer 
+	Parameter HEIGHT bound to: 64 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'blob' (7#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/new/blob.sv:28]
+INFO: [Synth 8-6157] synthesizing module 'fingerprint' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/new/picture_blob.sv:28]
+	Parameter WIDTH bound to: 277 - type: integer 
+	Parameter HEIGHT bound to: 182 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'fingerprint_rom' [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/fingerprint_rom_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fingerprint_rom' (8#1) [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/fingerprint_rom_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'red_fing' [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/red_fing_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'red_fing' (9#1) [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/red_fing_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'green_fing' [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/green_fing_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'green_fing' (10#1) [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/green_fing_stub.v:6]
+WARNING: [Synth 8-7023] instance 'green_coe' of module 'green_fing' has 4 connections declared, but only 3 given [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/new/picture_blob.sv:46]
+INFO: [Synth 8-6157] synthesizing module 'blue_fing' [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/blue_fing_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'blue_fing' (11#1) [C:/Users/devin/final_project/final_project.runs/synth_1/.Xil/Vivado-9720-DESKTOP-RNNIHH5/realtime/blue_fing_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'fingerprint' (12#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/new/picture_blob.sv:28]
+INFO: [Synth 8-6157] synthesizing module 'Lut_mg1' [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:417]
+INFO: [Synth 8-6155] done synthesizing module 'Lut_mg1' (13#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:417]
+INFO: [Synth 8-155] case statement is not full and has no default [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:366]
+INFO: [Synth 8-6155] done synthesizing module 'minigame_1' (14#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:303]
+INFO: [Synth 8-6157] synthesizing module 'xvga' [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:250]
+	Parameter DISPLAY_WIDTH bound to: 1024 - type: integer 
+	Parameter DISPLAY_HEIGHT bound to: 768 - type: integer 
+	Parameter H_FP bound to: 24 - type: integer 
+	Parameter H_SYNC_PULSE bound to: 136 - type: integer 
+	Parameter H_BP bound to: 160 - type: integer 
+	Parameter V_FP bound to: 3 - type: integer 
+	Parameter V_SYNC_PULSE bound to: 6 - type: integer 
+	Parameter V_BP bound to: 29 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'xvga' (15#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:250]
+INFO: [Synth 8-6157] synthesizing module 'display_8hex' [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:171]
+	Parameter bits bound to: 13 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'display_8hex' (16#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:171]
 WARNING: [Synth 8-3848] Net led16_b in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:31]
 WARNING: [Synth 8-3848] Net led16_g in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:31]
 WARNING: [Synth 8-3848] Net led16_r in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:31]
 WARNING: [Synth 8-3848] Net led17_b in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:32]
 WARNING: [Synth 8-3848] Net led17_g in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:32]
 WARNING: [Synth 8-3848] Net led17_r in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:32]
-WARNING: [Synth 8-3848] Net led in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:33]
-WARNING: [Synth 8-3848] Net segments in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:52]
+WARNING: [Synth 8-3848] Net segments in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:153]
 WARNING: [Synth 8-3848] Net dp in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:34]
-INFO: [Synth 8-6155] done synthesizing module 'top_level' (5#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:23]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_r[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_r[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_r[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_r[0]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_b[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_b[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_b[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_b[0]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_g[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_g[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_g[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_g[0]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_hs
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_vs
+WARNING: [Synth 8-3848] Net data_rand in module/entity top_level does not have driver. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:82]
+INFO: [Synth 8-6155] done synthesizing module 'top_level' (17#1) [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:23]
+WARNING: [Synth 8-3331] design TWICtl has unconnected port ERRTYPE_O
 WARNING: [Synth 8-3331] design top_level has unconnected port led16_b
 WARNING: [Synth 8-3331] design top_level has unconnected port led16_g
 WARNING: [Synth 8-3331] design top_level has unconnected port led16_r
 WARNING: [Synth 8-3331] design top_level has unconnected port led17_b
 WARNING: [Synth 8-3331] design top_level has unconnected port led17_g
 WARNING: [Synth 8-3331] design top_level has unconnected port led17_r
-WARNING: [Synth 8-3331] design top_level has unconnected port led[15]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[14]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[13]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[12]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[11]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[10]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[9]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[8]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[7]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[6]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[5]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[4]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[0]
 WARNING: [Synth 8-3331] design top_level has unconnected port dp
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[14]
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[13]
@@ -98,16 +126,8 @@ WARNING: [Synth 8-3331] design top_level has unconnected port sw[7]
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[6]
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[5]
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[4]
-WARNING: [Synth 8-3331] design top_level has unconnected port sw[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port sw[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port sw[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port sw[0]
-WARNING: [Synth 8-3331] design top_level has unconnected port btnu
-WARNING: [Synth 8-3331] design top_level has unconnected port btnl
-WARNING: [Synth 8-3331] design top_level has unconnected port btnr
-WARNING: [Synth 8-3331] design top_level has unconnected port btnd
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 893.238 ; gain = 307.398
+Finished RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 897.840 ; gain = 311.418
 ---------------------------------------------------------------------------------
 
 Report Check Netlist: 
@@ -120,38 +140,53 @@ Report Check Netlist:
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 896.461 ; gain = 310.621
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 897.840 ; gain = 311.418
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 896.461 ; gain = 310.621
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 897.840 ; gain = 311.418
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 896.461 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.023 . Memory (MB): peak = 897.840 ; gain = 0.000
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
 Initializing timing engine
 Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc] for cell 'clkdivider'
 Finished Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc] for cell 'clkdivider'
+Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/fingerprint_rom/fingerprint_rom/fingerprint_rom_in_context.xdc] for cell 'mgame1/nolabel_line339/finger_rom'
+Finished Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/fingerprint_rom/fingerprint_rom/fingerprint_rom_in_context.xdc] for cell 'mgame1/nolabel_line339/finger_rom'
+Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/blue_fing/blue_fing/blue_fing_in_context.xdc] for cell 'mgame1/nolabel_line339/blue_coe'
+Finished Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/blue_fing/blue_fing/blue_fing_in_context.xdc] for cell 'mgame1/nolabel_line339/blue_coe'
+Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/red_fing/red_fing/red_fing_in_context.xdc] for cell 'mgame1/nolabel_line339/red_coe'
+Finished Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/red_fing/red_fing/red_fing_in_context.xdc] for cell 'mgame1/nolabel_line339/red_coe'
+Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/green_fing/green_fing/green_fing_in_context.xdc] for cell 'mgame1/nolabel_line339/green_coe'
+Finished Parsing XDC File [c:/Users/devin/final_project/final_project.srcs/sources_1/ip/green_fing/green_fing/green_fing_in_context.xdc] for cell 'mgame1/nolabel_line339/green_coe'
 Parsing XDC File [C:/Users/devin/final_project/final_project.srcs/constrs_1/imports/Downloads/nexys4_ddr_lab3.xdc]
+WARNING: [Vivado 12-584] No ports matched 'tmp_int'. [C:/Users/devin/final_project/final_project.srcs/constrs_1/imports/Downloads/nexys4_ddr_lab3.xdc:205]
+WARNING: [Vivado 12-584] No ports matched 'tmp_ct'. [C:/Users/devin/final_project/final_project.srcs/constrs_1/imports/Downloads/nexys4_ddr_lab3.xdc:206]
 Finished Parsing XDC File [C:/Users/devin/final_project/final_project.srcs/constrs_1/imports/Downloads/nexys4_ddr_lab3.xdc]
+WARNING: [Project 1-498] One or more constraints failed evaluation while reading constraint file [C:/Users/devin/final_project/final_project.srcs/constrs_1/imports/Downloads/nexys4_ddr_lab3.xdc] and the design contains unresolved black boxes. These constraints will be read post-synthesis (as long as their source constraint file is marked as used_in_implementation) and should be applied correctly then. You should review the constraints listed in the file [.Xil/top_level_propImpl.xdc] and check the run log file to verify that these constraints were correctly applied.
 INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [C:/Users/devin/final_project/final_project.srcs/constrs_1/imports/Downloads/nexys4_ddr_lab3.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/top_level_propImpl.xdc].
 Resolution: To avoid this warning, move constraints listed in [.Xil/top_level_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1013.191 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1008.820 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1013.191 ; gain = 0.000
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.019 . Memory (MB): peak = 1008.820 ; gain = 0.000
+WARNING: [Timing 38-316] Clock period '20.000' specified during out-of-context synthesis of instance 'mgame1/nolabel_line339/blue_coe' at clock pin 'clka' is different from the actual clock period '15.385', this can lead to different synthesis results.
+WARNING: [Timing 38-316] Clock period '20.000' specified during out-of-context synthesis of instance 'mgame1/nolabel_line339/finger_rom' at clock pin 'clka' is different from the actual clock period '15.385', this can lead to different synthesis results.
+WARNING: [Timing 38-316] Clock period '20.000' specified during out-of-context synthesis of instance 'mgame1/nolabel_line339/green_coe' at clock pin 'clka' is different from the actual clock period '15.385', this can lead to different synthesis results.
+WARNING: [Timing 38-316] Clock period '20.000' specified during out-of-context synthesis of instance 'mgame1/nolabel_line339/red_coe' at clock pin 'clka' is different from the actual clock period '15.385', this can lead to different synthesis results.
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:12 ; elapsed = 00:00:12 . Memory (MB): peak = 1013.191 ; gain = 427.352
+Finished Constraint Validation : Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 1011.922 ; gain = 425.500
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7a100tcsg324-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:12 ; elapsed = 00:00:12 . Memory (MB): peak = 1013.191 ; gain = 427.352
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 1011.922 ; gain = 425.500
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
@@ -159,11 +194,44 @@ Start Applying 'set_property' XDC Constraints
 Applied set_property IO_BUFFER_TYPE = NONE for clk_100mhz. (constraint file  c:/Users/devin/final_project/final_project.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc, line 3).
 Applied set_property CLOCK_BUFFER_TYPE = NONE for clk_100mhz. (constraint file  c:/Users/devin/final_project/final_project.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc, line 4).
 Applied set_property DONT_TOUCH = true for clkdivider. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for mgame1/nolabel_line339/finger_rom. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for mgame1/nolabel_line339/blue_coe. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for mgame1/nolabel_line339/red_coe. (constraint file  auto generated constraint, line ).
+Applied set_property DONT_TOUCH = true for mgame1/nolabel_line339/green_coe. (constraint file  auto generated constraint, line ).
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:12 ; elapsed = 00:00:12 . Memory (MB): peak = 1013.191 ; gain = 427.352
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 1011.922 ; gain = 425.500
 ---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'TWICtl'
+INFO: [Synth 8-5544] ROM "TempSensInitMap" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
+WARNING: [Synth 8-3936] Found unconnected internal register 'start_temp_reg' and it is trimmed from '13' to '12' bits. [C:/Users/devin/final_project/final_project.srcs/sources_1/new/top_level.sv:344]
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'minigame_1'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                  stidle |                             0001 |                             0000
+                 ststart |                             1111 |                             0001
+                 stwrite |                             0000 |                             0011
+                  stsack |                             0010 |                             0110
+                  stread |                             0111 |                             0010
+            stmnackstart |                             0110 |                             1001
+                  stmack |                             0100 |                             0111
+             stmnackstop |                             0101 |                             1000
+                  ststop |                             0011 |                             0101
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'gray' in module 'TWICtl'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                   START |                              000 |                              000
+            FIRST_SQUARE |                              001 |                              001
+           SECOND_SQUARE |                              010 |                              010
+            THIRD_SQUARE |                              011 |                              011
+                  DECODE |                              100 |                              100
+                    DONE |                              101 |                              101
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'minigame_1'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 1013.191 ; gain = 427.352
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 1011.922 ; gain = 425.500
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -177,19 +245,58 @@ Start RTL Component Statistics
 Detailed RTL Component Info : 
 +---Adders : 
 	   2 Input     27 Bit       Adders := 1     
+	   3 Input     16 Bit       Adders := 1     
+	   3 Input     13 Bit       Adders := 4     
 	   2 Input     12 Bit       Adders := 1     
+	   3 Input     12 Bit       Adders := 6     
+	   4 Input     12 Bit       Adders := 1     
+	   2 Input     11 Bit       Adders := 1     
+	   2 Input     10 Bit       Adders := 1     
+	   2 Input      8 Bit       Adders := 2     
 	   4 Input      4 Bit       Adders := 1     
+	   2 Input      4 Bit       Adders := 1     
+	   2 Input      3 Bit       Adders := 1     
+	   2 Input      2 Bit       Adders := 2     
+	   2 Input      1 Bit       Adders := 1     
+	   3 Input      1 Bit       Adders := 2     
++---XORs : 
+	   2 Input      1 Bit         XORs := 1     
 +---Registers : 
 	               27 Bit    Registers := 1     
-	                8 Bit    Registers := 1     
+	               16 Bit    Registers := 3     
+	               13 Bit    Registers := 1     
+	               12 Bit    Registers := 10    
+	               11 Bit    Registers := 1     
+	               10 Bit    Registers := 1     
+	                8 Bit    Registers := 6     
 	                7 Bit    Registers := 1     
-	                1 Bit    Registers := 5     
+	                4 Bit    Registers := 1     
+	                3 Bit    Registers := 3     
+	                2 Bit    Registers := 4     
+	                1 Bit    Registers := 30    
 +---Muxes : 
 	   2 Input     27 Bit        Muxes := 1     
-	   2 Input     12 Bit        Muxes := 1     
-	   8 Input      8 Bit        Muxes := 1     
-	   2 Input      1 Bit        Muxes := 7     
-	   3 Input      1 Bit        Muxes := 1     
+	   4 Input     17 Bit        Muxes := 1     
+	   2 Input     12 Bit        Muxes := 8     
+	   4 Input     12 Bit        Muxes := 4     
+	   6 Input     12 Bit        Muxes := 3     
+	   2 Input      8 Bit        Muxes := 4     
+	   8 Input      8 Bit        Muxes := 3     
+	   9 Input      4 Bit        Muxes := 1     
+	  27 Input      4 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 3     
+	   8 Input      3 Bit        Muxes := 1     
+	   4 Input      3 Bit        Muxes := 2     
+	   2 Input      3 Bit        Muxes := 11    
+	   6 Input      3 Bit        Muxes := 1     
+	   3 Input      2 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 56    
+	   3 Input      1 Bit        Muxes := 6     
+	   4 Input      1 Bit        Muxes := 20    
+	   8 Input      1 Bit        Muxes := 7     
+	   9 Input      1 Bit        Muxes := 1     
+	   6 Input      1 Bit        Muxes := 5     
 ---------------------------------------------------------------------------------
 Finished RTL Component Statistics 
 ---------------------------------------------------------------------------------
@@ -197,13 +304,15 @@ Finished RTL Component Statistics
 Start RTL Hierarchical Component Statistics 
 ---------------------------------------------------------------------------------
 Hierarchical RTL Component report 
-Module display_8hex 
+Module top_level 
 Detailed RTL Component Info : 
 +---Registers : 
-	                8 Bit    Registers := 1     
-	                7 Bit    Registers := 1     
+	               16 Bit    Registers := 1     
+	               13 Bit    Registers := 1     
+	               12 Bit    Registers := 1     
+	                1 Bit    Registers := 4     
 +---Muxes : 
-	   8 Input      8 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 3     
 Module debounce 
 Detailed RTL Component Info : 
 +---Registers : 
@@ -224,6 +333,115 @@ Detailed RTL Component Info :
 	   2 Input     12 Bit        Muxes := 1     
 	   3 Input      1 Bit        Muxes := 1     
 	   2 Input      1 Bit        Muxes := 3     
+Module random_num 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      1 Bit       Adders := 1     
+	   3 Input      1 Bit       Adders := 2     
++---Registers : 
+	               16 Bit    Registers := 1     
+Module TWICtl 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      8 Bit       Adders := 2     
+	   2 Input      3 Bit       Adders := 1     
+	   2 Input      2 Bit       Adders := 1     
++---XORs : 
+	   2 Input      1 Bit         XORs := 1     
++---Registers : 
+	                8 Bit    Registers := 4     
+	                3 Bit    Registers := 2     
+	                2 Bit    Registers := 3     
+	                1 Bit    Registers := 6     
++---Muxes : 
+	   2 Input      8 Bit        Muxes := 2     
+	   9 Input      4 Bit        Muxes := 1     
+	  27 Input      4 Bit        Muxes := 1     
+	   3 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 27    
+	   4 Input      1 Bit        Muxes := 20    
+	   8 Input      1 Bit        Muxes := 1     
+	   3 Input      1 Bit        Muxes := 5     
+	   9 Input      1 Bit        Muxes := 1     
+Module TempSensorCtl 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      4 Bit       Adders := 1     
+	   2 Input      2 Bit       Adders := 1     
++---Registers : 
+	               16 Bit    Registers := 1     
+	                8 Bit    Registers := 1     
+	                4 Bit    Registers := 1     
+	                3 Bit    Registers := 1     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   4 Input     17 Bit        Muxes := 1     
+	   2 Input      8 Bit        Muxes := 2     
+	   8 Input      8 Bit        Muxes := 2     
+	   8 Input      3 Bit        Muxes := 1     
+	   4 Input      3 Bit        Muxes := 1     
+	   2 Input      3 Bit        Muxes := 4     
+	   2 Input      2 Bit        Muxes := 1     
+	   8 Input      1 Bit        Muxes := 6     
+	   2 Input      1 Bit        Muxes := 3     
+Module blob 
+Detailed RTL Component Info : 
++---Adders : 
+	   3 Input     13 Bit       Adders := 1     
+	   3 Input     12 Bit       Adders := 1     
++---Muxes : 
+	   2 Input     12 Bit        Muxes := 1     
+Module fingerprint 
+Detailed RTL Component Info : 
++---Adders : 
+	   3 Input     16 Bit       Adders := 1     
+	   3 Input     13 Bit       Adders := 1     
+	   3 Input     12 Bit       Adders := 1     
++---Registers : 
+	               12 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     12 Bit        Muxes := 1     
+Module Lut_mg1 
+Detailed RTL Component Info : 
++---Registers : 
+	               12 Bit    Registers := 4     
++---Muxes : 
+	   4 Input     12 Bit        Muxes := 4     
+Module minigame_1 
+Detailed RTL Component Info : 
++---Adders : 
+	   4 Input     12 Bit       Adders := 1     
+	   3 Input     12 Bit       Adders := 2     
++---Registers : 
+	               12 Bit    Registers := 4     
+	                2 Bit    Registers := 1     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input     12 Bit        Muxes := 3     
+	   6 Input     12 Bit        Muxes := 3     
+	   6 Input      3 Bit        Muxes := 1     
+	   2 Input      3 Bit        Muxes := 7     
+	   4 Input      3 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+	   6 Input      1 Bit        Muxes := 5     
+Module xvga 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     11 Bit       Adders := 1     
+	   2 Input     10 Bit       Adders := 1     
++---Registers : 
+	               11 Bit    Registers := 1     
+	               10 Bit    Registers := 1     
+	                1 Bit    Registers := 5     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 2     
+Module display_8hex 
+Detailed RTL Component Info : 
++---Registers : 
+	                8 Bit    Registers := 1     
+	                7 Bit    Registers := 1     
++---Muxes : 
+	   8 Input      8 Bit        Muxes := 1     
 ---------------------------------------------------------------------------------
 Finished RTL Hierarchical Component Statistics
 ---------------------------------------------------------------------------------
@@ -240,43 +458,17 @@ Finished Part Resource Summary
 Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
 Warning: Parallel synthesis criteria is not met 
-INFO: [Synth 8-4471] merging register 't1/count_out_reg[11:0]' into 't1/count_out_reg[11:0]' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/timer.sv:33]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_r[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_r[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_r[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_r[0]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_b[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_b[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_b[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_b[0]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_g[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_g[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_g[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_g[0]
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_hs
-WARNING: [Synth 8-3331] design top_level has unconnected port vga_vs
+INFO: [Synth 8-4471] merging register 'count_out_reg[11:0]' into 'count_out_reg[11:0]' [C:/Users/devin/final_project/final_project.srcs/sources_1/imports/Downloads/timer.sv:33]
+DSP Report: Generating DSP nolabel_line339/image_addr, operation Mode is: C+A*(B:0x115).
+DSP Report: operator nolabel_line339/image_addr is absorbed into DSP nolabel_line339/image_addr.
+DSP Report: operator nolabel_line339/image_addr0 is absorbed into DSP nolabel_line339/image_addr.
+WARNING: [Synth 8-3331] design minigame_1 has unconnected port temp_in[12]
 WARNING: [Synth 8-3331] design top_level has unconnected port led16_b
 WARNING: [Synth 8-3331] design top_level has unconnected port led16_g
 WARNING: [Synth 8-3331] design top_level has unconnected port led16_r
 WARNING: [Synth 8-3331] design top_level has unconnected port led17_b
 WARNING: [Synth 8-3331] design top_level has unconnected port led17_g
 WARNING: [Synth 8-3331] design top_level has unconnected port led17_r
-WARNING: [Synth 8-3331] design top_level has unconnected port led[15]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[14]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[13]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[12]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[11]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[10]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[9]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[8]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[7]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[6]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[5]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[4]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[3]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[2]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[1]
-WARNING: [Synth 8-3331] design top_level has unconnected port led[0]
 WARNING: [Synth 8-3331] design top_level has unconnected port dp
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[14]
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[13]
@@ -285,9 +477,101 @@ WARNING: [Synth 8-3331] design top_level has unconnected port sw[11]
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[10]
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[9]
 WARNING: [Synth 8-3331] design top_level has unconnected port sw[8]
-INFO: [Common 17-14] Message 'Synth 8-3331' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+WARNING: [Synth 8-3331] design top_level has unconnected port sw[7]
+WARNING: [Synth 8-3331] design top_level has unconnected port sw[6]
+WARNING: [Synth 8-3331] design top_level has unconnected port sw[5]
+WARNING: [Synth 8-3331] design top_level has unconnected port sw[4]
+INFO: [Synth 8-3886] merging instance 'temp_sense/Inst_TWICtl/currAddr_reg[6]' (FDE) to 'temp_sense/Inst_TWICtl/currAddr_reg[3]'
+INFO: [Synth 8-3886] merging instance 'temp_sense/Inst_TWICtl/currAddr_reg[7]' (FDE) to 'temp_sense/Inst_TWICtl/currAddr_reg[1]'
+INFO: [Synth 8-3886] merging instance 'temp_sense/Inst_TWICtl/currAddr_reg[1]' (FDE) to 'temp_sense/Inst_TWICtl/currAddr_reg[2]'
+INFO: [Synth 8-3886] merging instance 'temp_sense/Inst_TWICtl/currAddr_reg[2]' (FDE) to 'temp_sense/Inst_TWICtl/currAddr_reg[4]'
+INFO: [Synth 8-3886] merging instance 'temp_sense/Inst_TWICtl/currAddr_reg[3]' (FDE) to 'temp_sense/Inst_TWICtl/currAddr_reg[5]'
+INFO: [Synth 8-3333] propagating constant 1 across sequential element (temp_sense/\Inst_TWICtl/currAddr_reg[4] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (temp_sense/\Inst_TWICtl/currAddr_reg[5] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (temp_sense/\Inst_TWICtl/int_Rst_reg )
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[0]' (FD) to 'mgame1/lut1/sq_1_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[0]' (FD) to 'mgame1/lut1/final_color_reg[1]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_3_reg[0]' (FD) to 'mgame1/lut1/sq_3_reg[1]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[0]' (FD) to 'mgame1/lut1/sq_2_reg[1]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[1]' (FD) to 'mgame1/lut1/sq_1_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[1]' (FD) to 'mgame1/lut1/final_color_reg[2]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_3_reg[1]' (FD) to 'mgame1/lut1/sq_3_reg[2]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[1]' (FD) to 'mgame1/lut1/sq_2_reg[2]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[2]' (FD) to 'mgame1/lut1/sq_1_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[2]' (FD) to 'mgame1/lut1/final_color_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_3_reg[2]' (FD) to 'mgame1/lut1/sq_3_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[2]' (FD) to 'mgame1/lut1/sq_2_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[3]' (FD) to 'mgame1/lut1/sq_3_reg[8]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[3]' (FD) to 'mgame1/lut1/sq_2_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[4]' (FD) to 'mgame1/lut1/sq_1_reg[5]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[4]' (FD) to 'mgame1/lut1/final_color_reg[5]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_3_reg[4]' (FD) to 'mgame1/lut1/sq_3_reg[5]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[4]' (FD) to 'mgame1/lut1/sq_2_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[5]' (FD) to 'mgame1/lut1/sq_1_reg[6]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[5]' (FD) to 'mgame1/lut1/final_color_reg[6]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_3_reg[5]' (FD) to 'mgame1/lut1/sq_3_reg[6]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[5]' (FD) to 'mgame1/lut1/sq_2_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[6]' (FD) to 'mgame1/lut1/sq_1_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[6]' (FD) to 'mgame1/lut1/final_color_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_3_reg[6]' (FD) to 'mgame1/lut1/sq_3_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[6]' (FD) to 'mgame1/lut1/sq_2_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[8]' (FD) to 'mgame1/lut1/sq_1_reg[9]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[8]' (FD) to 'mgame1/lut1/final_color_reg[9]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[8]' (FD) to 'mgame1/lut1/sq_2_reg[9]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[9]' (FD) to 'mgame1/lut1/sq_1_reg[10]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[9]' (FD) to 'mgame1/lut1/final_color_reg[10]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[9]' (FD) to 'mgame1/lut1/sq_2_reg[10]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_1_reg[10]' (FD) to 'mgame1/lut1/sq_1_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[10]' (FD) to 'mgame1/lut1/final_color_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[10]' (FD) to 'mgame1/lut1/sq_2_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[0]' (FDE) to 'mgame1/color_sq1_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[0]' (FDE) to 'mgame1/color_sq3_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[0]' (FDE) to 'mgame1/color_sq2_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[1]' (FDE) to 'mgame1/color_sq1_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[1]' (FDE) to 'mgame1/color_sq3_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[1]' (FDE) to 'mgame1/color_sq2_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[2]' (FDE) to 'mgame1/color_sq1_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[2]' (FDE) to 'mgame1/color_sq3_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[2]' (FDE) to 'mgame1/color_sq2_reg[3]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[4]' (FDE) to 'mgame1/color_sq1_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[4]' (FDE) to 'mgame1/color_sq3_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[4]' (FDE) to 'mgame1/color_sq2_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[5]' (FDE) to 'mgame1/color_sq1_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[5]' (FDE) to 'mgame1/color_sq3_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[5]' (FDE) to 'mgame1/color_sq2_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[6]' (FDE) to 'mgame1/color_sq1_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[6]' (FDE) to 'mgame1/color_sq3_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[6]' (FDE) to 'mgame1/color_sq2_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[8]' (FDE) to 'mgame1/color_sq1_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[8]' (FDE) to 'mgame1/color_sq3_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[8]' (FDE) to 'mgame1/color_sq2_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[9]' (FDE) to 'mgame1/color_sq1_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[9]' (FDE) to 'mgame1/color_sq3_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[9]' (FDE) to 'mgame1/color_sq2_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq1_reg[10]' (FDE) to 'mgame1/color_sq1_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq3_reg[10]' (FDE) to 'mgame1/color_sq3_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/color_sq2_reg[10]' (FDE) to 'mgame1/color_sq2_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_3_reg[3]' (FD) to 'mgame1/lut1/sq_1_reg[7]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_2_reg[3]' (FD) to 'mgame1/lut1/final_color_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/final_color_reg[7]' (FD) to 'mgame1/lut1/sq_2_reg[11]'
+INFO: [Synth 8-3886] merging instance 'mgame1/lut1/sq_3_reg[7]' (FD) to 'mgame1/lut1/sq_1_reg[11]'
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 1013.191 ; gain = 427.352
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:22 ; elapsed = 00:00:23 . Memory (MB): peak = 1011.922 ; gain = 425.500
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+DSP: Preliminary Mapping	Report (see note below)
++------------+---------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|Module Name | DSP Mapping   | A Size | B Size | C Size | D Size | P Size | AREG | BREG | CREG | DREG | ADREG | MREG | PREG | 
++------------+---------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|fingerprint | C+A*(B:0x115) | 16     | 9      | 11     | -      | 16     | 0    | 0    | 0    | -    | -     | 0    | 0    | 
++------------+---------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+
+Note: The table above is a preliminary report that shows the DSPs inferred at the current stage of the synthesis flow. Some DSP may be reimplemented as non DSP primitives later in the synthesis flow. Multiple instantiated DSPs are reported only once.
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -299,13 +583,13 @@ Report RTL Partitions:
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:22 ; elapsed = 00:00:22 . Memory (MB): peak = 1013.191 ; gain = 427.352
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:34 ; elapsed = 00:00:35 . Memory (MB): peak = 1027.164 ; gain = 440.742
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:25 ; elapsed = 00:00:25 . Memory (MB): peak = 1023.230 ; gain = 437.391
+Finished Timing Optimization : Time (s): cpu = 00:00:36 ; elapsed = 00:00:37 . Memory (MB): peak = 1049.414 ; gain = 462.992
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -316,8 +600,9 @@ Report RTL Partitions:
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
+INFO: [Synth 8-3886] merging instance 'mgame1/vsync_prev_reg' (FD) to 'vs_reg'
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:25 ; elapsed = 00:00:25 . Memory (MB): peak = 1023.230 ; gain = 437.391
+Finished Technology Mapping : Time (s): cpu = 00:00:37 ; elapsed = 00:00:38 . Memory (MB): peak = 1060.422 ; gain = 474.000
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -340,14 +625,15 @@ Start Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
+CRITICAL WARNING: [Synth 8-4442] BlackBox module \mgame1/nolabel_line339/green_coe  has unconnected pin ena
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 1027.039 ; gain = 441.199
+Finished IO Insertion : Time (s): cpu = 00:00:41 ; elapsed = 00:00:42 . Memory (MB): peak = 1065.672 ; gain = 479.250
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 1027.039 ; gain = 441.199
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:41 ; elapsed = 00:00:42 . Memory (MB): peak = 1065.672 ; gain = 479.250
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -366,88 +652,112 @@ Report Check Netlist:
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 1027.039 ; gain = 441.199
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:41 ; elapsed = 00:00:42 . Memory (MB): peak = 1065.672 ; gain = 479.250
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 1027.039 ; gain = 441.199
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:41 ; elapsed = 00:00:42 . Memory (MB): peak = 1065.672 ; gain = 479.250
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 1027.039 ; gain = 441.199
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:41 ; elapsed = 00:00:42 . Memory (MB): peak = 1065.672 ; gain = 479.250
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 1027.039 ; gain = 441.199
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:41 ; elapsed = 00:00:42 . Memory (MB): peak = 1065.672 ; gain = 479.250
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
 ---------------------------------------------------------------------------------
 
 Report BlackBoxes: 
-+------+--------------+----------+
-|      |BlackBox name |Instances |
-+------+--------------+----------+
-|1     |clk_wiz_0     |         1|
-+------+--------------+----------+
++------+----------------+----------+
+|      |BlackBox name   |Instances |
++------+----------------+----------+
+|1     |clk_wiz_0       |         1|
+|2     |fingerprint_rom |         1|
+|3     |red_fing        |         1|
+|4     |green_fing      |         1|
+|5     |blue_fing       |         1|
++------+----------------+----------+
 
 Report Cell Usage: 
-+------+----------+------+
-|      |Cell      |Count |
-+------+----------+------+
-|1     |clk_wiz_0 |     1|
-|2     |CARRY4    |   126|
-|3     |LUT1      |    17|
-|4     |LUT2      |   173|
-|5     |LUT3      |   174|
-|6     |LUT4      |    75|
-|7     |LUT5      |    60|
-|8     |LUT6      |   231|
-|9     |FDRE      |    91|
-|10    |FDSE      |     1|
-|11    |IBUF      |     2|
-|12    |OBUF      |    15|
-|13    |OBUFT     |    37|
-+------+----------+------+
++------+----------------+------+
+|      |Cell            |Count |
++------+----------------+------+
+|1     |blue_fing       |     1|
+|2     |clk_wiz_0       |     1|
+|3     |fingerprint_rom |     1|
+|4     |green_fing      |     1|
+|5     |red_fing        |     1|
+|6     |CARRY4          |   169|
+|7     |DSP48E1_1       |     1|
+|8     |LUT1            |    79|
+|9     |LUT2            |   251|
+|10    |LUT3            |   207|
+|11    |LUT4            |   135|
+|12    |LUT5            |    96|
+|13    |LUT6            |   396|
+|14    |MUXF7           |     8|
+|15    |FDRE            |   390|
+|16    |FDSE            |    35|
+|17    |IBUF            |    10|
+|18    |IOBUF           |     2|
+|19    |OBUF            |    45|
+|20    |OBUFT           |     7|
++------+----------------+------+
 
 Report Instance Areas: 
-+------+--------------+-------------+------+
-|      |Instance      |Module       |Cells |
-+------+--------------+-------------+------+
-|1     |top           |             |  1003|
-|2     |  db1         |debounce     |    40|
-|3     |  display_mod |display_8hex |    46|
-|4     |  t1          |timer        |   862|
-+------+--------------+-------------+------+
++------+--------------------+--------------+------+
+|      |Instance            |Module        |Cells |
++------+--------------------+--------------+------+
+|1     |top                 |              |  1864|
+|2     |  db1               |debounce      |    39|
+|3     |  db2               |debounce_0    |    39|
+|4     |  db3               |debounce_1    |    39|
+|5     |  db4               |debounce_2    |    42|
+|6     |  db5               |debounce_3    |    39|
+|7     |  display_mod       |display_8hex  |    77|
+|8     |  mgame1            |minigame_1    |   183|
+|9     |    lut1            |Lut_mg1       |    25|
+|10    |    nolabel_line339 |fingerprint   |    83|
+|11    |  random            |random_num    |    20|
+|12    |  t1                |timer         |   864|
+|13    |  temp_sense        |TempSensorCtl |   292|
+|14    |    Inst_TWICtl     |TWICtl        |   210|
+|15    |  xvga1             |xvga          |   106|
++------+--------------------+--------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 1027.039 ; gain = 441.199
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:41 ; elapsed = 00:00:42 . Memory (MB): peak = 1065.672 ; gain = 479.250
 ---------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 56 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:21 ; elapsed = 00:00:27 . Memory (MB): peak = 1027.039 ; gain = 324.469
-Synthesis Optimization Complete : Time (s): cpu = 00:00:29 ; elapsed = 00:00:29 . Memory (MB): peak = 1027.039 ; gain = 441.199
+Synthesis finished with 0 errors, 1 critical warnings and 20 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:32 ; elapsed = 00:00:40 . Memory (MB): peak = 1065.672 ; gain = 365.168
+Synthesis Optimization Complete : Time (s): cpu = 00:00:42 ; elapsed = 00:00:43 . Memory (MB): peak = 1065.672 ; gain = 479.250
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.009 . Memory (MB): peak = 1027.039 ; gain = 0.000
-INFO: [Netlist 29-17] Analyzing 126 Unisim elements for replacement
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.028 . Memory (MB): peak = 1065.672 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 180 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-140] Inserted 1 IBUFs to IO ports without IO buffers.
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1027.039 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1065.672 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
-No Unisim elements were transformed.
+  A total of 2 instances were transformed.
+  IOBUF => IOBUF (IBUF, OBUFT): 2 instances
 
 INFO: [Common 17-83] Releasing license: Synthesis
-24 Infos, 115 Warnings, 0 Critical Warnings and 0 Errors encountered.
+138 Infos, 61 Warnings, 1 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:00:34 ; elapsed = 00:00:35 . Memory (MB): peak = 1027.039 ; gain = 729.082
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1027.039 ; gain = 0.000
+synth_design: Time (s): cpu = 00:00:47 ; elapsed = 00:00:50 . Memory (MB): peak = 1065.672 ; gain = 768.332
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1065.672 ; gain = 0.000
 WARNING: [Constraints 18-5210] No constraints selected for write.
 Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
 INFO: [Common 17-1381] The checkpoint 'C:/Users/devin/final_project/final_project.runs/synth_1/top_level.dcp' has been generated.
 INFO: [runtcl-4] Executing : report_utilization -file top_level_utilization_synth.rpt -pb top_level_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Wed Nov 11 00:08:12 2020...
+INFO: [Common 17-206] Exiting Vivado at Sat Nov 21 16:53:45 2020...

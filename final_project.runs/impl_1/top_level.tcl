@@ -60,7 +60,6 @@ proc step_failed { step } {
   close $ch
 }
 
-set_msg_config -id {Common 17-41} -limit 10000000
 
 start_step init_design
 set ACTIVE_STEP init_design
@@ -76,9 +75,13 @@ set rc [catch {
   set_property parent.project_path C:/Users/devin/final_project/final_project.xpr [current_project]
   set_property ip_output_repo C:/Users/devin/final_project/final_project.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
-  set_property XPM_LIBRARIES XPM_CDC [current_project]
+  set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
   add_files -quiet C:/Users/devin/final_project/final_project.runs/synth_1/top_level.dcp
-  read_ip -quiet c:/Users/devin/final_project/final_project.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci
+  read_ip -quiet C:/Users/devin/final_project/final_project.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci
+  read_ip -quiet C:/Users/devin/final_project/final_project.srcs/sources_1/ip/fingerprint_rom/fingerprint_rom.xci
+  read_ip -quiet C:/Users/devin/final_project/final_project.srcs/sources_1/ip/blue_fing/blue_fing.xci
+  read_ip -quiet c:/Users/devin/final_project/final_project.srcs/sources_1/ip/red_fing/red_fing.xci
+  read_ip -quiet c:/Users/devin/final_project/final_project.srcs/sources_1/ip/green_fing/green_fing.xci
   read_xdc C:/Users/devin/final_project/final_project.srcs/constrs_1/imports/Downloads/nexys4_ddr_lab3.xdc
   link_design -top top_level -part xc7a100tcsg324-1
   close_msg_db -file init_design.pb
@@ -175,7 +178,7 @@ start_step write_bitstream
 set ACTIVE_STEP write_bitstream
 set rc [catch {
   create_msg_db write_bitstream.pb
-  set_property XPM_LIBRARIES XPM_CDC [current_project]
+  set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
   catch { write_mem_info -force top_level.mmi }
   write_bitstream -force top_level.bit 
   catch {write_debug_probes -quiet -force top_level}
