@@ -1,7 +1,7 @@
 Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
-| Date             : Sat Nov 21 16:55:56 2020
+| Date             : Wed Dec  2 11:26:56 2020
 | Host             : DESKTOP-RNNIHH5 running 64-bit major release  (build 9200)
 | Command          : report_power -file top_level_power_routed.rpt -pb top_level_power_summary_routed.pb -rpx top_level_power_routed.rpx
 | Design           : top_level
@@ -30,11 +30,11 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.241        |
+| Total On-Chip Power (W)  | 0.243        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.143        |
-| Device Static (W)        | 0.098        |
+| Dynamic (W)              | 0.142        |
+| Device Static (W)        | 0.101        |
 | Effective TJA (C/W)      | 4.6          |
 | Max Ambient (C)          | 83.9         |
 | Junction Temperature (C) | 26.1         |
@@ -52,20 +52,20 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Clocks         |     0.005 |        6 |       --- |             --- |
-| Slice Logic    |     0.006 |     1936 |       --- |             --- |
-|   LUT as Logic |     0.005 |     1023 |     63400 |            1.61 |
-|   CARRY4       |    <0.001 |      169 |     15850 |            1.07 |
-|   Register     |    <0.001 |      437 |    126800 |            0.34 |
-|   F7/F8 Muxes  |    <0.001 |       32 |     63400 |            0.05 |
-|   Others       |     0.000 |       70 |       --- |             --- |
-| Signals        |     0.007 |     1577 |       --- |             --- |
-| Block RAM      |     0.002 |       14 |       135 |           10.37 |
+| Clocks         |     0.005 |        5 |       --- |             --- |
+| Slice Logic    |     0.001 |     1762 |       --- |             --- |
+|   LUT as Logic |     0.001 |      708 |     63400 |            1.12 |
+|   CARRY4       |    <0.001 |       55 |     15850 |            0.35 |
+|   Register     |    <0.001 |      467 |    126800 |            0.37 |
+|   F7/F8 Muxes  |    <0.001 |      131 |     63400 |            0.21 |
+|   Others       |     0.000 |      210 |       --- |             --- |
+| Signals        |     0.004 |     1805 |       --- |             --- |
+| Block RAM      |     0.002 |       84 |       135 |           62.22 |
 | MMCM           |     0.122 |        1 |         6 |           16.67 |
 | DSPs           |    <0.001 |        1 |       240 |            0.42 |
-| I/O            |    <0.001 |       65 |       210 |           30.95 |
-| Static Power   |     0.098 |          |           |                 |
-| Total          |     0.241 |          |           |                 |
+| I/O            |     0.006 |       62 |       210 |           29.52 |
+| Static Power   |     0.101 |          |           |                 |
+| Total          |     0.243 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -75,16 +75,16 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     0.036 |       0.020 |      0.016 |
+| Vccint    |       1.000 |     0.031 |       0.013 |      0.017 |
 | Vccaux    |       1.800 |     0.086 |       0.068 |      0.018 |
-| Vcco33    |       3.300 |     0.004 |       0.000 |      0.004 |
+| Vcco33    |       3.300 |     0.006 |       0.002 |      0.004 |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |
 | Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |
 | Vcco135   |       1.350 |     0.000 |       0.000 |      0.000 |
 | Vcco12    |       1.200 |     0.000 |       0.000 |      0.000 |
 | Vccaux_io |       1.800 |     0.000 |       0.000 |      0.000 |
-| Vccbram   |       1.000 |     0.001 |       0.000 |      0.001 |
+| Vccbram   |       1.000 |     0.002 |       0.000 |      0.002 |
 | MGTAVcc   |       1.000 |     0.000 |       0.000 |      0.000 |
 | MGTAVtt   |       1.200 |     0.000 |       0.000 |      0.000 |
 | Vccadc    |       1.800 |     0.020 |       0.000 |      0.020 |
@@ -128,14 +128,13 @@ Table of Contents
 2.2 Clock Constraints
 ---------------------
 
-+--------------------+------------------------------------+-----------------+
-| Clock              | Domain                             | Constraint (ns) |
-+--------------------+------------------------------------+-----------------+
-| clk_out1_clk_wiz_0 | clkdivider/inst/clk_out1_clk_wiz_0 |            15.4 |
-| clkfbout_clk_wiz_0 | clkdivider/inst/clkfbout_clk_wiz_0 |            50.0 |
-| sys_clk_pin        | clk_100mhz                         |            10.0 |
-| sys_clk_pin        | clk_100mhz_IBUF_BUFG               |            10.0 |
-+--------------------+------------------------------------+-----------------+
++--------------------+-------------------------------+-----------------+
+| Clock              | Domain                        | Constraint (ns) |
++--------------------+-------------------------------+-----------------+
+| clk_out1_clk_wiz_0 | clkdivider/clk_out1_clk_wiz_0 |            15.4 |
+| clkfbout_clk_wiz_0 | clkdivider/clkfbout_clk_wiz_0 |            50.0 |
+| sys_clk_pin        | clk_100mhz                    |            10.0 |
++--------------------+-------------------------------+-----------------+
 
 
 3. Detailed Reports
@@ -144,18 +143,15 @@ Table of Contents
 3.1 By Hierarchy
 ----------------
 
-+---------------------+-----------+
-| Name                | Power (W) |
-+---------------------+-----------+
-| top_level           |     0.143 |
-|   clkdivider        |     0.122 |
-|     inst            |     0.122 |
-|   mgame1            |     0.005 |
-|     nolabel_line339 |     0.004 |
-|       finger_rom    |     0.002 |
-|   t1                |     0.011 |
-|   temp_sense        |     0.002 |
-|     Inst_TWICtl     |     0.001 |
-+---------------------+-----------+
++--------------+-----------+
+| Name         | Power (W) |
++--------------+-----------+
+| top_level    |     0.142 |
+|   clkdivider |     0.122 |
+|   mgame2     |     0.009 |
+|     kaboom   |     0.008 |
+|       rom1   |     0.003 |
+|   temp_sense |     0.001 |
++--------------+-----------+
 
 

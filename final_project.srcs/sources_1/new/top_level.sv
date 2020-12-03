@@ -42,13 +42,13 @@ module top_level( input clk_100mhz,
     parameter DEBOUNCE_COUNT = 1000000;
     
     logic timer_start, counting, expired, one_hz_enable;
-    logic [11:0] count;
-	logic [3:0] minutes, tens, ones;
+    logic [11:0] count, tens, ones;
+	logic [3:0] minutes;
 	logic [10:0] hcount;    // pixel on current line
     logic [9:0] vcount;     // line number
     logic hsync, vsync;
     logic [11:0] pixel;
-    logic [11:0] pixel_out1; //pixel_out minigame_1
+    logic [11:0] pixel_out1, pixel_out2; //pixel_out minigame_1
     logic [11:0] rgb;
     logic [3:0] minigame; //which minigame is being played/displayed
     logic up, down, left, right;
@@ -57,8 +57,9 @@ module top_level( input clk_100mhz,
     
     
     
+    
     //create 65 MHz clock for 1024 x 768 VGA graphics
-    clk_wiz_0 clkdivider (.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
+    clk_wiz_lab3 clkdivider(.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
     
     
     
@@ -93,7 +94,7 @@ module top_level( input clk_100mhz,
 	 wire [12:0] temp_o;
      reg [12:0] temp_valid;
     
-     always @(posedge clk_100mhz)
+     always @(posedge clk_65mhz)
          temp_valid <= rdy_o ?  temp_o : temp_valid;  // each bit is 0.0625 deg centigrade
     
      TempSensorCtl temp_sense(
@@ -102,7 +103,7 @@ module top_level( input clk_100mhz,
          .TEMP_O         (temp_o),  // 13bit msb = sign
          .RDY_O          (rdy_o),   // data valid
          .ERR_O          (err_o),
-         .CLK_I          (clk_100mhz),
+         .CLK_I          (clk_65mhz),
          .SRST_I         (1'b0)
         );
         
@@ -114,7 +115,13 @@ module top_level( input clk_100mhz,
 	 minigame_1 mgame1 (.vclock_in(clk_65mhz), .reset_in(sw[15]), .hcount_in(hcount), .vcount_in(vcount), 
 	 .pixel_out(pixel_out1), .vsync_in(vsync), .temp_in(temp_valid), .btnu(up), .btnd(down), .btnl(left), .btnr(right), .sw(sw[3:0]), .random(rand_out[1:0]));
 	 
-	 assign minigame = 3'b001; //choose which minigame is playing
+	 logic [11:0] count_mg2;
+	 logic [3:0] mg2_state;
+	 
+	 minigame_2 mgame2 (.vclock_in(clk_65mhz), .reset_in(sw[14]), .hcount_in(hcount), .vcount_in(vcount), 
+	 .pixel_out(pixel_out2), .vsync_in(vsync),  .btnu(up), .btnd(down), .btnl(left), 
+	 .btnr(right),  .random(rand_out[1:0]), .led_r(led16_r), .led_b(led16_b), .led_g(led16_g), .timer_count(count_mg2), .state(mg2_state));
+	 assign minigame = 3'b010; //choose which minigame is playing
 	 
 	 //Handle Graphics
 	 xvga xvga1(.vclock_in(clk_65mhz),.hcount_out(hcount),.vcount_out(vcount),
@@ -141,6 +148,7 @@ module top_level( input clk_100mhz,
           case(minigame)
             3'b000      :   rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}} ;
             3'b001      :   rgb <= pixel_out1;
+            3'b010      :   rgb <= pixel_out2;
             default     :   rgb <= rgb <= {12{border}};
         
           endcase
@@ -158,9 +166,10 @@ module top_level( input clk_100mhz,
     logic [31:0] data;      
     logic [6:0] segments;
     assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
-    assign data[3:0] = ones;
-    assign data[7:4] = tens;
-    assign data[11:8] = minutes;
+    //assign data[3:0] = ones[3:0];
+    //assign data[7:4] = tens[3:0];
+    assign data[3:0] = mg2_state;
+    assign data[11:4] = count_mg2[7:0];
     assign data[31:12] = {3'b0,temp_valid, 4'h0};
     
     display_8hex display_mod (.clk_in(clk_65mhz), .data_in(data),
@@ -304,7 +313,10 @@ module xvga(input vclock_in,
    end
 endmodule
 
-//////////////// Minigame 1 ////////////////////////
+/////////////////////////////////////////////////////////////////////
+//////////////// Minigame 1-FINGERPRINT SCAN ////////////////////////
+/////////////////////////////////////////////////////////////////////
+
 
 module minigame_1( input vclock_in,
                    input reset_in,
@@ -319,7 +331,6 @@ module minigame_1( input vclock_in,
                    //input blank_in,
                    
                    output logic [11:0] pixel_out
-                   //output logic [11:0] diff_out
                    
                    );
                    parameter START = 3'b000;
@@ -439,4 +450,174 @@ module Lut_mg1(         input clock,
 
 endmodule
 
+
+/////////////////////////////////////////////////////////////////////////////
+///////////////////// MINIGAME 2- SIMON SAYS/////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+
+module minigame_2( input vclock_in,
+                   input reset_in,
+                   input [10:0] hcount_in,
+                   input [9:0] vcount_in,
+                   input [1:0] random,
+                   input btnu, btnl, btnd, btnr,
+                   //input hsync_in,
+                   input vsync_in,
+                   //input blank_in,
+                   
+                   output logic [11:0] pixel_out,
+                   output logic [11:0] timer_count,
+                   output logic led_r,
+                   output logic  led_g,
+                   output logic  led_b,
+                   output logic [3:0] state
+                   
+                   );
+                   
+                   parameter  INIT = 4'b0000;
+                   parameter FLASH_1 = 4'b0001;
+                   parameter SEQ_1 = 4'b0010;
+                   parameter FLASH_2 = 4'b0011;
+                   parameter SEQ_2 = 4'b0100;
+                   parameter FLASH_3 = 4'b0101;
+                   parameter SEQ_3 = 4'b0110;
+                   parameter FLASH_4 = 4'b0111;
+                   parameter SEQ_4 = 4'b1000;
+                   parameter FAILED = 4'b1001;
+                   parameter SUCCESS = 4'b1010;
+                   parameter WAIT_FLASH1 = 4'b1011;
+                   parameter WAIT_FLASH2 = 4'b1100;
+                   parameter WAIT_FLASH3 = 4'b1101;
+                   parameter WAIT_FLASH4 = 4'b1110;
+                   
+                   
+//   assign checkerboard = hcount_in[8:6] + vcount_in[8:6];
+                    picture_blob_emma kaboom (.pixel_clk_in(vclock_in),.x_in(0),.hcount_in(hcount_in), 
+                    .y_in(200), .vcount_in(vcount_in), .pixel_out(pixel_out));
+                   
+                   //logic [3:0] state;
+                   logic [1:0] chosen_rand;
+     
+                   logic timer_start;
+                   //logic [11:0] timer_count;
+                   logic [3:0] state_count;
+                   logic expired;
+                   logic [2:0] lut_out, light_1, light_2, light_3, light_4;
+                   logic prev_btnu, prev_btnd, prev_btnl, prev_btnr;
+                   
+                   timer timer_mg2(.clock(vclock_in), .start_timer(timer_start), .value(12'd2), .count_out(timer_count), .expired_pulse(expired));
+                   Lut_mg2 lutmg2 (.rn(chosen_rand), .led_col(lut_out));
+                   logic vsync_prev;
+                   
+                   always_ff @(posedge vclock_in) begin
+                        vsync_prev <= vsync_in;
+                   end
+                   
+                   always_ff @(posedge vclock_in) begin
+                        if (reset_in) begin
+                            state <= 4'b0000;
+                            chosen_rand <= random;
+                            state_count <= 4'b0000;
+                            
+                        end 
+                            
+                        else if (vsync_prev & !vsync_in) begin
+                            case(state)
+                                INIT    :   begin chosen_rand <= random;
+                                                  case(state_count) 
+                                                        4'b0000  : begin light_1 <= lut_out; state_count <= state_count +1; state <= INIT; end
+                                                        4'b0001  : begin light_2 <= lut_out; state_count <= state_count +1; state <= INIT; end
+                                                        4'b0010  : begin light_3 <= lut_out; state_count <= state_count +1; state <= INIT;end
+                                                        4'b0011  : begin light_4 <= lut_out; state_count <= 4'b0000; state <= FLASH_1;end
+                                                   endcase   
+                                            end
+                                FLASH_1 :   begin state <= WAIT_FLASH1;
+                                                  {led_r, led_g, led_b} <= light_1;
+                                                  timer_start <= 1;
+                                            end
+                                WAIT_FLASH1  : begin timer_start <= 0;
+                                                    state <= expired? ((state_count==4'b0000)? SEQ_1 : FLASH_2) : WAIT_FLASH1;
+                                                    if(timer_count==12'b1) {led_r, led_g, led_b} <= 3'b000;
+                                                end
+                                SEQ_1   :   begin case(light_1) 
+                                             3'b100   :   begin state <= (btnu)? ((state_count==0)? FLASH_1:SEQ_2): SEQ_1; if(btnu) state_count <= state_count + 1;  end
+                                             3'b010   :   begin state <= (btnr)? ((state_count==0)? FLASH_1:SEQ_2): SEQ_1; if(btnr) state_count <= state_count +1;  end
+                                             3'b001   :   begin state <= (btnd)? ((state_count==0)? FLASH_1:SEQ_2): SEQ_1; if(btnd) state_count <= state_count + 1;  end
+                                             3'b101   :   begin state <= (btnl)? ((state_count==0)? FLASH_1:SEQ_2): SEQ_1; if(btnl) state_count <= state_count + 1;  end                   
+                                            endcase end
+                                FLASH_2 :   begin state <= WAIT_FLASH2;
+                                                  {led_r, led_g, led_b} <= light_2;
+                                                  timer_start <= 1;
+                                            end
+                                WAIT_FLASH2  : begin timer_start <= 0;
+                                                    state <= expired? ((state_count==4'b0001 || state_count==4'b0010)? SEQ_2 : FLASH_3) : WAIT_FLASH2;
+                                                    if(timer_count==12'b1) {led_r, led_g, led_b} <= 3'b000;
+                                                end
+                                SEQ_2   :   begin case(light_2) 
+                                             3'b100   :   begin state <= (state_count==1)? SEQ_1 :((btnu & ! prev_btnu)? ((state_count==2)? FLASH_1:SEQ_3): SEQ_2); if(btnu & ! prev_btnu) state_count <= state_count + 1;  end
+                                             3'b010   :   begin state <= (state_count==1)?SEQ_1:((btnr & ! prev_btnr)? ((state_count==2)? FLASH_1:SEQ_3): SEQ_2); if(btnr & ! prev_btnr) state_count <= state_count + 1;  end
+                                             3'b001   :   begin state <= (state_count==1)?SEQ_1:((btnd & ! prev_btnd)? ((state_count==2)? FLASH_1:SEQ_3): SEQ_2); if(btnd & ! prev_btnd) state_count <= state_count + 1;  end
+                                             3'b101   :   begin state <= (state_count==1)?SEQ_1:((btnl & ! prev_btnl)? ((state_count==2)? FLASH_1:SEQ_3): SEQ_2); if(btnl & ! prev_btnl) state_count <= state_count + 1;  end                   
+                                            endcase end
+                                FLASH_3 :   begin state <= WAIT_FLASH3;
+                                                  {led_r, led_g, led_b} <= light_3;
+                                                  timer_start <= 1;
+                                            end
+                                WAIT_FLASH3  : begin timer_start <= 0;
+                                                    state <= expired? ((state_count==4'b0011|| state_count==4'b0101)? SEQ_3 : FLASH_4) : WAIT_FLASH3;
+                                                    if(timer_count==12'b1) {led_r, led_g, led_b} <= 3'b000;
+                                                end
+                                SEQ_3   :   begin case(light_3) 
+                                             3'b100   :   begin state <= (state_count==3)? SEQ_1 :((btnu & ! prev_btnu)? ((state_count==5)? FLASH_1:SEQ_4): SEQ_3); if(btnu & ! prev_btnu) state_count <= state_count + 1;  end
+                                             3'b010   :   begin state <= (state_count==3)? SEQ_1 :((btnr & ! prev_btnr)? ((state_count==5)? FLASH_1:SEQ_4): SEQ_3); if(btnr & ! prev_btnr) state_count <= state_count + 1;  end
+                                             3'b001   :   begin state <= (state_count==3)? SEQ_1 :((btnd & ! prev_btnd)? ((state_count==5)? FLASH_1:SEQ_4): SEQ_3); if(btnd & ! prev_btnd) state_count <= state_count + 1;  end
+                                             3'b101   :   begin state <= (state_count==3)? SEQ_1 :((btnl & ! prev_btnl)? ((state_count==5)? FLASH_1:SEQ_4): SEQ_3); if(btnl & ! prev_btnl) state_count <= state_count + 1;  end                   
+                                            endcase end
+                                FLASH_4 :   begin state <= WAIT_FLASH4;
+                                                  {led_r, led_g, led_b} <= light_4;
+                                                  timer_start <= 1;
+                                            end
+                                WAIT_FLASH4  : begin timer_start <= 0;
+                                                    state <= expired? SEQ_4 : WAIT_FLASH4;
+                                                    if(timer_count==12'b1) {led_r, led_g, led_b} <= 3'b000;
+                                                end
+                                SEQ_4   :   begin case(light_4) 
+                                             3'b100   :   begin state <= (state_count==6)?SEQ_1:((btnu & !prev_btnu)? SUCCESS: SEQ_4);   end
+                                             3'b010   :   begin state <= (state_count==6)?SEQ_1:((btnr & !prev_btnr)? SUCCESS: SEQ_4);   end
+                                             3'b001   :   begin state <= (state_count==6)?SEQ_1:((btnd & !prev_btnd)? SUCCESS: SEQ_4);   end
+                                             3'b101   :   begin state <= (state_count==6)?SEQ_1:((btnl & !prev_btnl)? SUCCESS: SEQ_4);   end                   
+                                            endcase end
+                               SUCCESS  :   begin {led_r, led_g, led_b} <= 3'b111; end
+                               
+                             
+                             
+                             
+                             endcase
+                             prev_btnu <= btnu;
+                             prev_btnd <= btnd;
+                             prev_btnr <= btnr;
+                             prev_btnl <= btnl;                 
+                        
+                        end
+                  end
+                                                    
+endmodule
+
+/////////////////////////////////LUT for Minigame 2////////////////////////////
+module Lut_mg2(     
+                        input [1:0] rn,
+                        output logic [2:0] led_col                 
+);
+
+always_comb begin
+        case(rn)
+            2'b00       :   begin led_col = 3'b100 ; end
+            2'b01       :   begin led_col = 3'b010 ; end
+            2'b10       :  begin led_col = 3'b001 ; end
+            2'b11       :   begin led_col = 3'b101 ; end
+        endcase
+end
+
+endmodule
 

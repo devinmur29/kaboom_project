@@ -1,7 +1,7 @@
 Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
-| Date         : Sat Nov 21 16:54:58 2020
+| Date         : Wed Dec  2 11:26:02 2020
 | Host         : DESKTOP-RNNIHH5 running 64-bit major release  (build 9200)
 | Command      : report_control_sets -verbose -file top_level_control_sets_placed.rpt
 | Design       : top_level
@@ -23,11 +23,11 @@ Table of Contents
 +----------------------------------------------------------+-------+
 |                          Status                          | Count |
 +----------------------------------------------------------+-------+
-| Total control sets                                       |    29 |
-|    Minimum number of control sets                        |    29 |
+| Total control sets                                       |    33 |
+|    Minimum number of control sets                        |    33 |
 |    Addition due to synthesis replication                 |     0 |
 |    Addition due to physical synthesis replication        |     0 |
-| Unused register locations in slices containing registers |   101 |
+| Unused register locations in slices containing registers |   125 |
 +----------------------------------------------------------+-------+
 * Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
 ** Run report_qor_suggestions for automated merging and remapping suggestions
@@ -39,13 +39,13 @@ Table of Contents
 +--------------------+-------+
 |       Fanout       | Count |
 +--------------------+-------+
-| Total control sets |    29 |
-| >= 0 to < 4        |     3 |
-| >= 4 to < 6        |     4 |
-| >= 6 to < 8        |     1 |
+| Total control sets |    33 |
+| >= 0 to < 4        |     7 |
+| >= 4 to < 6        |     5 |
+| >= 6 to < 8        |     0 |
 | >= 8 to < 10       |     4 |
-| >= 10 to < 12      |     1 |
-| >= 12 to < 14      |     5 |
+| >= 10 to < 12      |     2 |
+| >= 12 to < 14      |     4 |
 | >= 14 to < 16      |     0 |
 | >= 16              |    11 |
 +--------------------+-------+
@@ -58,50 +58,54 @@ Table of Contents
 +--------------+-----------------------+------------------------+-----------------+--------------+
 | Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
 +--------------+-----------------------+------------------------+-----------------+--------------+
-| No           | No                    | No                     |             122 |           58 |
+| No           | No                    | No                     |             123 |           57 |
 | No           | No                    | Yes                    |               0 |            0 |
-| No           | Yes                   | No                     |             105 |           39 |
-| Yes          | No                    | No                     |              92 |           34 |
+| No           | Yes                   | No                     |             128 |           37 |
+| Yes          | No                    | No                     |              86 |           34 |
 | Yes          | No                    | Yes                    |               0 |            0 |
-| Yes          | Yes                   | No                     |             116 |           31 |
+| Yes          | Yes                   | No                     |             130 |           38 |
 +--------------+-----------------------+------------------------+-----------------+--------------+
 
 
 4. Detailed Control Set Information
 -----------------------------------
 
-+---------------------------+--------------------------------------------------+--------------------------------------+------------------+----------------+
-|        Clock Signal       |                   Enable Signal                  |           Set/Reset Signal           | Slice Load Count | Bel Load Count |
-+---------------------------+--------------------------------------------------+--------------------------------------+------------------+----------------+
-|  clkdivider/inst/clk_out1 |                                                  | display_mod/strobe_out[0]_i_1_n_0    |                1 |              1 |
-|  clkdivider/inst/clk_out1 |                                                  | display_mod/counter_reg[11]_0[0]     |                1 |              1 |
-|  clkdivider/inst/clk_out1 |                                                  | display_mod/p_0_in[2]                |                1 |              2 |
-|  clk_100mhz_IBUF_BUFG     | temp_sense/Inst_TWICtl/FSM_gray_state[3]_i_1_n_0 |                                      |                2 |              4 |
-|  clk_100mhz_IBUF_BUFG     | temp_sense/retryCnt[3]_i_2_n_0                   | temp_sense/retryCnt[3]_i_1_n_0       |                1 |              4 |
-|  clkdivider/inst/clk_out1 |                                                  | display_mod/p_0_in[1]                |                3 |              4 |
-|  clkdivider/inst/clk_out1 | xvga1/hreset                                     | xvga1/vcount_out0                    |                2 |              4 |
-|  clkdivider/inst/clk_out1 | xvga1/hreset                                     |                                      |                4 |              6 |
-|  clk_100mhz_IBUF_BUFG     |                                                  | temp_sense/Inst_TWICtl/busFreeCnt0_1 |                3 |              8 |
-|  clk_100mhz_IBUF_BUFG     | temp_sense/Inst_TWICtl/state_reg[1]_1            |                                      |                2 |              8 |
-|  clk_100mhz_IBUF_BUFG     | temp_sense/Inst_TWICtl/sclCnt[7]_i_2_n_0         | temp_sense/Inst_TWICtl/sclCnt0_0     |                3 |              8 |
-|  clk_100mhz_IBUF_BUFG     | temp_sense/Inst_TWICtl/dataByte[7]_i_1_n_0       |                                      |                4 |              8 |
-|  clkdivider/inst/clk_out1 |                                                  | xvga1/hreset                         |                4 |             11 |
-|  clkdivider/inst/clk_out1 |                                                  | xvga1/vcount_out_reg[9]_0            |                6 |             12 |
-|  clkdivider/inst/clk_out1 | t1/CEC                                           |                                      |                3 |             12 |
-|  clkdivider/inst/clk_out1 | mgame1/start_temp[11]_i_1_n_0                    |                                      |                3 |             12 |
-|  clk_100mhz_IBUF_BUFG     | temp_sense/Inst_TWICtl/state_reg[0]_0[0]         |                                      |                3 |             13 |
-|  clk_100mhz_IBUF_BUFG     | temp_sense/E[0]                                  |                                      |                7 |             13 |
-|  clkdivider/inst/clk_out1 | t1/E[0]                                          |                                      |                6 |             16 |
-|  clk_100mhz_IBUF_BUFG     |                                                  | temp_sense/clear                     |                5 |             17 |
-|  clk_100mhz_IBUF_BUFG     |                                                  | temp_sense/Inst_TWICtl/timeOutCnt0   |                5 |             20 |
-|  clkdivider/inst/clk_out1 | db1/count                                        | db1/count[0]_i_1_n_0                 |                5 |             20 |
-|  clkdivider/inst/clk_out1 | db2/count                                        | db2/count[0]_i_1__0_n_0              |                5 |             20 |
-|  clkdivider/inst/clk_out1 | db3/count                                        | db3/count[0]_i_1__1_n_0              |                5 |             20 |
-|  clkdivider/inst/clk_out1 | db4/count                                        | db4/count[0]_i_1__2_n_0              |                5 |             20 |
-|  clkdivider/inst/clk_out1 | db5/count                                        | db5/count[0]_i_1__3_n_0              |                5 |             20 |
-|  clk_100mhz_IBUF_BUFG     |                                                  |                                      |               12 |             24 |
-|  clkdivider/inst/clk_out1 |                                                  | db1/timer_start                      |               10 |             29 |
-|  clkdivider/inst/clk_out1 |                                                  |                                      |               46 |             98 |
-+---------------------------+--------------------------------------------------+--------------------------------------+------------------+----------------+
++----------------------+--------------------------------------------------+--------------------------------------+------------------+----------------+
+|     Clock Signal     |                   Enable Signal                  |           Set/Reset Signal           | Slice Load Count | Bel Load Count |
++----------------------+--------------------------------------------------+--------------------------------------+------------------+----------------+
+|  clkdivider/clk_out1 | db4/new_input_i_1__2_n_0                         |                                      |                1 |              1 |
+|  clkdivider/clk_out1 | db1/new_input_i_1_n_0                            |                                      |                1 |              1 |
+|  clkdivider/clk_out1 | db2/new_input_i_1__0_n_0                         |                                      |                1 |              1 |
+|  clkdivider/clk_out1 | db5/new_input_i_1__3_n_0                         |                                      |                1 |              1 |
+|  clkdivider/clk_out1 | db3/new_input_i_1__1_n_0                         |                                      |                1 |              1 |
+|  clkdivider/clk_out1 |                                                  | display_mod/strobe_out[3]_i_1_n_0    |                1 |              3 |
+|  clkdivider/clk_out1 | mgame2/timer_mg2/count_out_reg[0]_0              |                                      |                2 |              3 |
+|  clkdivider/clk_out1 | temp_sense/Inst_TWICtl/FSM_gray_state[3]_i_1_n_0 |                                      |                3 |              4 |
+|  clkdivider/clk_out1 | mgame2/state_count[3]_i_1_n_0                    | sw_IBUF[14]                          |                2 |              4 |
+|  clkdivider/clk_out1 | temp_sense/retryCnt[3]_i_2_n_0                   | temp_sense/retryCnt[3]_i_1_n_0       |                1 |              4 |
+|  clkdivider/clk_out1 | xvga1/prev_btnu                                  |                                      |                2 |              4 |
+|  clkdivider/clk_out1 | mgame2/FSM_sequential_state[3]_i_1_n_0           | sw_IBUF[14]                          |                2 |              4 |
+|  clkdivider/clk_out1 |                                                  | temp_sense/Inst_TWICtl/busFreeCnt0_1 |                3 |              8 |
+|  clkdivider/clk_out1 | temp_sense/Inst_TWICtl/dataByte[7]_i_1_n_0       |                                      |                3 |              8 |
+|  clkdivider/clk_out1 | temp_sense/Inst_TWICtl/state_reg[2]              |                                      |                1 |              8 |
+|  clkdivider/clk_out1 | temp_sense/Inst_TWICtl/sclCnt[7]_i_2_n_0         | temp_sense/Inst_TWICtl/sclCnt0_0     |                2 |              8 |
+|  clkdivider/clk_out1 | xvga1/E[0]                                       | xvga1/vcount_out0                    |                6 |             10 |
+|  clkdivider/clk_out1 |                                                  | xvga1/E[0]                           |                5 |             11 |
+|  clkdivider/clk_out1 |                                                  | xvga1/hcount_out_reg[10]_0           |                4 |             12 |
+|  clkdivider/clk_out1 | mgame2/timer_mg2/CEC                             |                                      |                3 |             12 |
+|  clkdivider/clk_out1 | temp_sense/Inst_TWICtl/ERR_O_reg_0[0]            |                                      |                3 |             13 |
+|  clkdivider/clk_out1 | temp_sense/E[0]                                  |                                      |                4 |             13 |
+|  clkdivider/clk_out1 |                                                  | temp_sense/clear                     |                4 |             16 |
+|  clkdivider/clk_out1 | t1/E[0]                                          |                                      |                8 |             16 |
+|  clkdivider/clk_out1 |                                                  | temp_sense/Inst_TWICtl/timeOutCnt0   |                5 |             20 |
+|  clkdivider/clk_out1 | db3/count                                        | db3/new_input_i_1__1_n_0             |                5 |             20 |
+|  clkdivider/clk_out1 | db1/count                                        | db1/new_input_i_1_n_0                |                5 |             20 |
+|  clkdivider/clk_out1 | db5/count                                        | db5/new_input_i_1__3_n_0             |                5 |             20 |
+|  clkdivider/clk_out1 | db2/count                                        | db2/new_input_i_1__0_n_0             |                5 |             20 |
+|  clkdivider/clk_out1 | db4/count                                        | db4/new_input_i_1__2_n_0             |                5 |             20 |
+|  clkdivider/clk_out1 |                                                  | db1/SR[0]                            |                8 |             28 |
+|  clkdivider/clk_out1 |                                                  | mgame2/timer_start__0                |                7 |             30 |
+|  clkdivider/clk_out1 |                                                  |                                      |               57 |            123 |
++----------------------+--------------------------------------------------+--------------------------------------+------------------+----------------+
 
 

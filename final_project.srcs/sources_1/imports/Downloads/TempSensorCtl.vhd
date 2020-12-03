@@ -40,7 +40,7 @@ use work.TWIUtils.ALL;
 --use UNISIM.VComponents.all;
 
 entity TempSensorCtl is
-	Generic (CLOCKFREQ : natural := 100); -- input CLK frequency in MHz
+	Generic (CLOCKFREQ : natural := 65); -- input CLK frequency in MHz
 	Port (
 		TMP_SCL : inout STD_LOGIC;
 		TMP_SDA : inout STD_LOGIC;
