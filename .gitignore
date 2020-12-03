@@ -71,3 +71,9 @@ xvlog.*
 
 ## checkpoint files
 *.dcp
+
+# IP files
+# TODO this is kinda hacky and idk how I feel about it
+final_project.srcs/sources_1/ip/**/*
+!final_project.srcs/sources_1/ip/**/*/
+!final_project.srcs/sources_1/ip/**/*.xci
