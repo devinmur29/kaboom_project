@@ -187,9 +187,9 @@
     <Step Id="synth_design"/>
   </Strategy>
   <BlockFileSet Type="BlockSrcs" Name="fingerprint_rom"/>
-  <BlockFileSet Type="BlockSrcs" Name="blue_fing"/>
-  <BlockFileSet Type="BlockSrcs" Name="red"/>
   <BlockFileSet Type="BlockSrcs" Name="gcm"/>
+  <BlockFileSet Type="BlockSrcs" Name="red"/>
+  <BlockFileSet Type="BlockSrcs" Name="blue_fing"/>
   <BlockFileSet Type="BlockSrcs" Name="red_fing"/>
   <BlockFileSet Type="BlockSrcs" Name="green_fing"/>
   <BlockFileSet Type="BlockSrcs" Name="bcm"/>
