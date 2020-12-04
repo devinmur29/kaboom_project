@@ -41,7 +41,22 @@ module top_level( input clk_100mhz,
     parameter ONE_HZ_PERIOD = 65_000_000;
     parameter DEBOUNCE_COUNT = 1000000;
     
-    logic timer_start, counting, expired, one_hz_enable;
+    //SCENE AND MINIGAME STATES
+    parameter HOME = 4'd0;
+    parameter MG1 = 4'd1;
+    parameter MG2 = 4'd2;
+    parameter MG3= 4'd3;
+    parameter MG4 = 4'd4;
+    parameter MG5 = 4'd5;
+    parameter WIN = 4'd6;
+    parameter LOSE = 4'd7;
+     
+    logic timer_start, counting, expired, one_hz_enable; //Game timer signals
+    logic reset; //reset game FSM
+    logic mg1_start, mg2_start, mg3_start, mg4_start, mg5_start; //Minigame start signals
+    logic mg1_fail, mg2_fail, mg3_fail, mg4_fail, mg5_fail; //Minigame fail signals
+    logic mg1_success, mg2_success, mg3_success, mg4_success, mg5_success; //Minigame success signals
+    logic game_state;
     logic [11:0] count, tens, ones;
 	logic [3:0] minutes;
 	logic [10:0] hcount;    // pixel on current line
@@ -51,7 +66,7 @@ module top_level( input clk_100mhz,
     logic [11:0] pixel_out1, pixel_out2; //pixel_out minigame_1
     logic [11:0] rgb;
     logic [3:0] minigame; //which minigame is being played/displayed
-    logic up, down, left, right;
+    logic up, down, left, right, center;
     
     
     
@@ -67,7 +82,7 @@ module top_level( input clk_100mhz,
  /////////Debounce Inputs/////////////////////
 	
 	
-	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db1 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnc),.clean_out(timer_start));
+	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db1 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnc),.clean_out(center));
 	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db2 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnu),.clean_out(up));
 	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db3 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnd),.clean_out(down));
 	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db4 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnl),.clean_out(left));
@@ -121,7 +136,7 @@ module top_level( input clk_100mhz,
 	 minigame_2 mgame2 (.vclock_in(clk_65mhz), .reset_in(sw[14]), .hcount_in(hcount), .vcount_in(vcount), 
 	 .pixel_out(pixel_out2), .vsync_in(vsync),  .btnu(up), .btnd(down), .btnl(left), 
 	 .btnr(right),  .random(rand_out[1:0]), .led_r(led16_r), .led_b(led16_b), .led_g(led16_g), .timer_count(count_mg2), .state(mg2_state));
-	 assign minigame = 3'b010; //choose which minigame is playing
+	 
 	 
 	 //Handle Graphics
 	 xvga xvga1(.vclock_in(clk_65mhz),.hcount_out(hcount),.vcount_out(vcount),
@@ -130,6 +145,19 @@ module top_level( input clk_100mhz,
      logic border = (hcount==0 | hcount==1023 | vcount==0 | vcount==767 |
                    hcount == 512 | vcount == 384);
      logic b,hs,vs;
+     
+     ////////////////////////////////////////////////////////GAMEPLAY FSM///////////////////////////////////////////////
+     assign reset = sw[15];
+     assign minigame = 3'b010; //choose which minigame is playing
+     
+     
+     always_ff @(posedge clk_65mhz) begin
+        if(reset) begin
+            
+            
+        end
+     end
+     
      
      //Graphics based on the minigame being played
      
@@ -620,4 +648,5 @@ always_comb begin
 end
 
 endmodule
+
 
