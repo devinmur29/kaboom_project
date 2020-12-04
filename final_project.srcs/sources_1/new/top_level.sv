@@ -34,8 +34,12 @@ module top_level( input clk_100mhz,
                   output logic ca, cb, cc, cd, ce, cf, cg, dp,  // segments a-g, dp
                   output logic[7:0] an,    // Display location 0-7
                   inout tmp_scl,
-                  inout tmp_sda
-             
+                  inout tmp_sda,
+
+                  input acl_miso,
+                  output acl_mosi,
+                  output acl_sclk,
+                  output acl_csn
     );
     
     parameter ONE_HZ_PERIOD = 65_000_000;
@@ -174,11 +178,19 @@ module top_level( input clk_100mhz,
     
     display_8hex display_mod (.clk_in(clk_65mhz), .data_in(data),
 	.seg_out({cg, cf, ce, cd, cc, cb, ca}), .strobe_out(an));
+
+	accel::e_orientation orientation;
 	
-    
-    
-    
-    
+	accelerometer accelerometer_builtin(
+        .clk_in(clk_65mhz),
+        .reset_in(reset),
+        .acl_miso,
+        .acl_mosi,
+        .acl_sclk,
+        .acl_csn,
+        
+        .orientation
+    );
 endmodule
 
 
