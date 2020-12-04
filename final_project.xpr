@@ -122,13 +122,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../vivado/labkit_imu/ADXL362Ctrl.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/ADXL362Ctrl.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../vivado/labkit_imu/SPI_If.vhd">
+      <File Path="$PSRCDIR/sources_1/imports/SPI_If.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>

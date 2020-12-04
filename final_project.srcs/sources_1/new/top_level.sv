@@ -188,7 +188,7 @@ module top_level( input clk_100mhz,
         .acl_mosi,
         .acl_sclk,
         .acl_csn,
-        
+
         .orientation
     );
 endmodule
