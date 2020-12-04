@@ -191,6 +191,12 @@ module top_level( input clk_100mhz,
 
         .orientation
     );
+
+    // Change NUM_SHUFFLED_ITEMS and SHUFFLED_ITEM_BITS, data_in should be whatever you want shuffled (packed array of bits)
+    // pulse should_shuffle_in when you want to shuffle; set data_out and valid_out accordingly
+    shuffler #(.NUM_SHUFFLED_ITEMS(8), .SHUFFLED_ITEM_BITS(4)) 
+              (.clk_in(clk_100mhz), .reset_in(), .data_in(), .random_in(rand_out[3:0]), 
+               .should_shuffle_in(), .data_out(), .valid_out());
 endmodule
 
 
