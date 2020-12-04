@@ -179,9 +179,9 @@ module top_level( input clk_100mhz,
     display_8hex display_mod (.clk_in(clk_65mhz), .data_in(data),
 	.seg_out({cg, cf, ce, cd, cc, cb, ca}), .strobe_out(an));
 
-	accel::e_orientation orientation;
-	
-	accelerometer accelerometer_builtin(
+    accel::e_orientation orientation;
+
+    accelerometer accelerometer_builtin(
         .clk_in(clk_65mhz),
         .reset_in(reset),
         .acl_miso,
