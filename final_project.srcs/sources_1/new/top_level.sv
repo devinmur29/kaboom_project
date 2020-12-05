@@ -39,9 +39,24 @@ module top_level( input clk_100mhz,
                   input acl_miso,
                   output acl_mosi,
                   output acl_sclk,
-                  output acl_csn
+                  output acl_csn,
+
+                  inout [3:0] sd_dat,
+
+                  output logic sd_reset,
+                  output logic sd_sck,
+                  output logic sd_cmd,
+
+                  output logic aud_pwm,
+                  output logic aud_sd
     );
-    
+
+    assign sd_dat[2:1] = 2'b11;
+    assign sd_reset = 0;
+
+    logic system_reset;
+    assign system_reset = sw[15];
+
     parameter ONE_HZ_PERIOD = 65_000_000;
     parameter DEBOUNCE_COUNT = 1000000;
     
@@ -197,6 +212,37 @@ module top_level( input clk_100mhz,
     shuffler #(.NUM_SHUFFLED_ITEMS(8), .SHUFFLED_ITEM_BITS(4)) 
               (.clk_in(clk_100mhz), .reset_in(), .data_in(), .random_in(rand_out[3:0]), 
                .should_shuffle_in(), .data_out(), .valid_out());
+
+/*
+    // generate 25 mhz clock for sd_controller
+    logic clk_25mhz;
+    clk_wiz_0 clocks(.clk_in1(clk_100mhz), .clk_out1(clk_25mhz), .reset());
+
+    logic [5:0] audio_header_raddr;
+    logic [31:0] audio_header_dout;
+    logic [5:0] graphics_header_raddr;
+    logic [31:0] graphics_header_dout;
+
+    logic audio_req;
+    logic [31:0] audio_req_addr;
+    logic audio_req_ack;
+    logic audio_req_we;
+    logic [7:0] audio_req_dout;
+
+    logic audio_out;
+
+    sd_card_fsm sd_controller(.clk_in(clk_25mhz), .reset_in(system_reset), .cs(sd_dat[3]), .mosi(sd_cmd),
+                              .miso(sd_dat[0]), .sclk(sd_sck), .graphics_header_raddr, .audio_header_raddr,
+                              .graphics_header_dout, .audio_header_dout, .audio_req, .audio_req_addr, .audio_req_ack,
+                              .audio_req_we, .audio_req_dout);
+
+    // Assign .play() to a pulse
+    sound_engine sengine(.clk(clk_25mhz), .reset(system_reset), .play(), .sound_id(), .audio_header_raddr, .audio_header_dout,
+                         .audio_req, .audio_req_addr, .audio_req_ack, .audio_req_we, .audio_req_dout, .audio_out);
+
+    assign aud_sd = 1'b1;
+    assign aud_pwm = audio_out ? 1'bZ : 1'b0;
+*/
 endmodule
 
 
