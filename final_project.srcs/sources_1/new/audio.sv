@@ -30,8 +30,7 @@ module sound_engine(
 
     fifo_generator_0 fifo(.din(audio_req_dout), .wr_en(audio_req_we),
                                  .dout(fifo_dout), .rd_en(fifo_rd_en),
-                                 .clk, .srst(reset), .data_count(),
-                                 .prog_empty(fifo_should_fill));
+                                 .clk, .rst(reset), .prog_empty(fifo_should_fill));
 
     localparam STATE_IDLE = 2'b00;
     localparam STATE_FETCH_ADDRESS = 2'b01;
