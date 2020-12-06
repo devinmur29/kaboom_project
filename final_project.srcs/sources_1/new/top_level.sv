@@ -279,6 +279,56 @@ module top_level( input clk_100mhz,
     assign aud_sd = 1'b1;
     assign aud_pwm = audio_out ? 1'bZ : 1'b0;
 */
+
+//confirm is button to press to confirm single/multiplayer
+//up down toggles between single / multiplayer
+//mode is just 2 bit output telling whether single/multi chosen -- single = 01 multi = 10 i believe
+//homescreen_graphics pg(.vclock_in(clk_65mhz),.reset_in(left), .confirm(center),
+//                .up_in(up),.down_in(down), .hcount_in(hcount),.vcount_in(vcount),
+//                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), .mode(led[1:0]),
+//                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(pixel));
+   
+    //starting here is winning
+    //confirm is just to try again
+//    win_graphics winning(.vclock_in(clk_65mhz),.reset_in(left), .confirm(center),
+//                .hcount_in(hcount),.vcount_in(vcount),
+//                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), .confirmed(led[15]),
+//                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(win_pixel));
+    
+    //starting here is losing
+    //confirm to try again
+//    lose_graphics losing(.vclock_in(clk_65mhz),.reset_in(left), .confirm(center),
+//                .hcount_in(hcount),.vcount_in(vcount),
+//                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), .confirmed(led[7]),
+//                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(lose_pixel));
+
+//button game
+//ones, tens, minutes from timer module
+//pushed button is the 'button' in the game, so the one you need to push following the rules to win
+//rand has text is a 1 bit entry from the random module, the button can be either blank or say 'hold', so 
+//this chooses one
+//rand button color, 2 bit random -- chooses button color based on rules in module
+//rand strip color chooses strip color 1 bit from random module, this will also be explained in rules
+//completed means they did it correctly, failed means they didnt
+//button_game bg(.vclock_in(clk_65mhz),.reset_in(left), .ones(ones[3:0]), .tens(tens[3:0]), .minutes(minutes),
+//                .hcount_in(hcount),.vcount_in(vcount), .pushed_button(up), .rand_has_text(1),
+//                .rand_button_color(2'b01), .rand_strip_color(1'b0), .completed(led17_g), .failed(led17_r),
+//                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
+//                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(button_pixel));
+
+//wire cutting game
+//color1-6 are 3 bit random entry numbers that choose colors for each wire
+//switches 15-10 are used to cut the wires atm, 15 corresponding to leftmost on screen and 10 to rightmost
+//again completed if they did it correctly, failed if not (i added a slight delay to these signals from when the
+//player cuts a wire because i wanted them to see that the cut wire turns black lol this was how i could best 
+//simulate cutting :,) )
+//wire_cutting wc(.vclock_in(clk_65mhz),.reset_in(left), 
+//                .incolor1(color1), .incolor2(color2), .incolor3(color3), .incolor4(color4), .incolor5(color5), .incolor6(color6),
+//                .hcount_in(hcount),.vcount_in(vcount), .cut_switch(sw[15:10]), .completed(led16_g), .failed(led16_r),
+//                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
+//                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(wire_pixel));
+
+
 endmodule
 
 
