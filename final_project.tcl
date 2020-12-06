@@ -47,11 +47,16 @@
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.assets/ds_color_map_green.coe"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.assets/ds_color_map_blue.coe"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.assets/ds_image_emma.coe"
+#    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/new/sd_controller.sv"
+#    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/new/sd_card.sv"
+#    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/new/audio.sv"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/ip/ila_0/ila_0.xci"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/ip/fingerprint_rom/fingerprint_rom.xci"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/ip/blue_fing/blue_fing.xci"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/ip/red_fing/red_fing.xci"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/ip/green_fing/green_fing.xci"
+#    "c:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci"
+#    "c:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sources_1/ip/fifo_generator_0/fifo_generator_0.xci"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/constrs_1/imports/nexys4_ddr_lab3.xdc"
 #    "C:/Users/Willie Zhu/Desktop/projects/kaboom_project/final_project.srcs/sim_1/imports/timer_tb.sv"
 #
@@ -149,13 +154,15 @@ set_property -name "platform.board_id" -value "nexys4_ddr" -objects $obj
 set_property -name "sim.central_dir" -value "$proj_dir/${_xil_proj_name_}.ip_user_files" -objects $obj
 set_property -name "sim.ip.auto_export_scripts" -value "1" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
-set_property -name "webtalk.activehdl_export_sim" -value "24" -objects $obj
-set_property -name "webtalk.ies_export_sim" -value "24" -objects $obj
-set_property -name "webtalk.modelsim_export_sim" -value "24" -objects $obj
-set_property -name "webtalk.questa_export_sim" -value "24" -objects $obj
-set_property -name "webtalk.riviera_export_sim" -value "24" -objects $obj
-set_property -name "webtalk.vcs_export_sim" -value "24" -objects $obj
-set_property -name "webtalk.xsim_export_sim" -value "24" -objects $obj
+set_property -name "target_simulator" -value "Questa" -objects $obj
+set_property -name "webtalk.activehdl_export_sim" -value "26" -objects $obj
+set_property -name "webtalk.ies_export_sim" -value "26" -objects $obj
+set_property -name "webtalk.modelsim_export_sim" -value "26" -objects $obj
+set_property -name "webtalk.questa_export_sim" -value "26" -objects $obj
+set_property -name "webtalk.riviera_export_sim" -value "26" -objects $obj
+set_property -name "webtalk.vcs_export_sim" -value "26" -objects $obj
+set_property -name "webtalk.xcelium_export_sim" -value "2" -objects $obj
+set_property -name "webtalk.xsim_export_sim" -value "26" -objects $obj
 set_property -name "webtalk.xsim_launch_sim" -value "2" -objects $obj
 set_property -name "xpm_libraries" -value "XPM_MEMORY" -objects $obj
 
@@ -192,6 +199,9 @@ set files [list \
  [file normalize "${origin_dir}/final_project.assets/ds_color_map_green.coe" ]\
  [file normalize "${origin_dir}/final_project.assets/ds_color_map_blue.coe" ]\
  [file normalize "${origin_dir}/final_project.assets/ds_image_emma.coe" ]\
+ [file normalize "${origin_dir}/final_project.srcs/sources_1/new/sd_controller.sv" ]\
+ [file normalize "${origin_dir}/final_project.srcs/sources_1/new/sd_card.sv" ]\
+ [file normalize "${origin_dir}/final_project.srcs/sources_1/new/audio.sv" ]\
 ]
 set added_files [add_files -fileset sources_1 $files]
 
@@ -256,6 +266,18 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
 set file "new/top_level.sv"
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "new/sd_controller.sv"
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "new/sd_card.sv"
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+
+set file "new/audio.sv"
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
@@ -453,6 +475,48 @@ if { ![get_property "is_locked" $file_obj] } {
 
 # Set 'sources_1' fileset file properties for local files
 # None
+
+# Set 'sources_1' fileset object
+set obj [get_filesets sources_1]
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci" ]\
+]
+set added_files [add_files -fileset sources_1 $files]
+
+# Set 'sources_1' fileset file properties for remote files
+# None
+
+# Set 'sources_1' fileset file properties for local files
+set file "blk_mem_gen_0/blk_mem_gen_0.xci"
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
+set_property -name "registered_with_manager" -value "1" -objects $file_obj
+if { ![get_property "is_locked" $file_obj] } {
+  set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
+}
+
+
+# Set 'sources_1' fileset object
+set obj [get_filesets sources_1]
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/final_project.srcs/sources_1/ip/fifo_generator_0/fifo_generator_0.xci" ]\
+]
+set added_files [add_files -fileset sources_1 $files]
+
+# Set 'sources_1' fileset file properties for remote files
+# None
+
+# Set 'sources_1' fileset file properties for local files
+set file "fifo_generator_0/fifo_generator_0.xci"
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
+set_property -name "registered_with_manager" -value "1" -objects $file_obj
+if { ![get_property "is_locked" $file_obj] } {
+  set_property -name "synth_checkpoint_mode" -value "Singular" -objects $file_obj
+}
+
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
