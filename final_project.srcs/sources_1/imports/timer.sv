@@ -58,7 +58,7 @@ module timer(clock, start_timer,  value, counting,
             end
    
             
-            end// else expired_pulse <= 0; //if im not counting restore expired pulse to 0
+            end //else expired_pulse <= 0; //if im not counting restore expired pulse to 0
             if(clock_count == ONE_HZ_PERIOD-1) begin //logic to control the one_hz signal
                 one_hz <= 1;
                 clock_count <= 0;

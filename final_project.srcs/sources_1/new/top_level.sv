@@ -23,6 +23,7 @@
 module top_level( input clk_100mhz,
                   input[15:0] sw,
                   input btnc, btnu, btnl, btnr, btnd,
+                  input acl_miso, //accelerometer input
                   output logic[3:0] vga_r,
                   output logic[3:0] vga_b,
                   output logic[3:0] vga_g,
@@ -33,6 +34,7 @@ module top_level( input clk_100mhz,
                   output logic [15:0] led,
                   output logic ca, cb, cc, cd, ce, cf, cg, dp,  // segments a-g, dp
                   output logic[7:0] an,    // Display location 0-7
+                  output acl_mosi, acl_sclk, acl_csn,
                   inout tmp_scl,
                   inout tmp_sda
              
@@ -67,6 +69,12 @@ module top_level( input clk_100mhz,
     logic [11:0] rgb;
     logic [3:0] minigame; //which minigame is being played/displayed
     logic up, down, left, right, center;
+    logic [4:0][2:0] minigame_order_in ; //5 array of 3 bits each.
+    logic [4:0][2:0] minigam_order_out;
+    
+    assign minigame_order_in = {3'b000, 3'b001, 3'b010, 3'b011, 3'b100};
+    
+    
     
     
     
@@ -136,6 +144,8 @@ module top_level( input clk_100mhz,
 	 minigame_2 mgame2 (.vclock_in(clk_65mhz), .reset_in(sw[14]), .hcount_in(hcount), .vcount_in(vcount), 
 	 .pixel_out(pixel_out2), .vsync_in(vsync),  .btnu(up), .btnd(down), .btnl(left), 
 	 .btnr(right),  .random(rand_out[1:0]), .led_r(led16_r), .led_b(led16_b), .led_g(led16_g), .timer_count(count_mg2), .state(mg2_state));
+	 
+	 ///////////////////////SHUFFLER INSTANTIATION/////////////////////////////////////////
 	 
 	 
 	 //Handle Graphics
@@ -358,7 +368,9 @@ module minigame_1( input vclock_in,
                    input [12:0] temp_in,
                    //input blank_in,
                    
-                   output logic [11:0] pixel_out
+                   output logic [11:0] pixel_out,
+                   output logic success, fail
+               
                    
                    );
                    parameter START = 3'b000;
@@ -367,6 +379,7 @@ module minigame_1( input vclock_in,
                    parameter THIRD_SQUARE = 3'b011;
                    parameter DECODE = 3'b100;
                    parameter DONE = 3'b101;
+                   parameter FAILED = 3'b110;
                    
                    
                    logic [11:0] pixel_ll, pixel_lr, pixel_lc, pixel_f;
@@ -404,6 +417,8 @@ module minigame_1( input vclock_in,
                             state <= 3'b000;
                             start_temp <= temp_in;
                             chosen_rand <= random;
+                            success <= 0;
+                            fail <= 0;
                         end 
                             
                         else if (vsync_prev & !vsync_in) begin
@@ -438,15 +453,17 @@ module minigame_1( input vclock_in,
                                                           end
                                                     end
                              DECODE           :     begin case(chosen_rand) 
-                                                                2'b00   :   begin state <= (sw[2]& btnu & btnr)? DONE: DECODE;  end
-                                                                2'b01   :   begin state <= (sw[0]& btnu & btnd)? DONE: DECODE;  end
-                                                                2'b10   :   begin state <= (sw[1]& btnl & btnr)? DONE: DECODE;  end
-                                                                2'b11   :   begin state <= (sw[3]& btnl & btnd)? DONE: DECODE;  end
+                                                                2'b00   :   begin state <= (sw[2]& btnu & btnr)? DONE: (sw[0]|sw[1]|sw[3]|btnl|btnd)? FAILED :DECODE;  end
+                                                                2'b01   :   begin state <= (sw[0]& btnu & btnd)? DONE: (sw[2]|sw[1]|sw[3]|btnl|btnr)? FAILED :DECODE;  end
+                                                                2'b10   :   begin state <= (sw[1]& btnl & btnr)? DONE: (sw[0]|sw[2]|sw[3]|btnd|btnu)? FAILED :DECODE;  end
+                                                                2'b11   :   begin state <= (sw[3]& btnl & btnd)? DONE: (sw[0]|sw[1]|sw[2]|btnr|btnu)? FAILED :DECODE;  end
                                                                 
                                                                 
                                                            endcase
                                                     end
-                             DONE             :     begin color_sq1 <= 12'h0F0; color_sq2 <= 12'h0F0; color_sq3 <= 12'h0F0; end
+                             DONE             :     begin color_sq1 <= 12'h0F0; color_sq2 <= 12'h0F0; color_sq3 <= 12'h0F0; success <= 1; end
+                             
+                             FAILED           :     fail <= 1;
                                                     
                         endcase
                       end
@@ -499,7 +516,8 @@ module minigame_2( input vclock_in,
                    output logic led_r,
                    output logic  led_g,
                    output logic  led_b,
-                   output logic [3:0] state
+                   output logic [3:0] state,
+                   output logic success, fail
                    
                    );
                    
@@ -521,32 +539,108 @@ module minigame_2( input vclock_in,
                    
                    
 //   assign checkerboard = hcount_in[8:6] + vcount_in[8:6];
-                    picture_blob_emma kaboom (.pixel_clk_in(vclock_in),.x_in(0),.hcount_in(hcount_in), 
-                    .y_in(200), .vcount_in(vcount_in), .pixel_out(pixel_out));
                    
                    //logic [3:0] state;
                    logic [1:0] chosen_rand;
      
                    logic timer_start;
-                   //logic [11:0] timer_count;
+                   logic [26:0] clock_count;
+                   logic [26:0] color_count;
                    logic [3:0] state_count;
                    logic expired;
                    logic [2:0] lut_out, light_1, light_2, light_3, light_4;
-                   logic prev_btnu, prev_btnd, prev_btnl, prev_btnr;
+                   logic prev_btnu, prev_btnd, prev_btnl, prev_btnr, btnu1, btnd1, btnr1, btnl1;
+                   logic [11:0] color_1, color_2, color_3, color_4, pixel_out1, pixel_out2, pixel_out3, pixel_out4;
+                   logic [1:0] color_rand;
+                   
+                   circle_blob  #(.RADIUS(32)) circle1 (.x_in(11'd512), .y_in(10'd416), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_1), .pixel_out(pixel_out1));
+                   circle_blob  #(.RADIUS(32)) circle2 (.x_in(11'd608), .y_in(10'd512), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_2), .pixel_out(pixel_out2));
+                   circle_blob  #(.RADIUS(32)) circle3 (.x_in(11'd512), .y_in(11'd608), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_3), .pixel_out(pixel_out3));
+                   circle_blob  #(.RADIUS(32)) circle4 (.x_in(11'd416), .y_in(10'd512), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_4), .pixel_out(pixel_out4));
+                   
+                   assign pixel_out = pixel_out1 + pixel_out2 + pixel_out3 + pixel_out4;
+                   assign btnu1 = btnu & !prev_btnu;
+                   assign btnd1 = btnd & !prev_btnd;
+                   assign btnr1 = btnr & !prev_btnr;
+                   assign btnl1 = btnl & !prev_btnl;
+                   
+                   
                    
                    timer timer_mg2(.clock(vclock_in), .start_timer(timer_start), .value(12'd2), .count_out(timer_count), .expired_pulse(expired));
                    Lut_mg2 lutmg2 (.rn(chosen_rand), .led_col(lut_out));
                    logic vsync_prev;
                    
-                   always_ff @(posedge vclock_in) begin
+                   
+                    always_ff @(posedge vclock_in) begin
                         vsync_prev <= vsync_in;
                    end
                    
+                   
+                   ////////////////////Fun color graphics///////////////////////////////////////////////////////
+                   
+                   always_ff @(posedge vclock_in) begin
+                        if (reset_in) begin
+                            color_1 <= 12'h00F;
+                            color_2 <= 12'h0F0;
+                            color_3 <= 12'hFF0;
+                            color_4 <= 12'hF00;
+                            color_rand <= random;
+                            clock_count <= 0;
+                            color_count <=0;
+                        end else begin
+                        
+                        if(color_count == 27'd65_000_00) begin
+                            color_rand <= random;
+                            color_count <= 0;
+                        end else color_count <= color_count + 1;
+                            
+                         if(clock_count == 27'd6_500_000) begin
+                            case(color_rand)
+                                2'b00   : begin color_1<=(state_count>4'b0000 & state != INIT)?color_1:{color_1[11:8], color_1[7:4], color_1[3:0]+1}; 
+                                                color_2<= (state_count>4'b0010 & state != INIT)? color_2: {color_2[11:8], color_2[7:4], color_2[3:0]+1};
+                                                color_3<= (state_count>4'b0101 & state != INIT)? color_3: {color_3[11:8], color_3[7:4], color_3[3:0]+1};
+                                                color_4<= (state==SUCCESS)? color_4:{color_4[11:8], color_4[7:4], color_4[3:0]+1};
+                                          end
+                                2'b01   : begin color_1<=(state_count>4'b0000 & state != INIT)?color_1:{color_1[11:8], color_1[7:4]+1, color_1[3:0]}; 
+                                                color_2<= (state_count>4'b0010 & state != INIT)? color_2: {color_2[11:8], color_2[7:4]+1, color_2[3:0]};
+                                                color_3<= (state_count>4'b0101 & state != INIT)? color_3: {color_3[11:8], color_3[7:4]+1, color_3[3:0]};
+                                                color_4<= (state==SUCCESS)? color_4:{color_4[11:8], color_4[7:4]+1, color_4[3:0]};
+                                          end
+                                                
+                                2'b10   : begin color_1<=(state_count>4'b0000 & state != INIT)?color_1:{color_1[11:8]+1, color_1[7:4], color_1[3:0]}; 
+                                                color_2<= (state_count>4'b0010 & state != INIT)? color_2: {color_2[11:8]+1, color_2[7:4], color_2[3:0]};
+                                                color_3<= (state_count>4'b0101 & state != INIT)? color_3: {color_3[11:8]+1, color_3[7:4], color_3[3:0]};
+                                                color_4<= (state==SUCCESS)? color_4:{color_4[11:8]+1, color_4[7:4], color_4[3:0]};
+                                          end
+                      
+                                2'b11   : begin color_1<=(state_count>4'b0000 & state != INIT)?color_1:{color_1[11:8], color_1[7:4]+1, color_1[3:0]-1}; 
+                                                color_2<= (state_count>4'b0010 & state != INIT)? color_2: {color_2[11:8], color_2[7:4]+1, color_2[3:0]-1};
+                                                color_3<= (state_count>4'b0101 & state != INIT)? color_3: {color_3[11:8], color_3[7:4]+1, color_3[3:0]-1};
+                                                color_4<= (state==SUCCESS)? color_4:{color_4[11:8]-1, color_4[7:4], color_4[3:0]};
+                                          end
+                               
+                         
+                            endcase
+                         clock_count <= 0;
+                         end else clock_count <= clock_count + 1;
+                         
+                         
+                         
+                        end
+                     
+                   end
+                   
+                   
+                  
+ /////////////////////////////////////////////Game logic////////////////////////////////////////////////
                    always_ff @(posedge vclock_in) begin
                         if (reset_in) begin
                             state <= 4'b0000;
                             chosen_rand <= random;
                             state_count <= 4'b0000;
+                            success <= 0;
+                            fail <= 0;
+                            {led_r, led_g, led_b} <= 3'b000;
                             
                         end 
                             
@@ -569,10 +663,10 @@ module minigame_2( input vclock_in,
                                                     if(timer_count==12'b1) {led_r, led_g, led_b} <= 3'b000;
                                                 end
                                 SEQ_1   :   begin case(light_1) 
-                                             3'b100   :   begin state <= (btnu)? ((state_count==0)? FLASH_1:SEQ_2): SEQ_1; if(btnu) state_count <= state_count + 1;  end
-                                             3'b010   :   begin state <= (btnr)? ((state_count==0)? FLASH_1:SEQ_2): SEQ_1; if(btnr) state_count <= state_count +1;  end
-                                             3'b001   :   begin state <= (btnd)? ((state_count==0)? FLASH_1:SEQ_2): SEQ_1; if(btnd) state_count <= state_count + 1;  end
-                                             3'b101   :   begin state <= (btnl)? ((state_count==0)? FLASH_1:SEQ_2): SEQ_1; if(btnl) state_count <= state_count + 1;  end                   
+                                             3'b100   :   begin state <= (btnu)? ((state_count==0)? FLASH_1:SEQ_2):(btnr | btnd | btnl)?FAILED: SEQ_1; if(btnu) state_count <= state_count + 1;  end
+                                             3'b010   :   begin state <= (btnr)? ((state_count==0)? FLASH_1:SEQ_2): (btnu | btnd | btnl)?FAILED: SEQ_1; if(btnr) state_count <= state_count +1;  end
+                                             3'b001   :   begin state <= (btnd)? ((state_count==0)? FLASH_1:SEQ_2): (btnr | btnu | btnl)?FAILED: SEQ_1; if(btnd) state_count <= state_count + 1;  end
+                                             3'b101   :   begin state <= (btnl)? ((state_count==0)? FLASH_1:SEQ_2): (btnr | btnd | btnu)?FAILED: SEQ_1; if(btnl) state_count <= state_count + 1;  end                   
                                             endcase end
                                 FLASH_2 :   begin state <= WAIT_FLASH2;
                                                   {led_r, led_g, led_b} <= light_2;
@@ -583,10 +677,14 @@ module minigame_2( input vclock_in,
                                                     if(timer_count==12'b1) {led_r, led_g, led_b} <= 3'b000;
                                                 end
                                 SEQ_2   :   begin case(light_2) 
-                                             3'b100   :   begin state <= (state_count==1)? SEQ_1 :((btnu & ! prev_btnu)? ((state_count==2)? FLASH_1:SEQ_3): SEQ_2); if(btnu & ! prev_btnu) state_count <= state_count + 1;  end
-                                             3'b010   :   begin state <= (state_count==1)?SEQ_1:((btnr & ! prev_btnr)? ((state_count==2)? FLASH_1:SEQ_3): SEQ_2); if(btnr & ! prev_btnr) state_count <= state_count + 1;  end
-                                             3'b001   :   begin state <= (state_count==1)?SEQ_1:((btnd & ! prev_btnd)? ((state_count==2)? FLASH_1:SEQ_3): SEQ_2); if(btnd & ! prev_btnd) state_count <= state_count + 1;  end
-                                             3'b101   :   begin state <= (state_count==1)?SEQ_1:((btnl & ! prev_btnl)? ((state_count==2)? FLASH_1:SEQ_3): SEQ_2); if(btnl & ! prev_btnl) state_count <= state_count + 1;  end                   
+                                             3'b100   :   begin state <= (state_count==1)? SEQ_1 :(btnu1? ((state_count==2)? FLASH_1:SEQ_3):(btnl1 | btnr1 | btnd1)?FAILED: SEQ_2);
+                                                                            if(btnu1) state_count <= state_count + 1;  end
+                                             3'b010   :   begin state <= (state_count==1)?SEQ_1:(btnr1? ((state_count==2)? FLASH_1:SEQ_3): (btnl1 | btnu1 | btnd1)?FAILED: SEQ_2); 
+                                                                            if(btnr1) state_count <= state_count + 1;  end
+                                             3'b001   :   begin state <= (state_count==1)?SEQ_1:(btnd1? ((state_count==2)? FLASH_1:SEQ_3): (btnl1 | btnr1 | btnu1)?FAILED: SEQ_2); 
+                                                                            if(btnd1) state_count <= state_count + 1;  end
+                                             3'b101   :   begin state <= (state_count==1)?SEQ_1:(btnl1? ((state_count==2)? FLASH_1:SEQ_3): (btnu1 | btnr1 | btnd1)?FAILED: SEQ_2); 
+                                                                            if(btnl1) state_count <= state_count + 1;  end                   
                                             endcase end
                                 FLASH_3 :   begin state <= WAIT_FLASH3;
                                                   {led_r, led_g, led_b} <= light_3;
@@ -597,10 +695,14 @@ module minigame_2( input vclock_in,
                                                     if(timer_count==12'b1) {led_r, led_g, led_b} <= 3'b000;
                                                 end
                                 SEQ_3   :   begin case(light_3) 
-                                             3'b100   :   begin state <= (state_count==3)? SEQ_1 :((btnu & ! prev_btnu)? ((state_count==5)? FLASH_1:SEQ_4): SEQ_3); if(btnu & ! prev_btnu) state_count <= state_count + 1;  end
-                                             3'b010   :   begin state <= (state_count==3)? SEQ_1 :((btnr & ! prev_btnr)? ((state_count==5)? FLASH_1:SEQ_4): SEQ_3); if(btnr & ! prev_btnr) state_count <= state_count + 1;  end
-                                             3'b001   :   begin state <= (state_count==3)? SEQ_1 :((btnd & ! prev_btnd)? ((state_count==5)? FLASH_1:SEQ_4): SEQ_3); if(btnd & ! prev_btnd) state_count <= state_count + 1;  end
-                                             3'b101   :   begin state <= (state_count==3)? SEQ_1 :((btnl & ! prev_btnl)? ((state_count==5)? FLASH_1:SEQ_4): SEQ_3); if(btnl & ! prev_btnl) state_count <= state_count + 1;  end                   
+                                             3'b100   :   begin state <= (state_count==3)? SEQ_1 :(btnu1? ((state_count==5)? FLASH_1:SEQ_4): (btnl1 | btnr1 | btnd1)?FAILED: SEQ_3); 
+                                                            if(btnu1) state_count <= state_count + 1;  end
+                                             3'b010   :   begin state <= (state_count==3)? SEQ_1 :(btnr1? ((state_count==5)? FLASH_1:SEQ_4): (btnl1 | btnu1 | btnd1)?FAILED: SEQ_3); 
+                                                            if(btnr1) state_count <= state_count + 1;  end
+                                             3'b001   :   begin state <= (state_count==3)? SEQ_1 :((btnd1)? ((state_count==5)? FLASH_1:SEQ_4):(btnl1 | btnr1 | btnu1)?FAILED: SEQ_3); 
+                                                            if(btnd1) state_count <= state_count + 1;  end
+                                             3'b101   :   begin state <= (state_count==3)? SEQ_1 :(btnl1? ((state_count==5)? FLASH_1:SEQ_4): (btnu1 | btnr1 | btnd1)?FAILED: SEQ_3); 
+                                                            if(btnl1) state_count <= state_count + 1;  end                   
                                             endcase end
                                 FLASH_4 :   begin state <= WAIT_FLASH4;
                                                   {led_r, led_g, led_b} <= light_4;
@@ -611,12 +713,14 @@ module minigame_2( input vclock_in,
                                                     if(timer_count==12'b1) {led_r, led_g, led_b} <= 3'b000;
                                                 end
                                 SEQ_4   :   begin case(light_4) 
-                                             3'b100   :   begin state <= (state_count==6)?SEQ_1:((btnu & !prev_btnu)? SUCCESS: SEQ_4);   end
-                                             3'b010   :   begin state <= (state_count==6)?SEQ_1:((btnr & !prev_btnr)? SUCCESS: SEQ_4);   end
-                                             3'b001   :   begin state <= (state_count==6)?SEQ_1:((btnd & !prev_btnd)? SUCCESS: SEQ_4);   end
-                                             3'b101   :   begin state <= (state_count==6)?SEQ_1:((btnl & !prev_btnl)? SUCCESS: SEQ_4);   end                   
+                                             3'b100   :   begin state <= (state_count==6)?SEQ_1:((btnu1)? SUCCESS:(btnd1 | btnl1 | btnr1)?FAILED: SEQ_4);   end
+                                             3'b010   :   begin state <= (state_count==6)?SEQ_1:((btnr1)? SUCCESS: (btnd1 | btnl1 | btnu1)?FAILED: SEQ_4);   end
+                                             3'b001   :   begin state <= (state_count==6)?SEQ_1:((btnd1)? SUCCESS: (btnu1 | btnl1 | btnr1)?FAILED: SEQ_4);   end
+                                             3'b101   :   begin state <= (state_count==6)?SEQ_1:((btnl1)? SUCCESS: (btnd1 | btnu1 | btnr1)?FAILED: SEQ_4);   end                   
                                             endcase end
-                               SUCCESS  :   begin {led_r, led_g, led_b} <= 3'b111; end
+                               SUCCESS  :   begin {led_r, led_g, led_b} <= 3'b111; success <=1; end
+                               
+                               FAILED   :   fail <=1;
                                
                              
                              
