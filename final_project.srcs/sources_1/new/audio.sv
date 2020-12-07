@@ -3,6 +3,7 @@ module sound_engine(
     input reset,
 
     input play,
+    input stop,
     input [4:0] sound_id,
 
     output logic [5:0] audio_header_raddr,
@@ -44,7 +45,7 @@ module sound_engine(
     localparam WAIT_CYCLES = 4'd8;     // wait 4 cycles for BRAM to settle
 
     always_ff @(posedge clk) begin
-        if (reset) begin
+        if (reset || stop) begin
             state <= STATE_IDLE;
             audio_req <= 1'b0;
         end else begin
@@ -138,3 +139,4 @@ module audio_PWM(
         end
     end
 endmodule
+
