@@ -23,8 +23,6 @@
 module top_level( input clk_100mhz,
                   input[15:0] sw,
                   input btnc, btnu, btnl, btnr, btnd,
-                  input serial_rx,
-                  output serial_tx,
                   output logic[3:0] vga_r,
                   output logic[3:0] vga_b,
                   output logic[3:0] vga_g,
@@ -64,38 +62,36 @@ module top_level( input clk_100mhz,
     
     //SCENE AND MINIGAME STATES
     parameter HOME = 4'd0;
-    parameter WIN = 4'd1;
-    parameter LOSE = 4'd2;
-    parameter SHUFFLE =4'd3;
-    parameter MG=4'd4;
-    parameter START = 4'd5;
+    parameter MG1 = 4'd1;
+    parameter MG2 = 4'd2;
+    parameter MG3= 4'd3;
+    parameter MG4 = 4'd4;
+    parameter MG5 = 4'd5;
+    parameter WIN = 4'd6;
+    parameter LOSE = 4'd7;
      
     logic timer_start, counting, expired, one_hz_enable; //Game timer signals
-    logic mg_start;
-    logic mg_fail1, mg_fail2, mg_success1, mg_success2, mg_fail, mg_success; //Minigame start, fail, success, signals
-    logic start_shuffle, done_shuffle; //signal to control start of shuffler, and to know when the shuffler is done
-    logic [3:0] game_state;
+    logic reset; //reset game FSM
+    logic mg1_start, mg2_start, mg3_start, mg4_start, mg5_start; //Minigame start signals
+    logic mg1_fail, mg2_fail, mg3_fail, mg4_fail, mg5_fail; //Minigame fail signals
+    logic mg1_success, mg2_success, mg3_success, mg4_success, mg5_success; //Minigame success signals
+    logic game_state;
     logic [11:0] count, tens, ones;
 	logic [3:0] minutes;
 	logic [10:0] hcount;    // pixel on current line
     logic [9:0] vcount;     // line number
     logic hsync, vsync;
     logic [11:0] pixel;
-    logic [11:0] pixel_out1, pixel_out2, pixel_out_fpga, pixel_out_fpgaop; //pixel_out minigame_1
+    logic [11:0] pixel_out1, pixel_out2; //pixel_out minigame_1
     logic [11:0] rgb;
     logic [3:0] minigame; //which minigame is being played/displayed
     logic up, down, left, right, center;
     logic [4:0][2:0] minigame_order_in ; //5 array of 3 bits each.
-    logic [4:0][2:0] minigame_order_out;
-    logic [1:0] multiplayer;
-    logic[2:0] i;//index for minigames
-    logic[2:0] i_op; //opponents' index for minigames
-     logic[1:0] strike_count; //your strikes
-     logic[1:0] strike_count_op; //opponents' strikes
+    logic [4:0][2:0] minigam_order_out;
     
-    assign minigame_order_in = {3'b010, 3'b010, 3'b001, 3'b001, 3'b010};
-    assign mg_fail = (mg_fail1 | mg_fail2);
-    assign mg_success = (mg_success1 | mg_success2);
+    assign minigame_order_in = {3'b000, 3'b001, 3'b010, 3'b011, 3'b100};
+    
+    
     
     
     
@@ -122,7 +118,7 @@ module top_level( input clk_100mhz,
 	///////////////////timer demo, value is in seconds////////////////////
 	
 	
-	timer #(.ONE_HZ_PERIOD(ONE_HZ_PERIOD)) t1 (.clock(clk_65mhz), .start_timer(timer_start),  .value(12'd300), .counting(counting), 
+	timer #(.ONE_HZ_PERIOD(ONE_HZ_PERIOD)) t1 (.clock(clk_65mhz), .start_timer(timer_start),  .value(12'd150), .counting(counting), 
 	 .expired_pulse(expired), .one_hz(one_hz_enable), .count_out(count), .ones(ones), .tens(tens), .minutes(minutes));
 	 
 	 
@@ -156,32 +152,18 @@ module top_level( input clk_100mhz,
      
      //Minigames
 	 
-	 minigame_1 mgame1 (.vclock_in(clk_65mhz), .reset_in(mg_start), .hcount_in(hcount), .vcount_in(vcount), 
-	 .pixel_out(pixel_out1), .vsync_in(vsync), .temp_in(temp_valid), .btnu(up), .btnd(down), .btnl(left), .btnr(right), 
-	 .sw(sw[3:0]), .random(rand_out[1:0]), .success(mg_success1), .fail(mg_fail1));
+	 minigame_1 mgame1 (.vclock_in(clk_65mhz), .reset_in(sw[15]), .hcount_in(hcount), .vcount_in(vcount), 
+	 .pixel_out(pixel_out1), .vsync_in(vsync), .temp_in(temp_valid), .btnu(up), .btnd(down), .btnl(left), .btnr(right), .sw(sw[3:0]), .random(rand_out[1:0]));
 	 
 	 logic [11:0] count_mg2;
 	 logic [3:0] mg2_state;
-	 logic [2:0] ledout_mg2;//{r,g,b} output for leds
-	 minigame_2 mgame2 (.vclock_in(clk_65mhz), .reset_in(mg_start), .hcount_in(hcount), .vcount_in(vcount), 
-	 .pixel_out(pixel_out2), .vsync_in(vsync),  .btnu(up), .btnd(down), .btnl(left), 
-	 .btnr(right),  .random(rand_out[1:0]), .led_r(ledout_mg2[2]), .led_b(ledout_mg2[0]), 
-	 .led_g(ledout_mg2[1]), .timer_count(count_mg2), .state(mg2_state), .fail(mg_fail2), .success(mg_success2));
 	 
-	
-	FPGA_graphics fpga_s (.vclock_in(clk_65mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
-	 .mg_completed(i), .pixel_out(pixel_out_fpga));
-	
-	FPGA_graphics_op fpga_m (.vclock_in(clk_65mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
-	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
-	
-	////////////////////////MULTIPLAYER FUNCTIONALITY//////////////////////////////////////////////
-	logic multiplayer_reset;
-	logic[31:0] mult_out;
-	multiplayer_data multi (.vclock_in(clk_65mhz), .reset_in(multiplayer_reset), .uart_in(serial_rx), .i(i), .strike_count(strike_count),.data_out(mult_out), .uart_out(serial_tx));
-	assign i_op = mult_out[2:0];
-	assign strike_count_op = mult_out[4:3];
-	
+	 minigame_2 mgame2 (.vclock_in(clk_65mhz), .reset_in(sw[14]), .hcount_in(hcount), .vcount_in(vcount), 
+	 .pixel_out(pixel_out2), .vsync_in(vsync),  .btnu(up), .btnd(down), .btnl(left), 
+	 .btnr(right),  .random(rand_out[1:0]), .led_r(led16_r), .led_b(led16_b), .led_g(led16_g), .timer_count(count_mg2), .state(mg2_state));
+	 
+	 ///////////////////////SHUFFLER INSTANTIATION/////////////////////////////////////////
+	 
 	 
 	 //Handle Graphics
 	 xvga xvga1(.vclock_in(clk_65mhz),.hcount_out(hcount),.vcount_out(vcount),
@@ -193,35 +175,14 @@ module top_level( input clk_100mhz,
      
      ////////////////////////////////////////////////////////GAMEPLAY FSM///////////////////////////////////////////////
      assign reset = sw[15];
-     assign multiplayer = sw[13:12];
-     //assign minigame = 3'b010; //choose which minigame is playing
+     assign minigame = 3'b010; //choose which minigame is playing
      
      
      always_ff @(posedge clk_65mhz) begin
-        if(system_reset) begin
-            game_state <= SHUFFLE;
-            minigame <= 3'b000;
-            i <= 3'b000;
-            strike_count <= 2'b00;
-        end else begin
-            case(game_state)
-                SHUFFLE :   begin start_shuffle <=1; game_state <= HOME; end
-                HOME    :   begin  game_state <= (multiplayer!=2'b00 &done_shuffle)? START : HOME;
-                                    start_shuffle <= 0;
-                                    if(multiplayer[1]) multiplayer_reset <= 1;
-                                    if(multiplayer!=2'b00 & done_shuffle) begin timer_start <=1;end end//multiplayer/singleplayer stuff
-                START   :   begin mg_start <=1; minigame <= minigame_order_out[i]; multiplayer_reset <=0; 
-                                    game_state <=(mg_fail|mg_success)?START: MG; timer_start<=0; end
-                
-                MG      :   begin  mg_start <= 0;
-                                   game_state <= (expired|i_op==5)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG;
-                                   if(mg_fail) strike_count <= strike_count+1;
-                                   else if (mg_success) i<=i+1; end
-                LOSE    :   begin minigame <= 3'b110; end
-                WIN     :   begin minigame <=3'b111; end
-                
-            endcase
-         end
+        if(reset) begin
+            
+            
+        end
      end
      
      
@@ -240,16 +201,9 @@ module top_level( input clk_100mhz,
     
     
           case(minigame)
-            3'b000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}};
-                            {led16_r, led16_g, led16_b} <= 3'b0; end 
-            3'b001      :   begin rgb <= multiplayer[1]? pixel_out1+pixel_out_fpga+pixel_out_fpgaop : pixel_out1+pixel_out_fpga;
-                            {led16_r, led16_g, led16_b} <= 3'b0; end
-            3'b010      :   begin rgb <= multiplayer[1]? pixel_out2+pixel_out_fpga+pixel_out_fpgaop : pixel_out2+pixel_out_fpga;
-                                  {led16_r, led16_g, led16_b} <= ledout_mg2; end
-            3'b110      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}};
-                            {led16_r, led16_g, led16_b} <= 3'b100; end 
-            3'b111      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}};
-                            {led16_r, led16_g, led16_b} <= 3'b111; end 
+            3'b000      :   rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}} ;
+            3'b001      :   rgb <= pixel_out1;
+            3'b010      :   rgb <= pixel_out2;
             default     :   rgb <= rgb <= {12{border}};
         
           endcase
@@ -267,10 +221,11 @@ module top_level( input clk_100mhz,
     logic [31:0] data;      
     logic [6:0] segments;
     assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
-    assign data[3:0] = game_state;
-    assign data[7:4] = {2'b0,strike_count_op};
-    assign data[11:8] = {1'b0, i_op};
-    assign data[31:12] = {minutes, tens[3:0], ones[3:0]};
+    //assign data[3:0] = ones[3:0];
+    //assign data[7:4] = tens[3:0];
+    assign data[3:0] = mg2_state;
+    assign data[11:4] = count_mg2[7:0];
+    assign data[31:12] = {3'b0,temp_valid, 4'h0};
     
     display_8hex display_mod (.clk_in(clk_65mhz), .data_in(data),
 	.seg_out({cg, cf, ce, cd, cc, cb, ca}), .strobe_out(an));
@@ -290,9 +245,9 @@ module top_level( input clk_100mhz,
 
     // Change NUM_SHUFFLED_ITEMS and SHUFFLED_ITEM_BITS, data_in should be whatever you want shuffled (packed array of bits)
     // pulse should_shuffle_in when you want to shuffle; set data_out and valid_out accordingly
-    shuffler #(.NUM_SHUFFLED_ITEMS(5), .SHUFFLED_ITEM_BITS(3)) 
-              (.clk_in(clk_65mhz), .reset_in(system_reset), .data_in(minigame_order_in), .random_in(rand_out[2:0]), 
-               .should_shuffle_in(start_shuffle), .data_out(minigame_order_out), .valid_out(done_shuffle));
+    shuffler #(.NUM_SHUFFLED_ITEMS(8), .SHUFFLED_ITEM_BITS(4)) 
+              (.clk_in(clk_100mhz), .reset_in(), .data_in(), .random_in(rand_out[3:0]), 
+               .should_shuffle_in(), .data_out(), .valid_out());
 
 /*
     // generate 25 mhz clock for sd_controller
@@ -520,8 +475,10 @@ module minigame_1( input vclock_in,
                    input [1:0] random,
                    input [3:0] sw,
                    input btnu, btnl, btnd, btnr,
+                   //input hsync_in,
                    input vsync_in,
                    input [12:0] temp_in,
+                   //input blank_in,
                    
                    output logic [11:0] pixel_out,
                    output logic success, fail
