@@ -33,10 +33,10 @@ module shuffler
     (
         input clk_in,
         input reset_in,
-        input [NUM_SHUFFLED_ITEMS * 4 - 1:0] data_in,
+        input [NUM_SHUFFLED_ITEMS * SHUFFLED_ITEM_BITS - 1:0] data_in,
         input [SHUFFLED_ITEM_BITS - 1:0]  random_in,
         input should_shuffle_in,
-        output logic [NUM_SHUFFLED_ITEMS * 4 - 1:0] data_out,
+        output logic [NUM_SHUFFLED_ITEMS * SHUFFLED_ITEM_BITS - 1:0] data_out,
         output logic valid_out
     );
 
