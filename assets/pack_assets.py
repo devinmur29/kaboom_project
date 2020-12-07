@@ -44,7 +44,8 @@ if not os.path.exists(GRAPHICS_OUTPUT_PATH):
     os.makedirs(GRAPHICS_OUTPUT_PATH)
 
 # pack graphics assets
-packer = Packer.create(max_width=TEXTUREMAP_WIDTH, max_height=TEXTUREMAP_HEIGHT, enable_rotated=False, border_padding=0, shape_padding=0, atlas_format="json")
+packer = Packer.create(max_width=TEXTUREMAP_WIDTH, max_height=TEXTUREMAP_HEIGHT, enable_rotated=False, \
+                       border_padding=0, shape_padding=0, atlas_format="json")
 
 # TODO also include image filenames to packed_asset_filenames
 # TODO do we need to quantize to 255 so we can make the background black? idk
@@ -88,7 +89,8 @@ for directory in os.listdir(GRAPHICS_PATH):
         for filename, data in texturemap_atlas['frames'].items():
             # FIXME this is a terrible hack, probably
             index = int(filename[:2])
-            texturemap_properties[index] = (data['frame']['x'], data['frame']['y'], data['frame']['w'], data['frame']['h'])
+            texturemap_properties[index] = (data['frame']['x'], data['frame']['y'],
+                                            data['frame']['w'], data['frame']['h'])
 
         texturemap_properties_list.append(texturemap_properties)
 
