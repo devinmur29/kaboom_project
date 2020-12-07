@@ -79,3 +79,4 @@ final_project.srcs/sources_1/ip/**/*
 !final_project.srcs/sources_1/ip/**/*.xci
 
 assets/packed_images/
+assets/packed.hex
