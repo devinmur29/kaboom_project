@@ -546,9 +546,9 @@ module minigame_1( input vclock_in,
                    logic [12:0] start_temp;
                    logic[1:0] chosen_rand;
                    
-                   blob #(.WIDTH(64), .HEIGHT(64)) square_1(.x_in(11'd138), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_ll), .color(color_sq1));
-                   blob #(.WIDTH(64), .HEIGHT(64)) square_2(.x_in(11'd479), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lc), .color(color_sq2));
-                   blob #(.WIDTH(64), .HEIGHT(64)) square_3(.x_in(11'd820), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lr), .color(color_sq3));
+                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_1(.x_in(11'd138), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_ll), .color(color_sq1));
+                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_2(.x_in(11'd479), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lc), .color(color_sq2));
+                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_3(.x_in(11'd820), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lr), .color(color_sq3));
                    fingerprint(.pixel_clk_in(vclock_in), .x_in(11'd386), .y_in(10'd351), .hcount_in(hcount_in), .vcount_in(vcount_in), .pixel_out(pixel_f));
                    
                    logic[11:0] diff1;
