@@ -110,12 +110,6 @@ set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33 } [get_ports { btnd }
 
 ##Pmod Header JB
 
-# RX input
-set_property -dict { PACKAGE_PIN D14   IOSTANDARD LVCMOS33 } [get_ports { serial_rx }]; #IO_L1P_T0_AD0P_15 Sch=jb[1]
-
-# TX output
-set_property -dict { PACKAGE_PIN F16   IOSTANDARD LVCMOS33 } [get_ports { serial_tx }]; #IO_L14N_T2_SRCC_15 Sch=jb[2]
-
 #set_property -dict { PACKAGE_PIN D14   IOSTANDARD LVCMOS33 } [get_ports { jb[0] }]; #IO_L1P_T0_AD0P_15 Sch=jb[1]
 #set_property -dict { PACKAGE_PIN F16   IOSTANDARD LVCMOS33 } [get_ports { jb[1] }]; #IO_L14N_T2_SRCC_15 Sch=jb[2]
 #set_property -dict { PACKAGE_PIN G16   IOSTANDARD LVCMOS33 } [get_ports { jb[2] }]; #IO_L13N_T2_MRCC_15 Sch=jb[3]
