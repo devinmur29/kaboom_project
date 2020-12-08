@@ -62,7 +62,7 @@ architecture Behavioral of TempSensorCtl is
 	component TWICtl
    generic 
    (
-		CLOCKFREQ : natural := 50;  -- input CLK frequency in MHz
+		CLOCKFREQ : natural := 25;  -- input CLK frequency in MHz
 		ATTEMPT_SLAVE_UNBLOCK : boolean := false --setting this true will attempt
 		--to drive a few clock pulses for a slave to allow to finish a previous
 		--interrupted read transfer, otherwise the bus might remain locked up		

@@ -195,11 +195,11 @@ module top_level( input clk_100mhz,
 	 .led_g(ledout_mg2[1]), .timer_count(count_mg2), .state(mg2_state), .fail(mg_fail2), .success(mg_success2));
 	 
 
-//	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
-//	 .mg_completed(i), .pixel_out(pixel_out_fpga));
+	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
+	 .mg_completed(i), .pixel_out(pixel_out_fpga));
 
-//	FPGA_graphics_op fpga_m (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
-//	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
+	FPGA_graphics_op fpga_m (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
+	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
 	
 	////////////////////////MULTIPLAYER FUNCTIONALITY//////////////////////////////////////////////
 	logic multiplayer_reset;
@@ -245,17 +245,17 @@ module top_level( input clk_100mhz,
                                     game_state <=(mg_fail|mg_success)?START: multiplayer[1]?MG_M:MG_S; timer_start<=0; end
                 
                 MG_M      :   begin  mg_start <= 0;
-                                   game_state <= (expired|i_op==6)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_M;
+                                   game_state <= (expired|i_op==6)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd5)?WIN:START):MG_M;
                                    strike_count <= expired? 2'b11:mg_fail?strike_count+1:strike_count;
                                    if (mg_success) i<=i+1;
                                    if(expired| i_op ==6|(strike_count_op !=2'b11&mg_fail&strike_count==2)) lose_start <=1;
-                                   else if(strike_count_op==2'b11|(mg_success&i==3'd4)) win_start <=1;   end
+                                   else if(strike_count_op==2'b11|(mg_success&i==3'd5)) win_start <=1;   end
                 MG_S      :   begin  mg_start <= 0;
-                                   game_state <= (expired)?LOSE:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_S;
+                                   game_state <= (expired)?LOSE:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd5)?WIN:START):MG_S;
                                    strike_count <= expired? 2'b11:mg_fail?strike_count+1:strike_count;
                                    if (mg_success) i<=i+1;
                                    if(expired|(mg_fail&strike_count==2)) lose_start <=1;
-                                   else if(mg_success&i==3'd4) win_start <=1;   end
+                                   else if(mg_success&i==3'd5) win_start <=1;   end
                 LOSE    :   begin lose_start<=0; 
                                     minigame <= (play_again)?4'b0000: 4'b0111;
                                     game_state <= (play_again)?SHUFFLE:LOSE;
@@ -364,8 +364,8 @@ module top_level( input clk_100mhz,
     logic system_clock;
     assign system_clock = clk_25mhz;
 
-    logic system_reset;
-    assign system_reset = sw[15];
+    //logic system_reset;
+    //assign system_reset = sw[15];
 
     logic should_render;
     logic render_dirty;
@@ -381,7 +381,7 @@ module top_level( input clk_100mhz,
     
     logic play;
     logic stop;
-    logic [4:0] sound_id;
+    //logic [4:0] sound_id;
 
     logic graphics_req;
     logic [31:0] graphics_req_addr;
@@ -800,9 +800,9 @@ module minigame_1( input vclock_in,
                    logic [12:0] start_temp;
                    logic[1:0] chosen_rand;
                    
-                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_1(.x_in(11'd138), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_ll), .color(color_sq1));
-                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_2(.x_in(11'd479), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lc), .color(color_sq2));
-                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_3(.x_in(11'd820), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lr), .color(color_sq3));
+                   blob_D #(.WIDTH(40), .HEIGHT(40)) square_1(.x_in(11'd220), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_ll), .color(color_sq1));
+                   blob_D #(.WIDTH(40), .HEIGHT(40)) square_2(.x_in(11'd300), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_lc), .color(color_sq2));
+                   blob_D #(.WIDTH(40), .HEIGHT(40)) square_3(.x_in(11'd380), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_lr), .color(color_sq3));
                   // fingerprint(.pixel_clk_in(vclock_in), .x_in(11'd386), .y_in(10'd351), .hcount_in(hcount_in), .vcount_in(vcount_in), .pixel_out(pixel_f));
                    
                    logic[11:0] diff1;
@@ -962,10 +962,10 @@ module minigame_2( input vclock_in,
                    logic [11:0] color_1, color_2, color_3, color_4, pixel_out1, pixel_out2, pixel_out3, pixel_out4;
                    logic [1:0] color_rand;
                    
-                   circle_blob  #(.RADIUS(32)) circle1 (.x_in(11'd512), .y_in(10'd416), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_1), .pixel_out(pixel_out1));
-                   circle_blob  #(.RADIUS(32)) circle2 (.x_in(11'd608), .y_in(10'd512), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_2), .pixel_out(pixel_out2));
-                   circle_blob  #(.RADIUS(32)) circle3 (.x_in(11'd512), .y_in(11'd608), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_3), .pixel_out(pixel_out3));
-                   circle_blob  #(.RADIUS(32)) circle4 (.x_in(11'd416), .y_in(10'd512), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_4), .pixel_out(pixel_out4));
+                   circle_blob  #(.RADIUS(16)) circle1 (.x_in(11'd320), .y_in(10'd216), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_1), .pixel_out(pixel_out1));
+                   circle_blob  #(.RADIUS(16)) circle2 (.x_in(11'd344), .y_in(10'd240), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_2), .pixel_out(pixel_out2));
+                   circle_blob  #(.RADIUS(16)) circle3 (.x_in(11'd320), .y_in(11'd264), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_3), .pixel_out(pixel_out3));
+                   circle_blob  #(.RADIUS(16)) circle4 (.x_in(11'd296), .y_in(10'd240), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_4), .pixel_out(pixel_out4));
                    
                    assign pixel_out = pixel_out1 + pixel_out2 + pixel_out3 + pixel_out4;
                    assign btnu1 = btnu & !prev_btnu;
