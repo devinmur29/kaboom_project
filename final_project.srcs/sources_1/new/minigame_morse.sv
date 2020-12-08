@@ -117,12 +117,51 @@ module minigame_morse(
     end
 
     logic [2:0] backgrounds_loaded;
-    logic [1:0] background_state;
+    logic [1:0] background_state, background_state_last;
+
+    always_ff @(posedge clk) begin
+        background_state_last <= background_state;
+    end
 
     localparam BACKGROUND_STATE_WAITING = 2'b00;
     localparam BACKGROUND_STATE_LOADING_TEXTUREMAP = 2'b01;
     localparam BACKGROUND_STATE_RENDERING = 2'b10;
     // we need to load the bg, then wait for an ack
+    logic background_should_render;
+    logic background_should_load_texturemap;
+
+    logic texturemap_loaded;    // have we loaded the texturemap yet?
+    logic texturemap_ready;    // has the texturemap been fully loaded?
+    localparam TEXTUREMAP_ID = 1;
+
+    // handle background state
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            backgrounds_loaded <= 3'd0;
+            background_state <= BACKGROUND_STATE_WAITING;
+        end else if (backgrounds_loaded < 4) begin
+            // load backgrounds
+            case (background_state)
+                BACKGROUND_STATE_WAITING: begin
+                    background_state <= BACKGROUND_STATE_LOADING_TEXTUREMAP;
+                end
+
+                BACKGROUND_STATE_LOADING_TEXTUREMAP: begin
+                    if (texturemap_load_ack) begin
+                        background_state <= BACKGROUND_STATE_RENDERING;
+                    end
+                end
+
+                BACKGROUND_STATE_RENDERING: begin
+                    if (render_ack) begin
+                        backgrounds_loaded <= backgrounds_loaded + 1;
+                        background_state <= BACKGROUND_STATE_LOADING_TEXTUREMAP;
+                    end
+                end
+            endcase
+        end
+    end
+
     // load the right texturemap!
     always_ff @(posedge clk) begin
         if (should_load_texturemap) should_load_texturemap <= 0;    // should be a pulse
@@ -132,27 +171,16 @@ module minigame_morse(
             texturemap_ready <= 1'b0;
 
             should_load_texturemap <= 1'b0;
-            backgrounds_loaded <= 3'd0;
-            background_state <= BACKGROUND_STATE_WAITING;
         end else if (backgrounds_loaded < 4) begin
-            // load backgrounds
-            case (background_state)
-                BACKGROUND_STATE_WAITING: begin
-                    texturemap_id <= FIRST_BACKGROUND_TEXTUREMAP;
-                    should_load_texturemap <= 1'b1;
-                    background_state <= BACKGROUND_STATE_LOADING_TEXTUREMAP;
-                end
-
-                BACKGROUND_STATE_LOADING_TEXTUREMAP: begin
-                    if (texturemap_load_ack) begin
-                        state <= BACKGROUND_STATE_RENDERING;
-                    end
-                end
-            endcase
+            if (background_state == BACKGROUND_STATE_LOADING_TEXTUREMAP &&
+                background_state != background_state_last) begin
+                texturemap_id <= FIRST_BACKGROUND_TEXTUREMAP + backgrounds_loaded;
+                should_load_texturemap <= 1'b1;
+            end
         end else begin
             if (!texturemap_loaded) begin
                 // TODO THIS SHOULD BE THE TEXTUREMAP YOU WANT
-                texturemap_id <= 1'b1;
+                texturemap_id <= TEXTUREMAP_ID;
                 texturemap_loaded <= 1'b1;
                 texturemap_ready <= 1'b0;
 
@@ -166,7 +194,7 @@ module minigame_morse(
     // configuration stuff
 //    assign render_dirty = 1'b0;
     assign render_dirty = 1'b1;
-    assign num_objects = 8'd2;
+//    assign num_objects = 8'd2;
 
     // draw things!
     always_ff @(posedge clk) begin
@@ -175,7 +203,19 @@ module minigame_morse(
 
         if (reset) begin
             to_draw <= 2'b11;
+        end else if (backgrounds_loaded < 4) begin
+            num_objects <= 1;
+
+            if (background_state == BACKGROUND_STATE_RENDERING &&
+                background_state != background_state_last) begin
+                new_object_we <= 1;
+                new_object_waddr <= 0;
+                new_object_properties <= {backgrounds_loaded[0] ? 10'd320 : 10'd0, backgrounds_loaded[1] ? 10'd240 : 10'd0, 10'h2FF, 4'h00, backgrounds_loaded[1:0]};
+                should_render <= 1'b1;
+            end
         end else begin
+            num_objects <= 2;
+
             if (led_last != led) begin
                 to_draw <= to_draw | 2'b01;
             end
