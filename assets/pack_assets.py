@@ -55,7 +55,6 @@ background = Image.new(mode="RGBA", size=(TEXTUREMAP_WIDTH, TEXTUREMAP_HEIGHT), 
 # TODO test with an image where the texturepack is not majority black (0x000000FF)
 # convert packed textures into texturemap
 for directory in os.listdir(GRAPHICS_PATH):
-    print(GRAPHICS_PATH + directory)
     # HACK this is terrible
     # get the texturepack id from directory name
     texturepack_id = directory[:3]
@@ -71,7 +70,6 @@ for directory in os.listdir(GRAPHICS_PATH):
         # texturemap.putpalette(palette)
         texturemap_8bit = texturemap.tobytes()
         texturemap_8bit = [rgba_to_8bit(r, g, b, a) for r, g, b, a in zip(*[iter(texturemap.tobytes())] * 4)]
-        print(texturemap_8bit[:10])
 
         # palette_bytes = texturemap.palette.tobytes()
         # palette_bytes = [palette_bytes[i : i + 3] for i in range(0, len(palette_bytes), 3)]
@@ -82,6 +80,8 @@ for directory in os.listdir(GRAPHICS_PATH):
     # texturemaps.append((texturemap_bytes, palette_bytes))
     texturemaps.append(texturemap_8bit)
 
+    print("texturepack " + texturepack_id)
+
     with open(GRAPHICS_OUTPUT_PATH + texturepack_id + "_texturepack.json") as texturemap_atlas_file:
         texturemap_properties = {}
         texturemap_atlas = json.load(texturemap_atlas_file)
@@ -91,13 +91,18 @@ for directory in os.listdir(GRAPHICS_PATH):
             index = int(filename[:2])
             texturemap_properties[index] = (data['frame']['x'], data['frame']['y'],
                                             data['frame']['w'], data['frame']['h'])
+            
+            print("└─ " + filename)
+            packed_asset_filenames.append(filename)
 
+        print()
         texturemap_properties_list.append(texturemap_properties)
 
 # pack audio assets
 for file in os.listdir(AUDIO_PATH):
     try:
         with wave.open(AUDIO_PATH + file, 'rb') as sound:
+            print(file)
             packed_asset_filenames.append(file)
 
             if sound.getparams()[:3] != (1, 1, 44100):
@@ -168,5 +173,5 @@ with open(OUTPUT_FILE, 'wb') as f:
             f.write(w.to_bytes(2, 'little'))
             f.write(h.to_bytes(2, 'little'))
 
-print(f'packed {len(packed_asset_filenames)} files!')
-print(*packed_asset_filenames, sep="\n")
+print(f'\npacked {len(packed_asset_filenames)} files!')
+# print(*packed_asset_filenames, sep="\n")
