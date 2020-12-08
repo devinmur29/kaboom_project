@@ -224,7 +224,7 @@ module top_level( input clk_100mhz,
      assign multiplayer = sw[13:12];
      //assign minigame = 3'b010; //choose which minigame is playing
      assign play_again = sw[11];
- /*
+ 
      always_ff @(posedge clk_25mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
@@ -267,9 +267,7 @@ module top_level( input clk_100mhz,
             endcase
          end
      end
-     */
-     assign minigame = sw[14:11];
-     
+
      //Graphics based on the minigame being played
      
      logic prev_onehz;
