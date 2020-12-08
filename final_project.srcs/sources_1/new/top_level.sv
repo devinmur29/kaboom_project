@@ -103,6 +103,7 @@ module top_level( input clk_100mhz,
     logic stop_sound; //stop a sound
     logic [4:0] sound_id; //sound to be played or stopped
     
+//    assign minigame_order_in = {4'b0010, 4'b0010, 4'b0001, 4'b0001, 4'b0010, 4'b0001};
     assign minigame_order_in = {4'b0010, 4'b0010, 4'b0001, 4'b0001, 4'b0010, 4'b0001};
     
     always_comb begin
@@ -224,7 +225,7 @@ module top_level( input clk_100mhz,
      assign multiplayer = sw[13:12];
      //assign minigame = 3'b010; //choose which minigame is playing
      assign play_again = sw[11];
- /*
+
      always_ff @(posedge clk_25mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
@@ -267,8 +268,7 @@ module top_level( input clk_100mhz,
             endcase
          end
      end
-*/
-    assign minigame = sw[14:11];
+
      //Graphics based on the minigame being played
      
      logic prev_onehz;
@@ -683,6 +683,9 @@ module top_level( input clk_100mhz,
         .texturemap_id(morse_texturemap_id),
         .should_load_texturemap(morse_should_load_texturemap),
         .texturemap_load_ack,
+
+        .failure(mg_fail6),
+        .success(mg_success6),
 
         .random(rand_out[3:0]),
         .sw(sw[3:0]),
