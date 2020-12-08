@@ -496,22 +496,22 @@ module xvga(input vclock_in,
             output logic vsync_out, hsync_out,
             output logic blank_out);
 
-   parameter DISPLAY_WIDTH  = 1024;      // display width
-   parameter DISPLAY_HEIGHT = 768;       // number of lines
+   parameter DISPLAY_WIDTH  = 640;      // display width
+   parameter DISPLAY_HEIGHT = 480;       // number of lines
 
-   parameter  H_FP = 24;                 // horizontal front porch
-   parameter  H_SYNC_PULSE = 136;        // horizontal sync
-   parameter  H_BP = 160;                // horizontal back porch
+   parameter  H_FP = 16;                 // horizontal front porch
+   parameter  H_SYNC_PULSE = 96;        // horizontal sync
+   parameter  H_BP = 48;                // horizontal back porch
 
-   parameter  V_FP = 3;                  // vertical front porch
-   parameter  V_SYNC_PULSE = 6;          // vertical sync 
-   parameter  V_BP = 29;                 // vertical back porch
+   parameter  V_FP = 11;                  // vertical front porch
+   parameter  V_SYNC_PULSE = 2;          // vertical sync
+   parameter  V_BP = 31;                 // vertical back porch
 
    // horizontal: 1344 pixels total
    // display 1024 pixels per line
    logic hblank,vblank;
    logic hsyncon,hsyncoff,hreset,hblankon;
-   assign hblankon = (hcount_out == (DISPLAY_WIDTH -1));    
+   assign hblankon = (hcount_out == (DISPLAY_WIDTH -1));
    assign hsyncon = (hcount_out == (DISPLAY_WIDTH + H_FP - 1));  //1047
    assign hsyncoff = (hcount_out == (DISPLAY_WIDTH + H_FP + H_SYNC_PULSE - 1));  // 1183
    assign hreset = (hcount_out == (DISPLAY_WIDTH + H_FP + H_SYNC_PULSE + H_BP - 1));  //1343
@@ -519,7 +519,7 @@ module xvga(input vclock_in,
    // vertical: 806 lines total
    // display 768 lines
    logic vsyncon,vsyncoff,vreset,vblankon;
-   assign vblankon = hreset & (vcount_out == (DISPLAY_HEIGHT - 1));   // 767 
+   assign vblankon = hreset & (vcount_out == (DISPLAY_HEIGHT - 1));   // 767
    assign vsyncon = hreset & (vcount_out == (DISPLAY_HEIGHT + V_FP - 1));  // 771
    assign vsyncoff = hreset & (vcount_out == (DISPLAY_HEIGHT + V_FP + V_SYNC_PULSE - 1));  // 777
    assign vreset = hreset & (vcount_out == (DISPLAY_HEIGHT + V_FP + V_SYNC_PULSE + V_BP - 1)); // 805
