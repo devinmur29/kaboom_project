@@ -133,7 +133,8 @@ with open(OUTPUT_FILE, 'wb') as f:
         bytes_required = math.ceil(len(data) / 512) * 512
 
         f.write(data)
-        f.write(bytes([0]) * (bytes_required - len(data)))
+        if bytes_required != len(data):
+            f.write(bytes([0]) * (bytes_required - len(data)))
 
         return bytes_required
 
@@ -141,8 +142,12 @@ with open(OUTPUT_FILE, 'wb') as f:
 
     # write graphics here
     # for texturemap, palette in texturemaps:
+    # HACK remove two bytes from the beginning to fix a graphical glitch
     for texturemap in texturemaps:
+        print(head_addr)
         # print(palette[0][0])
+        # bytes_written = write_with_padding(bytes(texturemap[8:]) + bytes(texturemap[:8]))
+        # bytes_written = write_with_padding(bytes(texturemap[-8:]) + bytes(texturemap[:-8]))
         bytes_written = write_with_padding(bytes(texturemap))
 
         head_addr += bytes_written
