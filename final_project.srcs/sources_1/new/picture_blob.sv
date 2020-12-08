@@ -21,14 +21,14 @@
 
 
 module picture_blob
-   #(parameter WIDTH = 985,     // default picture width
-               HEIGHT = 341)    // default picture height
+   #(parameter WIDTH = 152,     // default picture width
+               HEIGHT = 150)    // default picture height
    (input pixel_clk_in,
     input [10:0] x_in,hcount_in,
     input [9:0] y_in,vcount_in,
     output logic [11:0] pixel_out);
 
-   logic [18:0] image_addr;   // num of bits for 256*240 ROM
+   logic [16:0] image_addr;   // num of bits for 256*240 ROM
    logic [7:0] image_bits, red_mapped, green_mapped, blue_mapped;
 
    // calculate rom address and read the location
@@ -38,9 +38,9 @@ module picture_blob
    // use color map to create 4 bits R, 4 bits G, 4 bits B
    // since the image is greyscale, just replicate the red pixels
    // and not bother with the other two color maps.
-   red my_rcm (.clka(pixel_clk_in), .addra(image_bits), .douta(red_mapped));
-   gcm my_gcm (.clka(pixel_clk_in), .addra(image_bits), .douta(green_mapped));
-   bcm my_bcm (.clka(pixel_clk_in), .addra(image_bits), .douta(blue_mapped));
+   covered_r covr (.clka(pixel_clk_in), .addra(image_bits), .douta(red_mapped));
+   covered_g covg (.clka(pixel_clk_in), .addra(image_bits), .douta(green_mapped));
+   covered_b covb (.clka(pixel_clk_in), .addra(image_bits), .douta(blue_mapped));
    // note the one clock cycle delay in pixel!
    always_ff @ (posedge pixel_clk_in) begin
      if ((hcount_in >= x_in && hcount_in < (x_in+WIDTH)) &&
