@@ -178,12 +178,12 @@ module top_level( input clk_100mhz,
 	 .btnr(right),  .random(rand_out[1:0]), .led_r(ledout_mg2[2]), .led_b(ledout_mg2[0]), 
 	 .led_g(ledout_mg2[1]), .timer_count(count_mg2), .state(mg2_state), .fail(mg_fail2), .success(mg_success2));
 	 
-	
-	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
-	 .mg_completed(i), .pixel_out(pixel_out_fpga));
-	
-	FPGA_graphics_op fpga_m (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
-	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
+
+//	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
+//	 .mg_completed(i), .pixel_out(pixel_out_fpga));
+
+//	FPGA_graphics_op fpga_m (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
+//	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
 	
 	////////////////////////MULTIPLAYER FUNCTIONALITY//////////////////////////////////////////////
 	logic multiplayer_reset;
@@ -208,8 +208,7 @@ module top_level( input clk_100mhz,
      assign multiplayer = sw[13:12];
      //assign minigame = 3'b010; //choose which minigame is playing
      assign play_again = sw[11];
-     
-     
+ 
      always_ff @(posedge clk_25mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
@@ -257,7 +256,8 @@ module top_level( input clk_100mhz,
      //Graphics based on the minigame being played
      
      logic prev_onehz;
-     
+     logic [11:0] gengine_pixel_out;
+
     always_ff @(posedge clk_25mhz) begin
          hs <= hsync;
          vs <= vsync;
@@ -266,10 +266,10 @@ module top_level( input clk_100mhz,
          if(one_hz_enable & !prev_onehz)begin 
             led = rand_out;
          end
-    
-    
+
           case(minigame)
-            3'b000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}};
+//            3'b000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}};
+            3'b000      :   begin rgb <= gengine_pixel_out;
                             {led16_r, led16_g, led16_b} <= 3'b0; end 
             3'b001      :   begin rgb <= multiplayer[1]? pixel_out1+pixel_out_fpga+pixel_out_fpgaop : pixel_out1+pixel_out_fpga;
                             {led16_r, led16_g, led16_b} <= 3'b0; end
@@ -324,7 +324,33 @@ module top_level( input clk_100mhz,
                .should_shuffle_in(start_shuffle), .data_out(minigame_order_out), .valid_out(done_shuffle));
 
 
+    logic system_clock;
+    assign system_clock = clk_25mhz;
+
+    logic system_reset;
+    assign system_reset = sw[15];
+
+    logic should_render;
+    logic render_dirty;
+    logic [7:0] num_objects;    // TODO do we need num_objects if we have flags?
+    logic [7:0] new_object_waddr;
+    logic new_object_we;
+    logic [35:0] new_object_properties;
+    logic render_ack;
+
+    logic [7:0] texturemap_id;
+    logic should_load_texturemap;
+    logic texturemap_load_ack;
     
+    logic play;
+    logic stop;
+    logic [4:0] sound_id;
+
+    logic graphics_req;
+    logic [31:0] graphics_req_addr;
+    logic graphics_req_ack;
+    logic graphics_req_we;
+    logic [7:0] graphics_req_dout;
 
     logic [5:0] audio_header_raddr;
     logic [31:0] audio_header_dout;
@@ -339,20 +365,80 @@ module top_level( input clk_100mhz,
 
     logic audio_out;
 
-    sd_card_fsm sd_controller(.clk_in(clk_25mhz), .reset_in(system_reset), .cs(sd_dat[3]), .mosi(sd_cmd),
-                              .miso(sd_dat[0]), .sclk(sd_sck), .graphics_header_raddr, .audio_header_raddr,
-                              .graphics_header_dout, .audio_header_dout, .audio_req, .audio_req_addr, .audio_req_ack,
-                              .audio_req_we, .audio_req_dout);
+    sd_card_fsm sd_controller(
+        .clk_in(system_clock),
+        .reset_in(system_reset),
 
-    // Assign .play() to a pulse
-    
-    assign play_sound = up;
-    assign stop_sound = down;
-    
-    assign sound_id = sw[4:0];
-    
-    sound_engine sengine(.clk(clk_25mhz), .reset(system_reset), .play(play_sound), .stop(stop_sound), .sound_id(sound_id), .audio_header_raddr, .audio_header_dout,
-                         .audio_req, .audio_req_addr, .audio_req_ack, .audio_req_we, .audio_req_dout, .audio_out);
+        .cs(sd_dat[3]),
+        .mosi(sd_cmd),
+        .miso(sd_dat[0]),
+        .sclk(sd_sck),
+
+        .graphics_header_raddr(),
+        .audio_header_raddr,
+        .graphics_header_dout(),
+        .audio_header_dout,
+
+        .audio_req,
+        .audio_req_addr,
+        .audio_req_ack,
+        .audio_req_we,
+        .audio_req_dout,
+
+        .graphics_req,
+        .graphics_req_addr,
+        .graphics_req_ack,
+        .graphics_req_we,
+        .graphics_req_dout
+    );
+
+    graphics_engine gengine(
+        .clk(system_clock),
+        .reset(system_reset),
+
+        .hcount,
+        .vcount,
+
+        .pixel_out(gengine_pixel_out),
+
+        .should_render,
+        .render_dirty,
+        .num_objects,
+        .new_object_waddr,
+        .new_object_we,
+        .new_object_properties,
+        .render_ack,
+
+        .texturemap_id,
+        .should_load_texturemap,
+        .texturemap_load_ack,
+
+        .graphics_req,
+        .graphics_req_addr,
+        .graphics_req_ack,
+        .graphics_req_we,
+        .graphics_req_dout
+    );
+
+    sound_engine sengine(
+        .clk(system_clock),
+        .reset(system_reset),
+
+//        .play(play_sound),
+//        .stop(stop_sound),
+        .play,
+        .stop,
+        .sound_id,
+
+        .audio_header_raddr,
+        .audio_header_dout,
+        .audio_req, 
+        .audio_req_addr,
+        .audio_req_ack,
+        .audio_req_we,
+        .audio_req_dout,
+        .audio_out
+    );
 
     assign aud_sd = 1'b1;
     assign aud_pwm = audio_out ? 1'bZ : 1'b0;
@@ -406,6 +492,26 @@ module top_level( input clk_100mhz,
 //                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
 //                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(wire_pixel));
 
+    title_screen_graphics title_screen(
+        .clk(system_clock),
+        .reset,
+
+//        .play,
+//        .stop,
+//        .sound_id,
+
+        .should_render,
+        .render_dirty,
+        .num_objects,
+        .new_object_waddr,
+        .new_object_we,
+        .new_object_properties,
+        .render_ack,
+
+        .texturemap_id,
+        .should_load_texturemap,
+        .texturemap_load_ack
+    );
 
 endmodule
 
