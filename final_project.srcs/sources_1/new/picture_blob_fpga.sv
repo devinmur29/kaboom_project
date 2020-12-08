@@ -21,14 +21,14 @@
 
 
 module picture_blob_fpga
-   #(parameter WIDTH = 400,     // default picture width
-               HEIGHT = 247)    // default picture height
+   #(parameter WIDTH = 250,     // default picture width
+               HEIGHT = 154)    // default picture height
    (input pixel_clk_in,
     input [10:0] x_in,hcount_in,
     input [9:0] y_in,vcount_in,
     output logic [11:0] pixel_out);
 
-   logic [16:0] image_addr;   // num of bits for 400*248 ROM
+   logic [15:0] image_addr;   // num of bits for 400*248 ROM
    logic [7:0] image_bits, red_mapped, green_mapped, blue_mapped;
    // calculate rom address and read the location
    assign image_addr = (hcount_in-x_in) + (vcount_in-y_in) * WIDTH;
