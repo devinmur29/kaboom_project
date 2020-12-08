@@ -25,7 +25,9 @@ module multiplayer_data (
     input reset_in,         // 1 to initialize module
     input uart_in,          // UART input
     input [2:0] i,  
-    input [1:0] strike_count,        
+    input [1:0] strike_count, 
+    input btnc,
+    input game_state,   
         
     output logic [31:0] data_out,
     output logic uart_out
@@ -42,6 +44,9 @@ module multiplayer_data (
     parameter STATE_WAITING = 2'b01;
     parameter STATE_READING = 2'b10;
     parameter UART_IDLE_THRESHOLD = 130_000; // threshold for UART begin HIGH and we can start reading data
+    parameter TRANSMIT_MAX = 650_000;
+    
+    logic[20:0] transmit_count;
 
     logic [1:0] state;               // FSM state
     logic [31:0] counter;            // counts bits of serial
@@ -60,6 +65,7 @@ module multiplayer_data (
    
     logic [2:0] last_i;
     logic [1:0] last_strike_count;
+    logic prev_btnc;
 
     // pushbutton FSM
     // When we push a button, we should update the button counter
@@ -68,13 +74,16 @@ module multiplayer_data (
             tx_trigger <= 0;
             last_i <= 0;
             last_strike_count <=0;
+            prev_btnc <= 0;
+            transmit_count <= 0;
         end else begin
+         
             if (tx_trigger) tx_trigger <= 0;
             last_i <= i;
             last_strike_count <= strike_count;
-            
-            if (last_i!=i | last_strike_count!=strike_count) begin
-                tx_data <= {3'd0,strike_count,i};
+            prev_btnc <= btnc;
+            if (last_i!=i | last_strike_count!=strike_count |(btnc & !prev_btnc)) begin
+                tx_data <= {2'd0,btnc,strike_count,i};
                 tx_trigger <= 1;
             end
         end
