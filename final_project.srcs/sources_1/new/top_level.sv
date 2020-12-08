@@ -23,6 +23,12 @@
 module top_level( input clk_100mhz,
                   input[15:0] sw,
                   input btnc, btnu, btnl, btnr, btnd,
+                  ////mic inputs
+                  ///input vauxp3,
+                  //input vauxn3,
+                  //input vn_in,
+                  //input vp_in, 
+                  
                   input serial_rx,
                   output serial_tx,
                   output logic[3:0] vga_r,
@@ -103,7 +109,166 @@ module top_level( input clk_100mhz,
     logic stop_sound; //stop a sound
     logic [4:0] sound_id; //sound to be played or stopped
     
-    assign minigame_order_in = {4'b0010, 4'b0010, 4'b0001, 4'b0001, 4'b0010, 4'b0001};
+    
+    
+//    ///////////////////MIC AND FFT VARIABLES//////////////////////
+//    parameter SAMPLE_COUNT = 4164; //2082;//gets approximately (will generate audio at approx 21 kHz sample rate.
+    
+//    logic [15:0] sample_counter;
+//    logic [11:0] adc_data;
+//    logic [11:0] sampled_adc_data;
+//    logic sample_trigger;
+//    logic adc_ready;
+//    logic enable;
+//    logic [7:0] recorder_data;             
+//    logic [7:0] vol_out;
+//    logic pwm_val; //pwm signal (HI/LO)
+//    logic [15:0] scaled_adc_data;
+//    logic [15:0] scaled_signed_adc_data;
+//    logic [15:0] fft_data;
+//    logic       fft_ready;
+//    logic       fft_valid;
+//    logic       fft_last;
+//    logic [9:0] fft_data_counter;
+    
+//    logic fft_out_ready;
+//    logic fft_out_valid;
+//    logic fft_out_last;
+//    logic [31:0] fft_out_data;
+    
+//    logic sqsum_valid;
+//    logic sqsum_last;
+//    logic sqsum_ready;
+//    logic [31:0] sqsum_data;
+    
+//    logic fifo_valid;
+//    logic fifo_last;
+//    logic fifo_ready;
+//    logic [31:0] fifo_data;
+    
+//    logic [23:0] sqrt_data;
+//    logic sqrt_valid;
+//    logic sqrt_last;
+    
+//    logic pixel_clk;
+//    ///////////////////////////////////////////////////////////////////////
+    
+//    assign sample_trigger = (sample_counter == SAMPLE_COUNT);
+
+//    always_ff @(posedge clk_100mhz)begin
+//        if (sample_counter == SAMPLE_COUNT)begin
+//            sample_counter <= 16'b0;
+//        end else begin
+//            sample_counter <= sample_counter + 16'b1;
+//        end
+//        if (sample_trigger) begin
+//            scaled_adc_data <= 16*adc_data;
+//            scaled_signed_adc_data <= {~scaled_adc_data[15],scaled_adc_data[14:0]};
+//            sampled_adc_data <= {~adc_data[11],adc_data[10:0]}; //convert to signed. incoming data is offset binary
+//            if (fft_ready)begin
+//                fft_data_counter <= fft_data_counter +1;
+//                fft_last <= fft_data_counter==1023;
+//                fft_valid <= 1'b1;
+//                fft_data <= {~scaled_adc_data[15],scaled_adc_data[14:0]}; //set the FFT DATA here!
+//            end
+//            //https://en.wikipedia.org/wiki/Offset_binary
+//        end else begin
+//            fft_data <= 0;
+//            fft_last <= 0;
+//            fft_valid <= 0;
+//        end
+//    end
+
+//    //ADC uncomment when activating!
+//    xadc_wiz_0 my_adc ( .dclk_in(clk_100mhz), .daddr_in(8'h13), //read from 0x13 for a
+//                        .vauxn3(vauxn3),.vauxp3(vauxp3),
+//                        .vp_in(1),.vn_in(1),
+//                        .di_in(16'b0),
+//                        .do_out(adc_data),.drdy_out(adc_ready),
+//                        .den_in(1), .dwe_in(0));
+ 
+ 
+    
+    
+    //FFT module:
+    //CONFIGURATION:
+    //1 channel
+    //transform length: 1024
+    //target clock frequency: 100 MHz
+    //target Data throughput: 50 Msps
+    //Auto-select architecture
+    //IMPLEMENTATION:
+    //Fixed Point, Scaled, Truncation
+    //MAKE SURE TO SET NATURAL ORDER FOR OUTPUT ORDERING
+    //Input Data Width, Phase Factor Width: Both 16 bits
+    //Result uses 12 DSP48 Slices and 6 Block RAMs (under Impl Details)
+//    xfft_0 my_fft (.aclk(clk_100mhz), .s_axis_data_tdata(fft_data), 
+//                    .s_axis_data_tvalid(fft_valid),
+//                    .s_axis_data_tlast(fft_last), .s_axis_data_tready(fft_ready),
+//                    .s_axis_config_tdata(0), 
+//                     .s_axis_config_tvalid(0),
+//                     .s_axis_config_tready(),
+//                    .m_axis_data_tdata(fft_out_data), .m_axis_data_tvalid(fft_out_valid),
+//                    .m_axis_data_tlast(fft_out_last), .m_axis_data_tready(fft_out_ready));
+    
+    //for debugging commented out, make this whatever size,detail you want:
+    //ila_0 myila (.clk(clk_100mhz), .probe0(fifo_data), .probe1(sqrt_data), .probe2(sqsum_data), .probe3(fft_out_data));
+    
+    //custom module (was written with a Vivado AXI-Streaming Wizard so format looks inhuman
+    //this is because it was a template I customized.
+//    square_and_sum_v1_0 mysq(.s00_axis_aclk(clk_100mhz), .s00_axis_aresetn(1'b1),
+//                            .s00_axis_tready(fft_out_ready),
+//                            .s00_axis_tdata(fft_out_data),.s00_axis_tlast(fft_out_last),
+//                            .s00_axis_tvalid(fft_out_valid),.m00_axis_aclk(clk_100mhz),
+//                            .m00_axis_aresetn(1'b1),. m00_axis_tvalid(sqsum_valid),
+//                            .m00_axis_tdata(sqsum_data),.m00_axis_tlast(sqsum_last),
+//                            .m00_axis_tready(sqsum_ready));
+    
+//    //Didn't really need this fifo but put it in for because I felt like it and for practice:
+//    //This is an AXI4-Stream Data FIFO
+//    //FIFO Depth: 1024
+//    //No packet mode, no async clock, 2 sycn stages for clock domain crossing
+//    //no aclken conversion
+//    //TDATA Width: 4 bytes
+//    //Enable TSTRB: No...isn't needed
+//    //Enable TKEEP: No...isn't needed
+//    //Enable TLAST: Yes...use this for frame alignment
+//    //TID Width, TDEST Width, and TUSER width: all 0
+//    axis_data_fifo_0 myfifo (.s_axis_aclk(clk_100mhz), .s_axis_aresetn(1'b1),
+//                             .s_axis_tvalid(sqsum_valid), .s_axis_tready(sqsum_ready),
+//                             .s_axis_tdata(sqsum_data), .s_axis_tlast(sqsum_last),
+//                             .m_axis_tvalid(fifo_valid), .m_axis_tdata(fifo_data),
+//                             .m_axis_tready(fifo_ready), .m_axis_tlast(fifo_last));    
+    //AXI4-STREAMING Square Root Calculator:
+    //CONFIGUATION OPTIONS:
+    // Functional Selection: Square Root
+    //Architec Config: Parallel (can't change anyways)
+    //Pipelining: Max
+    //Data Format: UnsignedInteger
+    //Phase Format: Radians, the way God intended.
+    //Input Width: 32
+    //Output Width: 17
+    //Round Mode: Truncate
+    //0 on the others, and no scale compensation
+    //AXI4 STREAM OPTIONS:
+    //Has TLAST!!! need to propagate that
+    //Don't need a TUSER
+    //Flow Control: Blocking
+//    //optimize Goal: Performance
+//    //leave other things unchecked.
+//    cordic_0 mysqrt (.aclk(clk_100mhz), .s_axis_cartesian_tdata(fifo_data),
+//                     .s_axis_cartesian_tvalid(fifo_valid), .s_axis_cartesian_tlast(fifo_last),
+//                     .s_axis_cartesian_tready(fifo_ready),.m_axis_dout_tdata(sqrt_data),
+//                     .m_axis_dout_tvalid(sqrt_valid), .m_axis_dout_tlast(sqrt_last));
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+
+   
+   
+   
+   
+    
+    assign minigame_order_in = {4'b0010, 4'b0100, 4'b0101, 4'b0001, 4'b0101, 4'b0100};
     
     always_comb begin
         case(minigame)
@@ -194,6 +359,35 @@ module top_level( input clk_100mhz,
 	 .btnr(right),  .random(rand_out[1:0]), .led_r(ledout_mg2[2]), .led_b(ledout_mg2[0]), 
 	 .led_g(ledout_mg2[1]), .timer_count(count_mg2), .state(mg2_state), .fail(mg_fail2), .success(mg_success2));
 	 
+	 ///////////////////////minigame 3/////////////////////////////////////////////////
+//	 logic [9:0] led_minigame3;
+	 
+//	     micr_minigame minigame_3 (.vclock_in(clk_25mhz), .hcount_in(hcount), .vcount_in(vcount), .hsync_in(hsync),
+//            .vsync_in(vsync), .blank_in(blanking), .button(center), .sqrt_data(sqrt_data), 
+//            .sqrt_valid(sqrt_valid), .sqrt_last(sqrt_last), .minigame_number(minigame),
+//            .completed(mg_success3), .phsync_out(phsync), .pvsync_out(pvsync), 
+//            .pblank_out(pblank), .pixel_out(pixel_out3), .cool_led(led_minigame3));
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////
+   
+   
+   ////////////////////minigame_4////////////////////////////////////////////////
+   
+   logic hsync_mg4, vsync_mg4, blank_mg4;
+   
+	 wire_cutting minigame_4 (.vclock_in(clk_25mhz),.reset_in(mg_start), 
+                .incolor1(rand_out[2:0]), .incolor2(rand_out[5:3]), .incolor3(rand_out[8:6]), .incolor4(rand_out[11:9]), .incolor5(rand_out[14:12]), .incolor6(rand_out[3:1]),
+                .hcount_in(hcount),.vcount_in(vcount), .cut_switch(sw[9:4]), .completed(mg_success4), .failed(mg_fail4),
+                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
+                .phsync_out(hsync_mg4),.pvsync_out(vsync_mg4),.pblank_out(blank_mg4),.pixel_out(pixel_out4));
+                
+                
+     ///////////////////////////////////////////minigame_5//////////////////////////////////////////////////////////////
+     button_game bg(.vclock_in(clk_25mhz),.reset_in(mg_start), .ones(ones[3:0]), .tens(tens[3:0]), .minutes(minutes),
+                .hcount_in(hcount),.vcount_in(vcount), .pushed_button(up), .rand_has_text(rand_out[0]),
+                .rand_button_color(rand_out[2:1]), .rand_strip_color(rand_out[3]), .completed(mg5_success), .failed(mg5_fail),
+                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
+                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(button_pixel));
+     
 
 	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
 	 .mg_completed(i), .pixel_out(pixel_out_fpga));
@@ -511,11 +705,7 @@ module top_level( input clk_100mhz,
 //rand button color, 2 bit random -- chooses button color based on rules in module
 //rand strip color chooses strip color 1 bit from random module, this will also be explained in rules
 //completed means they did it correctly, failed means they didnt
-//button_game bg(.vclock_in(clk_65mhz),.reset_in(left), .ones(ones[3:0]), .tens(tens[3:0]), .minutes(minutes),
-//                .hcount_in(hcount),.vcount_in(vcount), .pushed_button(up), .rand_has_text(1),
-//                .rand_button_color(2'b01), .rand_strip_color(1'b0), .completed(led17_g), .failed(led17_r),
-//                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
-//                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(button_pixel));
+
 
 //wire cutting game
 //color1-6 are 3 bit random entry numbers that choose colors for each wire

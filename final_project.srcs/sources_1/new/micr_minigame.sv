@@ -137,7 +137,7 @@ module micr_minigame(
         if (color == correct_color) begin
             counter <= counter + 1;
         end else begin
-            if (counter >= 400000000) begin
+            if (counter >= 200000000) begin
                 counter <= counter + 1;
             end else begin
                 counter <= 0;
@@ -169,10 +169,10 @@ module micr_minigame(
            .y_in(300), .vcount_in(vcount_in), .pixel_out(uncovered_pixel));
            
      always_comb begin
-        if (counter >= 400000000) begin
+        if (counter >= 200_000_000) begin
             //finished_color = 12'b0000_1111_0000;
             //switch_images = 1'b1;
-            if (counter >= 600000000) begin
+            if (counter >= 300_000_000) begin
                 pixel_out = pixel | uncovered_pixel;
                 if (button) begin
                     completed = 1'b1;

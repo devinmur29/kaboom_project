@@ -52,6 +52,7 @@ module wire_cutting (
    assign pvsync_out = vsync_in;
    assign pblank_out = blank_in;
    
+   logic [2:0] incolor1_c, incolor2_c, incolor3_c, incolor4_c, incolor5_c, incolor6_c;
    logic [11:0] color1;
    logic [11:0] color2;
    logic [11:0] color3;
@@ -60,7 +61,7 @@ module wire_cutting (
    logic [11:0] color6;
    
    always_comb begin
-       case(incolor1)
+       case(incolor1_c)
            3'b000 : color1 = 12'hF00;
            3'b001 : color1 = 12'h0F0;
            3'b010 : color1 = 12'h00F;
@@ -74,7 +75,7 @@ module wire_cutting (
    end
    
    always_comb begin
-       case(incolor2)
+       case(incolor2_c)
            3'b000 : color2 = 12'hF00;
            3'b001 : color2 = 12'h0F0;
            3'b010 : color2 = 12'h00F;
@@ -88,7 +89,7 @@ module wire_cutting (
    end
    
    always_comb begin
-       case(incolor3)
+       case(incolor3_c)
            3'b000 : color3 = 12'hF00;
            3'b001 : color3 = 12'h0F0;
            3'b010 : color3 = 12'h00F;
@@ -102,7 +103,7 @@ module wire_cutting (
    end
    
    always_comb begin
-       case(incolor4)
+       case(incolor4_c)
            3'b000 : color4 = 12'hF00;
            3'b001 : color4 = 12'h0F0;
            3'b010 : color4 = 12'h00F;
@@ -116,7 +117,7 @@ module wire_cutting (
    end
    
    always_comb begin
-       case(incolor5)
+       case(incolor5_c)
            3'b000 : color5 = 12'hF00;
            3'b001 : color5 = 12'h0F0;
            3'b010 : color5 = 12'h00F;
@@ -130,7 +131,7 @@ module wire_cutting (
    end
    
    always_comb begin
-       case(incolor6)
+       case(incolor6_c)
            3'b000 : color6 = 12'hF00;
            3'b001 : color6 = 12'h0F0;
            3'b010 : color6 = 12'h00F;
@@ -311,6 +312,15 @@ module wire_cutting (
     end
    
    always_ff@(posedge vclock_in) begin
+        if(reset_in) begin
+                incolor1_c <= incolor1;
+                incolor2_c <= incolor2;
+                incolor3_c <= incolor3;
+                incolor4_c <= incolor4;
+                incolor5_c <= incolor5;
+                incolor6_c <= incolor6;
+            
+        end else begin
         if (cut_switch == need_to_cut_wire)begin
             correct_cut <= 3'b010;
         end else begin
@@ -323,6 +333,7 @@ module wire_cutting (
                 end
             end
         end
+      end
    end
    
    logic [11:0] blobcolor1;
