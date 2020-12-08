@@ -195,11 +195,11 @@ module top_level( input clk_100mhz,
 	 .led_g(ledout_mg2[1]), .timer_count(count_mg2), .state(mg2_state), .fail(mg_fail2), .success(mg_success2));
 	 
 
-	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
-	 .mg_completed(i), .pixel_out(pixel_out_fpga));
+//	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
+//	 .mg_completed(i), .pixel_out(pixel_out_fpga));
 
-	FPGA_graphics_op fpga_m (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
-	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
+//	FPGA_graphics_op fpga_m (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
+//	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
 	
 	////////////////////////MULTIPLAYER FUNCTIONALITY//////////////////////////////////////////////
 	logic multiplayer_reset;
@@ -224,7 +224,7 @@ module top_level( input clk_100mhz,
      assign multiplayer = sw[13:12];
      //assign minigame = 3'b010; //choose which minigame is playing
      assign play_again = sw[11];
- 
+ /*
      always_ff @(posedge clk_25mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
@@ -243,19 +243,19 @@ module top_level( input clk_100mhz,
                                     if(sw[10] & btnc_op) timer_start <= 1;end
                 START   :   begin mg_start <=1; minigame <= minigame_order_out[i]; multiplayer_reset <=0; 
                                     game_state <=(mg_fail|mg_success)?START: multiplayer[1]?MG_M:MG_S; timer_start<=0; end
-                
+
                 MG_M      :   begin  mg_start <= 0;
-                                   game_state <= (expired|i_op==6)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd5)?WIN:START):MG_M;
+                                   game_state <= (expired|i_op==6)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_M;
                                    strike_count <= expired? 2'b11:mg_fail?strike_count+1:strike_count;
                                    if (mg_success) i<=i+1;
                                    if(expired| i_op ==6|(strike_count_op !=2'b11&mg_fail&strike_count==2)) lose_start <=1;
-                                   else if(strike_count_op==2'b11|(mg_success&i==3'd5)) win_start <=1;   end
+                                   else if(strike_count_op==2'b11|(mg_success&i==3'd4)) win_start <=1;   end
                 MG_S      :   begin  mg_start <= 0;
-                                   game_state <= (expired)?LOSE:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd5)?WIN:START):MG_S;
+                                   game_state <= (expired)?LOSE:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_S;
                                    strike_count <= expired? 2'b11:mg_fail?strike_count+1:strike_count;
                                    if (mg_success) i<=i+1;
                                    if(expired|(mg_fail&strike_count==2)) lose_start <=1;
-                                   else if(mg_success&i==3'd5) win_start <=1;   end
+                                   else if(mg_success&i==3'd4) win_start <=1;   end
                 LOSE    :   begin lose_start<=0; 
                                     minigame <= (play_again)?4'b0000: 4'b0111;
                                     game_state <= (play_again)?SHUFFLE:LOSE;
@@ -267,12 +267,17 @@ module top_level( input clk_100mhz,
             endcase
          end
      end
-     
+     */
+     assign minigame = sw[14:11];
      
      //Graphics based on the minigame being played
      
      logic prev_onehz;
      logic [11:0] gengine_pixel_out;
+
+     localparam TITLE_SCREEN = 4'b0000;
+     localparam LOSE_SCREEN = 4'b0111;
+     localparam WIN_SCREEN = 4'b1000;
 
     always_ff @(posedge clk_25mhz) begin
          hs <= hsync;
@@ -310,9 +315,9 @@ module top_level( input clk_100mhz,
                                   {led16_r, led16_g, led16_b} <= 0;
                                   play_sound <=0; stop_sound <=0; sound_id <= 0;
                                   end
-            4'b0111      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //LOSE, change to pixel_out_lose
+            4'b0111      :   begin rgb <= gengine_pixel_out; //LOSE, change to pixel_out_lose
                             {led16_r, led16_g, led16_b} <= 3'b100; end 
-            4'b1000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //WIN, change to pixel_out_win
+            4'b1000      :   begin rgb <= gengine_pixel_out; //WIN, change to pixel_out_win
                             {led16_r, led16_g, led16_b} <= 3'b111; end 
             4'b1001      :  begin rgb <= pixel_out_sync;
                                   {led16_r, led16_g, led16_b} <= 3'b000;end //SYNC STATE
@@ -333,10 +338,10 @@ module top_level( input clk_100mhz,
     logic [31:0] data;      
     logic [6:0] segments;
     assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
-    assign data[3:0] = game_state;
-    assign data[7:4] = {2'b0,strike_count_op};
-    assign data[11:8] = {1'b0, i_op};
-    assign data[31:12] = {7'b0, btnc_op,minutes, tens[3:0], ones[3:0]};
+//    assign data[3:0] = game_state;
+//    assign data[7:4] = {2'b0,strike_count_op};
+//    assign data[11:8] = {1'b0, i_op};
+//    assign data[31:12] = {7'b0, btnc_op,minutes, tens[3:0], ones[3:0]};
     
     display_8hex display_mod (.clk_in(clk_25mhz), .data_in(data),
 	.seg_out({cg, cf, ce, cd, cc, cb, ca}), .strobe_out(an));
@@ -353,6 +358,7 @@ module top_level( input clk_100mhz,
 
         .orientation
     );
+    assign data[3:0] = orientation;
 
     // Change NUM_SHUFFLED_ITEMS and SHUFFLED_ITEM_BITS, data_in should be whatever you want shuffled (packed array of bits)
     // pulse should_shuffle_in when you want to shuffle; set data_out and valid_out accordingly
@@ -364,8 +370,8 @@ module top_level( input clk_100mhz,
     logic system_clock;
     assign system_clock = clk_25mhz;
 
-    //logic system_reset;
-    //assign system_reset = sw[15];
+    logic system_reset;
+    assign system_reset = sw[15];
 
     logic should_render;
     logic render_dirty;
@@ -381,7 +387,7 @@ module top_level( input clk_100mhz,
     
     logic play;
     logic stop;
-    //logic [4:0] sound_id;
+    logic [4:0] sound_id;
 
     logic graphics_req;
     logic [31:0] graphics_req_addr;
@@ -529,6 +535,99 @@ module top_level( input clk_100mhz,
 //                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
 //                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(wire_pixel));
 
+    // This is a horrible, giant multiplexer to resolve conflicts between different modules that use gengine/sengine
+    // the sight of this is actually truly awful
+
+    logic morse_should_render;
+    logic morse_render_dirty;
+    logic [7:0] morse_num_objects;
+    logic [7:0] morse_new_object_waddr;
+    logic morse_new_object_we;
+    logic [35:0] morse_new_object_properties;
+
+    logic [7:0] morse_texturemap_id;
+    logic morse_should_load_texturemap;
+
+    logic title_screen_should_render;
+    logic title_screen_render_dirty;
+    logic [7:0] title_screen_num_objects;
+    logic [7:0] title_screen_new_object_waddr;
+    logic title_screen_new_object_we;
+    logic [35:0] title_screen_new_object_properties;
+
+    logic [7:0] title_screen_texturemap_id;
+    logic title_screen_should_load_texturemap;
+
+    logic lose_screen_should_render;
+    logic lose_screen_render_dirty;
+    logic [7:0] lose_screen_num_objects;
+    logic [7:0] lose_screen_new_object_waddr;
+    logic lose_screen_new_object_we;
+    logic [35:0] lose_screen_new_object_properties;
+
+    logic [7:0] lose_screen_texturemap_id;
+    logic lose_screen_should_load_texturemap;
+
+    logic win_screen_should_render;
+    logic win_screen_render_dirty;
+    logic [7:0] win_screen_num_objects;
+    logic [7:0] win_screen_new_object_waddr;
+    logic win_screen_new_object_we;
+    logic [35:0] win_screen_new_object_properties;
+
+    logic [7:0] win_screen_texturemap_id;
+    logic win_screen_should_load_texturemap;
+
+    logic minigame_reset;
+    logic [3:0] minigame_last;
+
+    always_ff @(posedge system_clock) begin
+        minigame_last <= minigame;
+        if (minigame_reset) minigame_reset <= 1'b0;
+
+        if (minigame_last != minigame) begin
+            minigame_reset <= 1'b1;
+        end
+
+        case (minigame)
+            TITLE_SCREEN: begin
+                should_render <= title_screen_should_render;
+                render_dirty <= title_screen_render_dirty;
+                num_objects <= title_screen_num_objects;
+                new_object_waddr <= title_screen_new_object_waddr;
+                new_object_we <= title_screen_new_object_we;
+                new_object_properties <= title_screen_new_object_properties;
+        
+                texturemap_id <= title_screen_texturemap_id;
+                should_load_texturemap <= title_screen_should_load_texturemap;
+            end
+
+            WIN_SCREEN: begin
+                should_render <= win_screen_should_render;
+                render_dirty <= win_screen_render_dirty;
+                num_objects <= win_screen_num_objects;
+                new_object_waddr <= win_screen_new_object_waddr;
+                new_object_we <= win_screen_new_object_we;
+                new_object_properties <= win_screen_new_object_properties;
+        
+                texturemap_id <= win_screen_texturemap_id;
+                should_load_texturemap <= win_screen_should_load_texturemap;
+            end
+
+            LOSE_SCREEN: begin
+                should_render <= lose_screen_should_render;
+                render_dirty <= lose_screen_render_dirty;
+                num_objects <= lose_screen_num_objects;
+                new_object_waddr <= lose_screen_new_object_waddr;
+                new_object_we <= lose_screen_new_object_we;
+                new_object_properties <= lose_screen_new_object_properties;
+        
+                texturemap_id <= lose_screen_texturemap_id;
+                should_load_texturemap <= lose_screen_should_load_texturemap;
+            end
+        endcase
+    end
+
     minigame_morse minigame_morse_inst(
         .clk(system_clock),
         .reset,
@@ -537,41 +636,41 @@ module top_level( input clk_100mhz,
 //        .stop,
 //        .sound_id,
 
-        .should_render,
-        .render_dirty,
-        .num_objects,
-        .new_object_waddr,
-        .new_object_we,
-        .new_object_properties,
+        .should_render(morse_should_render),
+        .render_dirty(morse_render_dirty),
+        .num_objects(morse_num_objects),
+        .new_object_waddr(morse_new_object_waddr),
+        .new_object_we(morse_new_object_we),
+        .new_object_properties(morse_new_object_properties),
         .render_ack,
 
-        .texturemap_id,
-        .should_load_texturemap,
-        .texturemap_load_ack,
+        .texturemap_id(morse_texturemap_id),
+        .should_load_texturemap(morse_should_load_texturemap),
+        .texturemap_load_ack(morse_texturemap_load_ack),
 
         .random(rand_out[3:0]),
         .sw(sw[3:0]),
         .btnc(center)
     );
-    
+
     title_screen_graphics title_screen(
         .clk(system_clock),
-        .reset,
+        .reset(minigame_reset || system_reset),
 
 //        .play,
 //        .stop,
 //        .sound_id,
 
-        .should_render,
-        .render_dirty,
-        .num_objects,
-        .new_object_waddr,
-        .new_object_we,
-        .new_object_properties,
+        .should_render(title_screen_should_render),
+        .render_dirty(title_screen_render_dirty),
+        .num_objects(title_screen_num_objects),
+        .new_object_waddr(title_screen_new_object_waddr),
+        .new_object_we(title_screen_new_object_we),
+        .new_object_properties(title_screen_new_object_properties),
         .render_ack,
 
-        .texturemap_id,
-        .should_load_texturemap,
+        .texturemap_id(title_screen_texturemap_id),
+        .should_load_texturemap(title_screen_should_load_texturemap),
         .texturemap_load_ack,
 
         .up,
@@ -579,25 +678,25 @@ module top_level( input clk_100mhz,
         .confirm(center),
         .mode()
     );
-/*
+
     lose_graphics lose_screen(
         .clk(system_clock),
-        .reset,
+        .reset(minigame_reset || system_reset),
 
 //        .play,
 //        .stop,
 //        .sound_id,
 
-        .should_render,
-        .render_dirty,
-        .num_objects,
-        .new_object_waddr,
-        .new_object_we,
-        .new_object_properties,
+        .should_render(lose_screen_should_render),
+        .render_dirty(lose_screen_render_dirty),
+        .num_objects(lose_screen_num_objects),
+        .new_object_waddr(lose_screen_new_object_waddr),
+        .new_object_we(lose_screen_new_object_we),
+        .new_object_properties(lose_screen_new_object_properties),
         .render_ack,
 
-        .texturemap_id,
-        .should_load_texturemap,
+        .texturemap_id(lose_screen_texturemap_id),
+        .should_load_texturemap(lose_screen_should_load_texturemap),
         .texturemap_load_ack,
 
         .confirm(down),
@@ -606,28 +705,28 @@ module top_level( input clk_100mhz,
 
     win_graphics win_screen(
         .clk(system_clock),
-        .reset,
+        .reset(minigame_reset || system_reset),
 
 //        .play,
 //        .stop,
 //        .sound_id,
 
-        .should_render,
-        .render_dirty,
-        .num_objects,
-        .new_object_waddr,
-        .new_object_we,
-        .new_object_properties,
+        .should_render(win_screen_should_render),
+        .render_dirty(win_screen_render_dirty),
+        .num_objects(win_screen_num_objects),
+        .new_object_waddr(win_screen_new_object_waddr),
+        .new_object_we(win_screen_new_object_we),
+        .new_object_properties(win_screen_new_object_properties),
         .render_ack,
 
-        .texturemap_id,
-        .should_load_texturemap,
+        .texturemap_id(win_screen_texturemap_id),
+        .should_load_texturemap(win_screen_should_load_texturemap),
         .texturemap_load_ack,
 
         .confirm(down),
         .confirmed()
     );
-*/
+
 endmodule
 
 
@@ -800,9 +899,9 @@ module minigame_1( input vclock_in,
                    logic [12:0] start_temp;
                    logic[1:0] chosen_rand;
                    
-                   blob_D #(.WIDTH(40), .HEIGHT(40)) square_1(.x_in(11'd220), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_ll), .color(color_sq1));
-                   blob_D #(.WIDTH(40), .HEIGHT(40)) square_2(.x_in(11'd300), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_lc), .color(color_sq2));
-                   blob_D #(.WIDTH(40), .HEIGHT(40)) square_3(.x_in(11'd380), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_lr), .color(color_sq3));
+                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_1(.x_in(11'd138), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_ll), .color(color_sq1));
+                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_2(.x_in(11'd479), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lc), .color(color_sq2));
+                   blob_D #(.WIDTH(64), .HEIGHT(64)) square_3(.x_in(11'd820), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lr), .color(color_sq3));
                   // fingerprint(.pixel_clk_in(vclock_in), .x_in(11'd386), .y_in(10'd351), .hcount_in(hcount_in), .vcount_in(vcount_in), .pixel_out(pixel_f));
                    
                    logic[11:0] diff1;
@@ -962,10 +1061,10 @@ module minigame_2( input vclock_in,
                    logic [11:0] color_1, color_2, color_3, color_4, pixel_out1, pixel_out2, pixel_out3, pixel_out4;
                    logic [1:0] color_rand;
                    
-                   circle_blob  #(.RADIUS(16)) circle1 (.x_in(11'd320), .y_in(10'd216), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_1), .pixel_out(pixel_out1));
-                   circle_blob  #(.RADIUS(16)) circle2 (.x_in(11'd344), .y_in(10'd240), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_2), .pixel_out(pixel_out2));
-                   circle_blob  #(.RADIUS(16)) circle3 (.x_in(11'd320), .y_in(11'd264), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_3), .pixel_out(pixel_out3));
-                   circle_blob  #(.RADIUS(16)) circle4 (.x_in(11'd296), .y_in(10'd240), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_4), .pixel_out(pixel_out4));
+                   circle_blob  #(.RADIUS(32)) circle1 (.x_in(11'd512), .y_in(10'd416), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_1), .pixel_out(pixel_out1));
+                   circle_blob  #(.RADIUS(32)) circle2 (.x_in(11'd608), .y_in(10'd512), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_2), .pixel_out(pixel_out2));
+                   circle_blob  #(.RADIUS(32)) circle3 (.x_in(11'd512), .y_in(11'd608), .vclock_in(vclock_in),.vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_3), .pixel_out(pixel_out3));
+                   circle_blob  #(.RADIUS(32)) circle4 (.x_in(11'd416), .y_in(10'd512), .vclock_in(vclock_in), .vcount_in(vcount_in), .hcount_in(hcount_in), .color(color_4), .pixel_out(pixel_out4));
                    
                    assign pixel_out = pixel_out1 + pixel_out2 + pixel_out3 + pixel_out4;
                    assign btnu1 = btnu & !prev_btnu;

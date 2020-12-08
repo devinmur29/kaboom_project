@@ -34,6 +34,7 @@ module minigame_morse(
     output logic [7:0] new_object_waddr,
     output logic new_object_we,
     output logic [35:0] new_object_properties,
+    input logic render_ack,
 
     output logic [7:0] texturemap_id,
     output logic should_load_texturemap,
@@ -42,13 +43,14 @@ module minigame_morse(
     input [3:0] random,
     input [3:0] sw,
     input btnc,
-//    output logic [7:0] debug,
-    output logic led
+
+    output logic success,
+    output logic failure
 );
 
     // 16 possible answers
     logic [3:0] solution;
-    logic solved;
+    logic led;
 
     localparam DOT = 2'b10;
     localparam DASH = 2'b11;
@@ -202,12 +204,13 @@ module minigame_morse(
     // are we guaranteed to be reset every time?
     always_ff @(posedge clk) begin
         if (reset) begin
-            solved <= 1'b0;
+            success <= 1'b0;
+            failure <= 1'b0;
         end else begin
             if (btnc && sw == solution) begin
-                solved <= 1'b1;
+                success <= 1'b1;
             end else if (btnc) begin
-                // do error output here
+                failure <= 1'b1;
             end
         end
     end
