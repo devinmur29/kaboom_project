@@ -43,8 +43,7 @@ module multiplayer_data (
    
     parameter STATE_WAITING = 2'b01;
     parameter STATE_READING = 2'b10;
-    parameter UART_IDLE_THRESHOLD = 130_000; // threshold for UART begin HIGH and we can start reading data
-    parameter TRANSMIT_MAX = 650_000;
+    parameter UART_IDLE_THRESHOLD = 50_000; // threshold for UART begin HIGH and we can start reading data
     
     logic[20:0] transmit_count;
 

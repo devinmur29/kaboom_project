@@ -59,8 +59,8 @@ module top_level( input clk_100mhz,
     logic system_reset;
     assign system_reset = sw[15];
 
-    parameter ONE_HZ_PERIOD = 65_000_000;
-    parameter DEBOUNCE_COUNT = 1000000;
+    parameter ONE_HZ_PERIOD = 25_000_000;
+    parameter DEBOUNCE_COUNT = 1_000_000;
     
     //SCENE AND MINIGAME STATES
     parameter HOME = 4'd0;
@@ -96,6 +96,9 @@ module top_level( input clk_100mhz,
     logic[1:0] strike_count_op; //opponents' strikes
     logic btnc_op; //other player's sync button
     logic play_again; //output of win/lose modules
+    logic play_sound; //play a sound
+    logic stop_sound; //stop a sound
+    logic [4:0] sound_id; //sound to be played or stopped
     
     assign minigame_order_in = {3'b010, 3'b010, 3'b001, 3'b001, 3'b010};
     assign mg_fail = (mg_fail1 | mg_fail2);
@@ -107,7 +110,10 @@ module top_level( input clk_100mhz,
     
     
     //create 65 MHz clock for 1024 x 768 VGA graphics
-    clk_wiz_lab3 clkdivider(.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
+    //clk_wiz_lab3 clkdivider(.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
+    // generate 25 mhz clock for sd_controller
+    logic clk_25mhz;
+    clk_wiz_0 clocks(.clk_in1(clk_100mhz), .clk_out1(clk_25mhz));
     
     
     
@@ -115,18 +121,18 @@ module top_level( input clk_100mhz,
  /////////Debounce Inputs/////////////////////
 	
 	
-	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db1 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnc),.clean_out(center));
-	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db2 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnu),.clean_out(up));
-	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db3 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnd),.clean_out(down));
-	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db4 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnl),.clean_out(left));
-	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db5 (.reset_in(sw[15]), .clock_in(clk_65mhz), .noisy_in(btnr),.clean_out(right));
+	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db1 (.reset_in(sw[15]), .clock_in(clk_25mhz), .noisy_in(btnc),.clean_out(center));
+	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db2 (.reset_in(sw[15]), .clock_in(clk_25mhz), .noisy_in(btnu),.clean_out(up));
+	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db3 (.reset_in(sw[15]), .clock_in(clk_25mhz), .noisy_in(btnd),.clean_out(down));
+	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db4 (.reset_in(sw[15]), .clock_in(clk_25mhz), .noisy_in(btnl),.clean_out(left));
+	debounce #(.DEBOUNCE_COUNT(DEBOUNCE_COUNT)) db5 (.reset_in(sw[15]), .clock_in(clk_25mhz), .noisy_in(btnr),.clean_out(right));
 	
 	
 	
 	///////////////////timer demo, value is in seconds////////////////////
 	
 	
-	timer #(.ONE_HZ_PERIOD(ONE_HZ_PERIOD)) t1 (.clock(clk_65mhz), .start_timer(timer_start),  .value(12'd300), .counting(counting), 
+	timer #(.ONE_HZ_PERIOD(ONE_HZ_PERIOD)) t1 (.clock(clk_25mhz), .start_timer(timer_start),  .value(12'd300), .counting(counting), 
 	 .expired_pulse(expired), .one_hz(one_hz_enable), .count_out(count), .ones(ones), .tens(tens), .minutes(minutes));
 	 
 	 
@@ -136,13 +142,13 @@ module top_level( input clk_100mhz,
 	 //pseudorandom number generator, clock the ouput in order to select a random number
 	 wire data_rand;
 	 logic[15:0] rand_out;
-	 random_num random (.clock(clk_65mhz),.data(data_rand), .random_number(rand_out));
+	 random_num random (.clock(clk_25mhz),.data(data_rand), .random_number(rand_out));
 	 
 	 //temperature sensor data
 	 wire [12:0] temp_o;
      reg [12:0] temp_valid;
     
-     always @(posedge clk_65mhz)
+     always @(posedge clk_25mhz)
          temp_valid <= rdy_o ?  temp_o : temp_valid;  // each bit is 0.0625 deg centigrade
     
      TempSensorCtl temp_sense(
@@ -151,7 +157,7 @@ module top_level( input clk_100mhz,
          .TEMP_O         (temp_o),  // 13bit msb = sign
          .RDY_O          (rdy_o),   // data valid
          .ERR_O          (err_o),
-         .CLK_I          (clk_65mhz),
+         .CLK_I          (clk_25mhz),
          .SRST_I         (1'b0)
         );
         
@@ -160,29 +166,29 @@ module top_level( input clk_100mhz,
      
      //Minigames
 	 
-	 minigame_1 mgame1 (.vclock_in(clk_65mhz), .reset_in(mg_start), .hcount_in(hcount), .vcount_in(vcount), 
+	 minigame_1 mgame1 (.vclock_in(clk_25mhz), .reset_in(mg_start), .hcount_in(hcount), .vcount_in(vcount), 
 	 .pixel_out(pixel_out1), .vsync_in(vsync), .temp_in(temp_valid), .btnu(up), .btnd(down), .btnl(left), .btnr(right), 
 	 .sw(sw[3:0]), .random(rand_out[1:0]), .success(mg_success1), .fail(mg_fail1));
 	 
 	 logic [11:0] count_mg2;
 	 logic [3:0] mg2_state;
 	 logic [2:0] ledout_mg2;//{r,g,b} output for leds
-	 minigame_2 mgame2 (.vclock_in(clk_65mhz), .reset_in(mg_start), .hcount_in(hcount), .vcount_in(vcount), 
+	 minigame_2 mgame2 (.vclock_in(clk_25mhz), .reset_in(mg_start), .hcount_in(hcount), .vcount_in(vcount), 
 	 .pixel_out(pixel_out2), .vsync_in(vsync),  .btnu(up), .btnd(down), .btnl(left), 
 	 .btnr(right),  .random(rand_out[1:0]), .led_r(ledout_mg2[2]), .led_b(ledout_mg2[0]), 
 	 .led_g(ledout_mg2[1]), .timer_count(count_mg2), .state(mg2_state), .fail(mg_fail2), .success(mg_success2));
 	 
 	
-	FPGA_graphics fpga_s (.vclock_in(clk_65mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
+	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
 	 .mg_completed(i), .pixel_out(pixel_out_fpga));
 	
-	FPGA_graphics_op fpga_m (.vclock_in(clk_65mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
+	FPGA_graphics_op fpga_m (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
 	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
 	
 	////////////////////////MULTIPLAYER FUNCTIONALITY//////////////////////////////////////////////
 	logic multiplayer_reset;
 	logic[31:0] mult_out;
-	multiplayer_data multi (.vclock_in(clk_65mhz), .reset_in(multiplayer_reset), .uart_in(serial_rx), 
+	multiplayer_data multi (.vclock_in(clk_25mhz), .reset_in(multiplayer_reset), .uart_in(serial_rx), 
 	.i(i), .strike_count(strike_count), .btnc(sw[10]), .game_state(game_state), .data_out(mult_out), .uart_out(serial_tx));
 	assign i_op = mult_out[2:0];
 	assign strike_count_op = mult_out[4:3];
@@ -190,7 +196,7 @@ module top_level( input clk_100mhz,
 	
 	 
 	 //Handle Graphics
-	 xvga xvga1(.vclock_in(clk_65mhz),.hcount_out(hcount),.vcount_out(vcount),
+	 xvga xvga1(.vclock_in(clk_25mhz),.hcount_out(hcount),.vcount_out(vcount),
           .hsync_out(hsync),.vsync_out(vsync),.blank_out(blank));
      
      logic border = (hcount==0 | hcount==1023 | vcount==0 | vcount==767 |
@@ -204,7 +210,7 @@ module top_level( input clk_100mhz,
      assign play_again = sw[11];
      
      
-     always_ff @(posedge clk_65mhz) begin
+     always_ff @(posedge clk_25mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
             minigame <= 3'b000;
@@ -252,7 +258,7 @@ module top_level( input clk_100mhz,
      
      logic prev_onehz;
      
-    always_ff @(posedge clk_65mhz) begin
+    always_ff @(posedge clk_25mhz) begin
          hs <= hsync;
          vs <= vsync;
          b <= blank;
@@ -295,13 +301,13 @@ module top_level( input clk_100mhz,
     assign data[11:8] = {1'b0, i_op};
     assign data[31:12] = {7'b0, btnc_op,minutes, tens[3:0], ones[3:0]};
     
-    display_8hex display_mod (.clk_in(clk_65mhz), .data_in(data),
+    display_8hex display_mod (.clk_in(clk_25mhz), .data_in(data),
 	.seg_out({cg, cf, ce, cd, cc, cb, ca}), .strobe_out(an));
 
     accel::e_orientation orientation;
 
     accelerometer accelerometer_builtin(
-        .clk_in(clk_65mhz),
+        .clk_in(clk_25mhz),
         .reset_in(reset),
         .acl_miso,
         .acl_mosi,
@@ -314,13 +320,11 @@ module top_level( input clk_100mhz,
     // Change NUM_SHUFFLED_ITEMS and SHUFFLED_ITEM_BITS, data_in should be whatever you want shuffled (packed array of bits)
     // pulse should_shuffle_in when you want to shuffle; set data_out and valid_out accordingly
     shuffler #(.NUM_SHUFFLED_ITEMS(5), .SHUFFLED_ITEM_BITS(3)) 
-              (.clk_in(clk_65mhz), .reset_in(system_reset), .data_in(minigame_order_in), .random_in(rand_out[2:0]), 
+              (.clk_in(clk_25mhz), .reset_in(system_reset), .data_in(minigame_order_in), .random_in(rand_out[2:0]), 
                .should_shuffle_in(start_shuffle), .data_out(minigame_order_out), .valid_out(done_shuffle));
 
-/*
-    // generate 25 mhz clock for sd_controller
-    logic clk_25mhz;
-    clk_wiz_0 clocks(.clk_in1(clk_100mhz), .clk_out1(clk_25mhz), .reset());
+
+    
 
     logic [5:0] audio_header_raddr;
     logic [31:0] audio_header_dout;
@@ -341,12 +345,18 @@ module top_level( input clk_100mhz,
                               .audio_req_we, .audio_req_dout);
 
     // Assign .play() to a pulse
-    sound_engine sengine(.clk(clk_25mhz), .reset(system_reset), .play(), .sound_id(), .audio_header_raddr, .audio_header_dout,
+    
+    assign play_sound = up;
+    assign stop_sound = down;
+    
+    assign sound_id = sw[4:0];
+    
+    sound_engine sengine(.clk(clk_25mhz), .reset(system_reset), .play(play_sound), .stop(stop_sound), .sound_id(sound_id), .audio_header_raddr, .audio_header_dout,
                          .audio_req, .audio_req_addr, .audio_req_ack, .audio_req_we, .audio_req_dout, .audio_out);
 
     assign aud_sd = 1'b1;
     assign aud_pwm = audio_out ? 1'bZ : 1'b0;
-*/
+
 
 //confirm is button to press to confirm single/multiplayer
 //up down toggles between single / multiplayer
