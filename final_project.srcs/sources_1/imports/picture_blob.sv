@@ -37,14 +37,14 @@ module fingerprint
    logic [7:0] image_bits, red_mapped, green_mapped, blue_mapped;
    // calculate rom address and read the location
    assign image_addr = (hcount_in-x_in) + (vcount_in-y_in) * WIDTH;
-   fingerprint_rom finger_rom (.clka(pixel_clk_in), .addra(image_addr), .douta(image_bits));
+//   fingerprint_rom finger_rom (.clka(pixel_clk_in), .addra(image_addr), .douta(image_bits));
 
    // use color map to create 4 bits R, 4 bits G, 4 bits B
    // since the image is greyscale, just replicate the red pixels
    // and not bother with the other two color maps.
-   red_fing red_coe (.clka(pixel_clk_in), .addra(image_bits), .douta(red_mapped));
-   green_fing green_coe (.clka(pixel_clk_in), .addra(image_bits), .douta(green_mapped));
-   blue_fing blue_coe (.clka(pixel_clk_in), .addra(image_bits), .douta(blue_mapped));
+//   red_fing red_coe (.clka(pixel_clk_in), .addra(image_bits), .douta(red_mapped));
+//   green_fing green_coe (.clka(pixel_clk_in), .addra(image_bits), .douta(green_mapped));
+//   blue_fing blue_coe (.clka(pixel_clk_in), .addra(image_bits), .douta(blue_mapped));
    // note the one clock cycle delay in pixel!
    always_ff @ (posedge pixel_clk_in) begin
      if ((hcount_in >= x_in && hcount_in < (x_in+WIDTH)) &&

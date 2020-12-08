@@ -256,7 +256,8 @@ module graphics_engine(
                     framebuffer_we <= 1;
                     framebuffer_din <= texturemap_dout;
                     // If we go off the bottom-right of the object (i.e. we're done)
-                    if (texturemap_x >= object_width - 1 || framebuffer_wx >= FRAMEBUFFER_WIDTH - 1) begin
+                    // TODO off by 1 error?
+                    if (texturemap_x >= object_width - 1|| framebuffer_wx >= FRAMEBUFFER_WIDTH - 1) begin
                         if (texturemap_y >= object_height - 1 || framebuffer_wy >= FRAMEBUFFER_HEIGHT - 1) begin
                             wait_counter <= 4'd8;
                             state <= STATE_WAIT;

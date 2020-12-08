@@ -284,7 +284,9 @@ module top_level( input clk_100mhz,
          end
 
           case(minigame)
-            4'b0000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //home, change to pixel_out_home
+//            4'b0000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //home, change to pixel_out_home
+//                            {led16_r, led16_g, led16_b} <= 3'b0; end 
+            4'b0000      :   begin rgb <= gengine_pixel_out; //home, change to pixel_out_home
                             {led16_r, led16_g, led16_b} <= 3'b0; end 
             4'b0001      :   begin rgb <= multiplayer[1]? pixel_out1+pixel_out_fpga+pixel_out_fpgaop : pixel_out1+pixel_out_fpga;
                             {led16_r, led16_g, led16_b} <= 3'b0; 
@@ -527,6 +529,7 @@ module top_level( input clk_100mhz,
 //                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
 //                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(wire_pixel));
 
+
     title_screen_graphics title_screen(
         .clk(system_clock),
         .reset,
@@ -545,9 +548,62 @@ module top_level( input clk_100mhz,
 
         .texturemap_id,
         .should_load_texturemap,
-        .texturemap_load_ack
+        .texturemap_load_ack,
+
+        .up,
+        .down,
+        .confirm(center),
+        .mode()
+    );
+/*
+    lose_graphics lose_screen(
+        .clk(system_clock),
+        .reset,
+
+//        .play,
+//        .stop,
+//        .sound_id,
+
+        .should_render,
+        .render_dirty,
+        .num_objects,
+        .new_object_waddr,
+        .new_object_we,
+        .new_object_properties,
+        .render_ack,
+
+        .texturemap_id,
+        .should_load_texturemap,
+        .texturemap_load_ack,
+
+        .confirm(down),
+        .confirmed()
     );
 
+    win_graphics win_screen(
+        .clk(system_clock),
+        .reset,
+
+//        .play,
+//        .stop,
+//        .sound_id,
+
+        .should_render,
+        .render_dirty,
+        .num_objects,
+        .new_object_waddr,
+        .new_object_we,
+        .new_object_properties,
+        .render_ack,
+
+        .texturemap_id,
+        .should_load_texturemap,
+        .texturemap_load_ack,
+
+        .confirm(down),
+        .confirmed()
+    );
+*/
 endmodule
 
 
