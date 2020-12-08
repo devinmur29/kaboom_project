@@ -1,3 +1,24 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: Willie Zhu <zhuw@mit.edu>
+// 
+// Create Date: 12/07/2020 03:04:47 PM
+// Design Name: 
+// Module Name: graphics_engine
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 module sound_engine(
     input clk,
     input reset,

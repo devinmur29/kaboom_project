@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company:
-// Engineer:
+// Engineer: Willie Zhu <zhuw@mit.edu>
 //
 // Create Date: 12/03/2020 09:20:26 PM
 // Design Name:
@@ -18,6 +18,7 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
+
 package accel;
     typedef enum logic[2:0] { center, top, bottom, left, right } e_orientation;
 endpackage
