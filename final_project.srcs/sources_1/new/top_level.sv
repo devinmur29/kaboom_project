@@ -67,11 +67,13 @@ module top_level( input clk_100mhz,
     parameter WIN = 4'd1;
     parameter LOSE = 4'd2;
     parameter SHUFFLE =4'd3;
-    parameter MG=4'd4;
+    parameter MG_S=4'd4;
     parameter START = 4'd5;
+    parameter SYNC = 4'd6;
+    parameter MG_M = 4'd7;
      
     logic timer_start, counting, expired, one_hz_enable; //Game timer signals
-    logic mg_start;
+    logic mg_start, win_start, lose_start; //start signals for the minigame, win, and lose screens
     logic mg_fail1, mg_fail2, mg_success1, mg_success2, mg_fail, mg_success; //Minigame start, fail, success, signals
     logic start_shuffle, done_shuffle; //signal to control start of shuffler, and to know when the shuffler is done
     logic [3:0] game_state;
@@ -90,8 +92,10 @@ module top_level( input clk_100mhz,
     logic [1:0] multiplayer;
     logic[2:0] i;//index for minigames
     logic[2:0] i_op; //opponents' index for minigames
-     logic[1:0] strike_count; //your strikes
-     logic[1:0] strike_count_op; //opponents' strikes
+    logic[1:0] strike_count; //your strikes
+    logic[1:0] strike_count_op; //opponents' strikes
+    logic btnc_op; //other player's sync button
+    logic play_again; //output of win/lose modules
     
     assign minigame_order_in = {3'b010, 3'b010, 3'b001, 3'b001, 3'b010};
     assign mg_fail = (mg_fail1 | mg_fail2);
@@ -178,9 +182,11 @@ module top_level( input clk_100mhz,
 	////////////////////////MULTIPLAYER FUNCTIONALITY//////////////////////////////////////////////
 	logic multiplayer_reset;
 	logic[31:0] mult_out;
-	multiplayer_data multi (.vclock_in(clk_65mhz), .reset_in(multiplayer_reset), .uart_in(serial_rx), .i(i), .strike_count(strike_count),.data_out(mult_out), .uart_out(serial_tx));
+	multiplayer_data multi (.vclock_in(clk_65mhz), .reset_in(multiplayer_reset), .uart_in(serial_rx), 
+	.i(i), .strike_count(strike_count), .btnc(sw[10]), .game_state(game_state), .data_out(mult_out), .uart_out(serial_tx));
 	assign i_op = mult_out[2:0];
 	assign strike_count_op = mult_out[4:3];
+	assign btnc_op = mult_out[5];
 	
 	 
 	 //Handle Graphics
@@ -195,30 +201,47 @@ module top_level( input clk_100mhz,
      assign reset = sw[15];
      assign multiplayer = sw[13:12];
      //assign minigame = 3'b010; //choose which minigame is playing
+     assign play_again = sw[11];
      
      
      always_ff @(posedge clk_65mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
             minigame <= 3'b000;
-            i <= 3'b000;
-            strike_count <= 2'b00;
         end else begin
             case(game_state)
-                SHUFFLE :   begin start_shuffle <=1; game_state <= HOME; end
-                HOME    :   begin  game_state <= (multiplayer!=2'b00 &done_shuffle)? START : HOME;
+                SHUFFLE :   begin start_shuffle <=1; game_state <= HOME;
+                                  i <= 3'b000;
+                                  strike_count <= 2'b00;end
+                HOME    :   begin  game_state <= (multiplayer!=2'b00 &done_shuffle)? multiplayer[1]?SYNC:  START : HOME;
                                     start_shuffle <= 0;
                                     if(multiplayer[1]) multiplayer_reset <= 1;
-                                    if(multiplayer!=2'b00 & done_shuffle) begin timer_start <=1;end end//multiplayer/singleplayer stuff
+                                    if(multiplayer==2'b01 & done_shuffle) begin timer_start <=1;end end//multiplayer/singleplayer stuff
+                                    
+                SYNC    :   begin   multiplayer_reset <= 0; game_state <= (sw[10] & btnc_op)?START:SYNC; 
+                                    if(sw[10] & btnc_op) timer_start <= 1;end
                 START   :   begin mg_start <=1; minigame <= minigame_order_out[i]; multiplayer_reset <=0; 
-                                    game_state <=(mg_fail|mg_success)?START: MG; timer_start<=0; end
+                                    game_state <=(mg_fail|mg_success)?START: multiplayer[1]?MG_M:MG_S; timer_start<=0; end
                 
-                MG      :   begin  mg_start <= 0;
-                                   game_state <= (expired|i_op==5)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG;
-                                   if(mg_fail) strike_count <= strike_count+1;
-                                   else if (mg_success) i<=i+1; end
-                LOSE    :   begin minigame <= 3'b110; end
-                WIN     :   begin minigame <=3'b111; end
+                MG_M      :   begin  mg_start <= 0;
+                                   game_state <= (expired|i_op==5)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_M;
+                                   strike_count <= expired? 2'b11:mg_fail?strike_count+1:strike_count;
+                                   if (mg_success) i<=i+1;
+                                   if(expired| i_op ==5 |(strike_count_op !=2'b11&mg_fail&strike_count==2)) lose_start <=1;
+                                   else if(strike_count_op==2'b11|(mg_success&i==3'd4)) win_start <=1;   end
+                MG_S      :   begin  mg_start <= 0;
+                                   game_state <= (expired)?LOSE:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_S;
+                                   strike_count <= expired? 2'b11:mg_fail?strike_count+1:strike_count;
+                                   if (mg_success) i<=i+1;
+                                   if(expired|(mg_fail&strike_count==2)) lose_start <=1;
+                                   else if(mg_success&i==3'd4) win_start <=1;   end
+                LOSE    :   begin lose_start<=0; 
+                                    minigame <= (play_again)?3'b000: 3'b110;
+                                    game_state <= (play_again)?SHUFFLE:LOSE;
+                                   end
+                WIN     :   begin win_start <= 0; 
+                                   minigame <= (play_again)?3'b000:3'b111;
+                                   game_state <= (play_again)?SHUFFLE:WIN; end
                 
             endcase
          end
@@ -270,7 +293,7 @@ module top_level( input clk_100mhz,
     assign data[3:0] = game_state;
     assign data[7:4] = {2'b0,strike_count_op};
     assign data[11:8] = {1'b0, i_op};
-    assign data[31:12] = {minutes, tens[3:0], ones[3:0]};
+    assign data[31:12] = {7'b0, btnc_op,minutes, tens[3:0], ones[3:0]};
     
     display_8hex display_mod (.clk_in(clk_65mhz), .data_in(data),
 	.seg_out({cg, cf, ce, cd, cc, cb, ca}), .strobe_out(an));
