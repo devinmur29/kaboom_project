@@ -64,7 +64,7 @@ module accelerometer(
 
     // if the tilt of the board in any x/y direction exceeds this number, output that orientation;
     // otherwise, output accel::center (i.e. the board is flat on the table)
-    localparam BOARD_ORIENTATION_THRESHOLD = 12'h1C0;
+    localparam BOARD_ORIENTATION_THRESHOLD = 12'h140;
 
 //    logic [31:0] data2;
 //    assign data2 = {x_sign, x_mag_filtered, y_sign, y_mag_filtered};
