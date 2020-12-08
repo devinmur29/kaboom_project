@@ -529,7 +529,31 @@ module top_level( input clk_100mhz,
 //                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
 //                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(wire_pixel));
 
+    minigame_morse minigame_morse_inst(
+        .clk(system_clock),
+        .reset,
 
+//        .play,
+//        .stop,
+//        .sound_id,
+
+        .should_render,
+        .render_dirty,
+        .num_objects,
+        .new_object_waddr,
+        .new_object_we,
+        .new_object_properties,
+        .render_ack,
+
+        .texturemap_id,
+        .should_load_texturemap,
+        .texturemap_load_ack,
+
+        .random(rand_out[3:0]),
+        .sw(sw[3:0]),
+        .btnc(center)
+    );
+    
     title_screen_graphics title_screen(
         .clk(system_clock),
         .reset,
