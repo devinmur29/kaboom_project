@@ -43,7 +43,11 @@ module sd_card_fsm(
     output logic audio_req_we,           // write enable
     output logic [7:0] audio_req_dout,
 
-    output logic [31:0] debug
+    input graphics_req,               // are we requesting a graphics block?
+    input [31:0] graphics_req_addr,   // graphics request address; MUST BE MULTIPLE OF 512
+    output logic graphics_req_ack,          // acks on request served
+    output logic graphics_req_we,           // write enable
+    output logic [7:0] graphics_req_dout
 );
 
     // sd_controller inputs
@@ -70,19 +74,22 @@ module sd_card_fsm(
     end
 
     // write address for initial header fill
+    // TODO we use blk_mem_audio_header, but we might want to use something else
+    // TODO we don't need graphics_header!!!!!
     logic [15:0]  init_waddr;
     logic        graphics_header_we;
-    blk_mem_gen_0 graphics_header(.addra(init_waddr[7:0]), .clka(clk_in), .dina(dout), .wea(graphics_header_we && byte_available),
+    blk_mem_audio_header graphics_header(.addra(init_waddr[7:0]), .clka(clk_in), .dina(dout), .wea(graphics_header_we && byte_available),
                                   .addrb(graphics_header_raddr), .clkb(clk_in), .doutb(graphics_header_dout));
 
     logic        audio_header_we;
-    blk_mem_gen_0 audio_header(.addra(init_waddr[7:0]), .clka(clk_in), .dina(dout), .wea(audio_header_we && byte_available),
+    blk_mem_audio_header audio_header(.addra(init_waddr[7:0]), .clka(clk_in), .dina(dout), .wea(audio_header_we && byte_available),
                                .addrb(audio_header_raddr), .clkb(clk_in), .doutb(audio_header_dout));
 
     localparam STATE_INIT_GRAPHICS = 3'b000;
     localparam STATE_INIT_AUDIO = 3'b001;
     localparam STATE_IDLE = 3'b010;
-    localparam STATE_BLOCK_READ = 3'b100;
+    localparam STATE_BLOCK_READ_AUDIO = 3'b100;
+    localparam STATE_BLOCK_READ_GRAPHICS = 3'b101;
 
     logic [2:0] state;
     logic [15:0] req_bytes_read;
@@ -105,6 +112,9 @@ module sd_card_fsm(
 
             audio_req_we <= 1'b0;
             audio_req_ack <= 1'b0;
+
+            graphics_req_we <= 1'b0;
+            graphics_req_ack <= 1'b0;
         end else begin
             case (state)
                 STATE_INIT_GRAPHICS: begin
@@ -138,16 +148,22 @@ module sd_card_fsm(
                     audio_req_we <= 1'b0;
                     audio_req_ack <= 1'b0;
 
+                    graphics_req_we <= 1'b0;
+                    graphics_req_ack <= 1'b0;
+                    req_bytes_read <= 0;
+
                     if (audio_req) begin
-                        state <= STATE_BLOCK_READ;
+                        state <= STATE_BLOCK_READ_AUDIO;
 
                         address <= audio_req_addr;
-                        req_bytes_read <= 0;
-//                    end else if (graphics_req) begin
+                    end else if (graphics_req) begin
+                        state <= STATE_BLOCK_READ_GRAPHICS;
+
+                        address <= graphics_req_addr;
                     end
                 end
 
-                STATE_BLOCK_READ: begin
+                STATE_BLOCK_READ_AUDIO: begin
                     if (audio_req_we) audio_req_we <= 1'b0;
 
                     if (req_bytes_read >= 512) begin
@@ -158,6 +174,21 @@ module sd_card_fsm(
                     end else if (byte_available && !byte_available_last) begin
                         audio_req_dout <= dout;
                         audio_req_we <= 1'b1;
+                        req_bytes_read <= req_bytes_read + 1;
+                    end
+                end
+
+                STATE_BLOCK_READ_GRAPHICS: begin
+                    if (graphics_req_we) graphics_req_we <= 1'b0;
+
+                    if (req_bytes_read >= 512) begin
+                        state <= STATE_IDLE;
+                        graphics_req_ack <= 1'b1;
+                    end else if (ready) begin
+                        rd <= 1;
+                    end else if (byte_available && !byte_available_last) begin
+                        graphics_req_dout <= dout;
+                        graphics_req_we <= 1'b1;
                         req_bytes_read <= req_bytes_read + 1;
                     end
                 end
