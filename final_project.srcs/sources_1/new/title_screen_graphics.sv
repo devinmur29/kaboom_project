@@ -205,4 +205,7 @@ module title_screen_graphics(
         end
     end
 
+    assign play = 1'b1;
+    assign stop = 1'b0;
+    assign sound_id = 5'd3;
 endmodule

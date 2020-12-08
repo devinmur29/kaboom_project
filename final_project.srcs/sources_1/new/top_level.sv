@@ -224,7 +224,7 @@ module top_level( input clk_100mhz,
      assign multiplayer = sw[13:12];
      //assign minigame = 3'b010; //choose which minigame is playing
      assign play_again = sw[11];
- 
+ /*
      always_ff @(posedge clk_25mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
@@ -267,7 +267,8 @@ module top_level( input clk_100mhz,
             endcase
          end
      end
-
+*/
+    assign minigame = sw[14:11];
      //Graphics based on the minigame being played
      
      logic prev_onehz;
@@ -276,6 +277,7 @@ module top_level( input clk_100mhz,
      localparam TITLE_SCREEN = 4'b0000;
      localparam LOSE_SCREEN = 4'b0111;
      localparam WIN_SCREEN = 4'b1000;
+     localparam MORSE_MINIGAME = 4'b0110;
 
     always_ff @(posedge clk_25mhz) begin
          hs <= hsync;
@@ -309,7 +311,7 @@ module top_level( input clk_100mhz,
                                   {led16_r, led16_g, led16_b} <= 0;
                                   play_sound <=0; stop_sound <=0; sound_id <= 0;
                                   end
-            4'b0110      : begin rgb <= multiplayer[1]? pixel_out6+pixel_out_fpga+pixel_out_fpgaop : pixel_out6+pixel_out_fpga;
+            4'b0110      : begin rgb <= multiplayer[1]? gengine_pixel_out+pixel_out_fpga+pixel_out_fpgaop : gengine_pixel_out +pixel_out_fpga;
                                   {led16_r, led16_g, led16_b} <= 0;
                                   play_sound <=0; stop_sound <=0; sound_id <= 0;
                                   end
@@ -588,6 +590,18 @@ module top_level( input clk_100mhz,
         end
 
         case (minigame)
+            MORSE_MINIGAME: begin
+                should_render <= morse_should_render;
+                render_dirty <= morse_render_dirty;
+                num_objects <= morse_num_objects;
+                new_object_waddr <= morse_new_object_waddr;
+                new_object_we <= morse_new_object_we;
+                new_object_properties <= morse_new_object_properties;
+        
+                texturemap_id <= morse_texturemap_id;
+                should_load_texturemap <= morse_should_load_texturemap;
+            end
+
             TITLE_SCREEN: begin
                 should_render <= title_screen_should_render;
                 render_dirty <= title_screen_render_dirty;
@@ -626,13 +640,37 @@ module top_level( input clk_100mhz,
         endcase
     end
 
+    logic morse_play_sound;
+    logic morse_stop_sound;
+    logic [4:0] morse_sound_id;
+
+    logic title_screen_play_sound;
+    logic title_screen_stop_sound;
+    logic [4:0] title_screen_sound_id;
+
+    always_ff @(posedge system_clock) begin
+        case (minigame)
+            MORSE_MINIGAME: begin
+                play_sound <= morse_play_sound;
+                stop_sound <= morse_stop_sound;
+                sound_id <= morse_sound_id;
+            end
+
+            TITLE_SCREEN: begin
+                play_sound <= title_screen_play_sound;
+                stop_sound <= title_screen_stop_sound;
+                sound_id <= title_screen_sound_id;
+            end
+        endcase
+    end
+
     minigame_morse minigame_morse_inst(
         .clk(system_clock),
-        .reset,
+        .reset(minigame_reset || system_reset),
 
-//        .play,
-//        .stop,
-//        .sound_id,
+        .play(morse_play_sound),
+        .stop(morse_stop_sound),
+        .sound_id(morse_sound_id),
 
         .should_render(morse_should_render),
         .render_dirty(morse_render_dirty),
@@ -644,7 +682,7 @@ module top_level( input clk_100mhz,
 
         .texturemap_id(morse_texturemap_id),
         .should_load_texturemap(morse_should_load_texturemap),
-        .texturemap_load_ack(morse_texturemap_load_ack),
+        .texturemap_load_ack,
 
         .random(rand_out[3:0]),
         .sw(sw[3:0]),
@@ -655,9 +693,9 @@ module top_level( input clk_100mhz,
         .clk(system_clock),
         .reset(minigame_reset || system_reset),
 
-//        .play,
-//        .stop,
-//        .sound_id,
+        .play(title_screen_play_sound),
+        .stop(title_screen_stop_sound),
+        .sound_id(title_screen_sound_id),
 
         .should_render(title_screen_should_render),
         .render_dirty(title_screen_render_dirty),
