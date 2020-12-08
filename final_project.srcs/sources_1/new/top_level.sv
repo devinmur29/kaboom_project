@@ -74,7 +74,9 @@ module top_level( input clk_100mhz,
      
     logic timer_start, counting, expired, one_hz_enable; //Game timer signals
     logic mg_start, win_start, lose_start; //start signals for the minigame, win, and lose screens
-    logic mg_fail1, mg_fail2, mg_success1, mg_success2, mg_fail, mg_success; //Minigame start, fail, success, signals
+    logic mg_fail1, mg_fail2, mg_fail3, mg_fail4, mg_fail5, mg_fail6;
+    logic mg_success1, mg_success2, mg_success3, mg_success4, mg_success5, mg_success6;
+    logic mg_fail, mg_success; //Minigame start, fail, success, signals
     logic start_shuffle, done_shuffle; //signal to control start of shuffler, and to know when the shuffler is done
     logic [3:0] game_state;
     logic [11:0] count, tens, ones;
@@ -83,13 +85,14 @@ module top_level( input clk_100mhz,
     logic [9:0] vcount;     // line number
     logic hsync, vsync;
     logic [11:0] pixel;
-    logic [11:0] pixel_out1, pixel_out2, pixel_out_fpga, pixel_out_fpgaop; //pixel_out minigame_1
+    logic [11:0] pixel_out1, pixel_out2, pixel_out3, pixel_out4, pixel_out5, pixel_out6;
+    logic [11:0] pixel_out_fpga, pixel_out_fpgaop, pixel_out_win, pixel_out_lose, pixel_out_home, pixel_out_sync; //pixel_out minigame_1
     logic [11:0] rgb;
-    logic [3:0] minigame; //which minigame is being played/displayed
+    logic [4:0] minigame; //which minigame is being played/displayed
     logic up, down, left, right, center;
-    logic [4:0][2:0] minigame_order_in ; //5 array of 3 bits each.
-    logic [4:0][2:0] minigame_order_out;
-    logic [1:0] multiplayer;
+    logic [5:0][3:0] minigame_order_in ; //6 array of 4 bits each.
+    logic [5:0][3:0] minigame_order_out;
+    logic [1:0] multiplayer; //is the game in multiplayer mode or single mode
     logic[2:0] i;//index for minigames
     logic[2:0] i_op; //opponents' index for minigames
     logic[1:0] strike_count; //your strikes
@@ -100,9 +103,22 @@ module top_level( input clk_100mhz,
     logic stop_sound; //stop a sound
     logic [4:0] sound_id; //sound to be played or stopped
     
-    assign minigame_order_in = {3'b010, 3'b010, 3'b001, 3'b001, 3'b010};
-    assign mg_fail = (mg_fail1 | mg_fail2);
-    assign mg_success = (mg_success1 | mg_success2);
+    assign minigame_order_in = {4'b0010, 4'b0010, 4'b0001, 4'b0001, 4'b0010, 4'b0001};
+    
+    always_comb begin
+        case(minigame)
+            4'b0001 :  begin mg_fail = mg_fail1; mg_success = mg_success1; end
+            4'b0010 :  begin mg_fail = mg_fail2; mg_success = mg_success2; end
+            4'b0011 :  begin mg_fail = mg_fail3; mg_success = mg_success3; end
+            4'b0100 :  begin mg_fail = mg_fail4; mg_success = mg_success4; end
+            4'b0101 :  begin mg_fail = mg_fail5; mg_success = mg_success5; end
+            4'b0110 :  begin mg_fail = mg_fail6; mg_success = mg_success6; end
+            default :  begin mg_fail = 0;   mg_success=0; end
+         endcase
+     end
+            
+                        
+    
     
     
     
@@ -213,7 +229,7 @@ module top_level( input clk_100mhz,
      always_ff @(posedge clk_25mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
-            minigame <= 3'b000;
+            minigame <= 4'b0000;
         end else begin
             case(game_state)
                 SHUFFLE :   begin start_shuffle <=1; game_state <= HOME;
@@ -221,7 +237,7 @@ module top_level( input clk_100mhz,
                                   strike_count <= 2'b00;end
                 HOME    :   begin  game_state <= (multiplayer!=2'b00 &done_shuffle)? multiplayer[1]?SYNC:  START : HOME;
                                     start_shuffle <= 0;
-                                    if(multiplayer[1]) multiplayer_reset <= 1;
+                                    if(multiplayer[1] & done_shuffle) multiplayer_reset <= 1;
                                     if(multiplayer==2'b01 & done_shuffle) begin timer_start <=1;end end//multiplayer/singleplayer stuff
                                     
                 SYNC    :   begin   multiplayer_reset <= 0; game_state <= (sw[10] & btnc_op)?START:SYNC; 
@@ -230,10 +246,10 @@ module top_level( input clk_100mhz,
                                     game_state <=(mg_fail|mg_success)?START: multiplayer[1]?MG_M:MG_S; timer_start<=0; end
                 
                 MG_M      :   begin  mg_start <= 0;
-                                   game_state <= (expired|i_op==5)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_M;
+                                   game_state <= (expired|i_op==6)?LOSE:(strike_count_op==2'b11)?WIN:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_M;
                                    strike_count <= expired? 2'b11:mg_fail?strike_count+1:strike_count;
                                    if (mg_success) i<=i+1;
-                                   if(expired| i_op ==5 |(strike_count_op !=2'b11&mg_fail&strike_count==2)) lose_start <=1;
+                                   if(expired| i_op ==6|(strike_count_op !=2'b11&mg_fail&strike_count==2)) lose_start <=1;
                                    else if(strike_count_op==2'b11|(mg_success&i==3'd4)) win_start <=1;   end
                 MG_S      :   begin  mg_start <= 0;
                                    game_state <= (expired)?LOSE:(mg_fail)?((strike_count==2)?LOSE:START):(mg_success)?((i==3'd4)?WIN:START):MG_S;
@@ -242,11 +258,11 @@ module top_level( input clk_100mhz,
                                    if(expired|(mg_fail&strike_count==2)) lose_start <=1;
                                    else if(mg_success&i==3'd4) win_start <=1;   end
                 LOSE    :   begin lose_start<=0; 
-                                    minigame <= (play_again)?3'b000: 3'b110;
+                                    minigame <= (play_again)?4'b0000: 4'b0111;
                                     game_state <= (play_again)?SHUFFLE:LOSE;
                                    end
                 WIN     :   begin win_start <= 0; 
-                                   minigame <= (play_again)?3'b000:3'b111;
+                                   minigame <= (play_again)?4'b0000:4'b1000;
                                    game_state <= (play_again)?SHUFFLE:WIN; end
                 
             endcase
@@ -269,16 +285,36 @@ module top_level( input clk_100mhz,
     
     
           case(minigame)
-            3'b000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}};
+            4'b0000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //home, change to pixel_out_home
                             {led16_r, led16_g, led16_b} <= 3'b0; end 
-            3'b001      :   begin rgb <= multiplayer[1]? pixel_out1+pixel_out_fpga+pixel_out_fpgaop : pixel_out1+pixel_out_fpga;
-                            {led16_r, led16_g, led16_b} <= 3'b0; end
-            3'b010      :   begin rgb <= multiplayer[1]? pixel_out2+pixel_out_fpga+pixel_out_fpgaop : pixel_out2+pixel_out_fpga;
-                                  {led16_r, led16_g, led16_b} <= ledout_mg2; end
-            3'b110      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}};
+            4'b0001      :   begin rgb <= multiplayer[1]? pixel_out1+pixel_out_fpga+pixel_out_fpgaop : pixel_out1+pixel_out_fpga;
+                            {led16_r, led16_g, led16_b} <= 3'b0; 
+                           end
+            4'b0010      :   begin rgb <= multiplayer[1]? pixel_out2+pixel_out_fpga+pixel_out_fpgaop : pixel_out2+pixel_out_fpga;
+                                  {led16_r, led16_g, led16_b} <= ledout_mg2; 
+                                  ; end
+            4'b0011      :   begin rgb <= multiplayer[1]? pixel_out3+pixel_out_fpga+pixel_out_fpgaop : pixel_out3+pixel_out_fpga;
+                                  {led16_r, led16_g, led16_b} <= 0;
+                                  play_sound <=0; stop_sound <=0; sound_id <= 0;
+                                   end
+            4'b0100      :  begin rgb <= multiplayer[1]? pixel_out4+pixel_out_fpga+pixel_out_fpgaop : pixel_out4+pixel_out_fpga;
+                                  {led16_r, led16_g, led16_b} <= 0;
+                                  play_sound <=0; stop_sound <=0; sound_id <= 0;
+                                  end
+            4'b0101      :  begin rgb <= multiplayer[1]? pixel_out5+pixel_out_fpga+pixel_out_fpgaop : pixel_out5+pixel_out_fpga;
+                                  {led16_r, led16_g, led16_b} <= 0;
+                                  play_sound <=0; stop_sound <=0; sound_id <= 0;
+                                  end
+            4'b0110      : begin rgb <= multiplayer[1]? pixel_out6+pixel_out_fpga+pixel_out_fpgaop : pixel_out6+pixel_out_fpga;
+                                  {led16_r, led16_g, led16_b} <= 0;
+                                  play_sound <=0; stop_sound <=0; sound_id <= 0;
+                                  end
+            4'b0111      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //LOSE, change to pixel_out_lose
                             {led16_r, led16_g, led16_b} <= 3'b100; end 
-            3'b111      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}};
+            4'b1000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //WIN, change to pixel_out_win
                             {led16_r, led16_g, led16_b} <= 3'b111; end 
+            4'b1001      :  begin rgb <= pixel_out_sync;
+                                  {led16_r, led16_g, led16_b} <= 3'b000;end //SYNC STATE
             default     :   rgb <= rgb <= {12{border}};
         
           endcase
@@ -319,8 +355,8 @@ module top_level( input clk_100mhz,
 
     // Change NUM_SHUFFLED_ITEMS and SHUFFLED_ITEM_BITS, data_in should be whatever you want shuffled (packed array of bits)
     // pulse should_shuffle_in when you want to shuffle; set data_out and valid_out accordingly
-    shuffler #(.NUM_SHUFFLED_ITEMS(5), .SHUFFLED_ITEM_BITS(3)) 
-              (.clk_in(clk_25mhz), .reset_in(system_reset), .data_in(minigame_order_in), .random_in(rand_out[2:0]), 
+    shuffler #(.NUM_SHUFFLED_ITEMS(6), .SHUFFLED_ITEM_BITS(4)) 
+              (.clk_in(clk_25mhz), .reset_in(system_reset), .data_in(minigame_order_in), .random_in(rand_out[3:0]), 
                .should_shuffle_in(start_shuffle), .data_out(minigame_order_out), .valid_out(done_shuffle));
 
 
@@ -582,7 +618,7 @@ module minigame_1( input vclock_in,
                    blob_D #(.WIDTH(64), .HEIGHT(64)) square_1(.x_in(11'd138), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_ll), .color(color_sq1));
                    blob_D #(.WIDTH(64), .HEIGHT(64)) square_2(.x_in(11'd479), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lc), .color(color_sq2));
                    blob_D #(.WIDTH(64), .HEIGHT(64)) square_3(.x_in(11'd820), .hcount_in(hcount_in), .y_in(10'd600), .vcount_in(vcount_in), .pixel_out(pixel_lr), .color(color_sq3));
-                   fingerprint(.pixel_clk_in(vclock_in), .x_in(11'd386), .y_in(10'd351), .hcount_in(hcount_in), .vcount_in(vcount_in), .pixel_out(pixel_f));
+                  // fingerprint(.pixel_clk_in(vclock_in), .x_in(11'd386), .y_in(10'd351), .hcount_in(hcount_in), .vcount_in(vcount_in), .pixel_out(pixel_f));
                    
                    logic[11:0] diff1;
                    logic[11:0] diff2;
