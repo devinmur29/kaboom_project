@@ -314,6 +314,9 @@ module minigame_morse(
         end
     end
 
+    assign play = 1'b1;
+    assign stop = 1'b0;
+    assign sound_id = 5'd4;
 endmodule
 
 // morse code LUT; uses ASCII values, so we could potentially use this in conjunction with a font renderer
