@@ -109,7 +109,7 @@ module top_level( input clk_100mhz,
     logic stop_sound; //stop a sound
     logic [4:0] sound_id; //sound to be played or stopped
     
-    
+ /////////////////////////////MICROPHONE WILL BE INCORPORATED BEFORE CHECKOFF///////////////////////////////////////////////////////////
     
 //    ///////////////////MIC AND FFT VARIABLES//////////////////////
 //    parameter SAMPLE_COUNT = 4164; //2082;//gets approximately (will generate audio at approx 21 kHz sample rate.
