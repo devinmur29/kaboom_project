@@ -268,7 +268,9 @@ module top_level( input clk_100mhz,
    
    
     
-    assign minigame_order_in = {4'b0010, 4'b0100, 4'b0101, 4'b0001, 4'b0101, 4'b0100};
+ //   assign minigame_order_in = {4'b0010, 4'b0100, 4'b0101, 4'b0001, 4'b0101, 4'b0100};
+//    assign minigame_order_in = {4'b0010, 4'b0010, 4'b0001, 4'b0001, 4'b0010, 4'b0001};
+    assign minigame_order_in = {4'b0010, 4'b0010, 4'b0001, 4'b0001, 4'b0010, 4'b0001};
     
     always_comb begin
         case(minigame)
@@ -461,8 +463,6 @@ module top_level( input clk_100mhz,
             endcase
          end
      end
-     
-     
      //Graphics based on the minigame being played
      
      logic prev_onehz;
@@ -872,6 +872,9 @@ module top_level( input clk_100mhz,
         .texturemap_id(morse_texturemap_id),
         .should_load_texturemap(morse_should_load_texturemap),
         .texturemap_load_ack,
+
+        .failure(mg_fail6),
+        .success(mg_success6),
 
         .random(rand_out[3:0]),
         .sw(sw[3:0]),
