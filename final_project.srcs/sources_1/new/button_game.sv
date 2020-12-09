@@ -47,9 +47,13 @@ module button_game (
 
    logic [11:0] button_color;
    logic released;
+   logic [1:0] rand_button_color1;
+   logic rand_strip_color1;
+   logic rand_has_text1;
+   
    
    always_comb begin
-       case (rand_button_color)
+       case (rand_button_color1)
            2'b00 : button_color = 12'hF00;
            2'b01 : button_color = 12'h0F0;
            2'b10 : button_color = 12'h00F;
@@ -59,14 +63,14 @@ module button_game (
    end
    logic [11:0] strip_color;
    always_comb begin
-       case (rand_strip_color)
+       case (rand_strip_color1)
            1'b0 : strip_color = 12'hFF0;
            1'b1 : strip_color = 12'h0FF;
            default : strip_color = 12'hFF0;
        endcase
    end
    logic has_text;
-   assign has_text = rand_has_text;
+   assign has_text = rand_has_text1;
          
    assign phsync_out = hsync_in;
    assign pvsync_out = vsync_in;
@@ -98,6 +102,11 @@ module button_game (
           push_min <= 0;
           push_tens <= 0;
           push_ones <= 0;
+          rand_button_color1 <= rand_button_color;
+          rand_strip_color1 <= rand_strip_color;
+          rand_has_text1 <= rand_has_text;
+          
+          
       end else begin
           if (counter1 == 1_000_000)begin
                if ((pushed_button == 1) && (prev_push1 == 0))begin
