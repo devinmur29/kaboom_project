@@ -472,6 +472,7 @@ module top_level( input clk_100mhz,
      localparam LOSE_SCREEN = 4'b0111;
      localparam WIN_SCREEN = 4'b1000;
      localparam MORSE_MINIGAME = 4'b0110;
+     logic stop_sound_between_minigames;
 
     always_ff @(posedge clk_25mhz) begin
          hs <= hsync;
@@ -495,19 +496,15 @@ module top_level( input clk_100mhz,
                                   ; end
             4'b0011      :   begin rgb <= multiplayer[1]? pixel_out3+pixel_out_fpga+pixel_out_fpgaop : pixel_out3+pixel_out_fpga;
                                   {led16_r, led16_g, led16_b} <= 0;
-                                  play_sound <=0; stop_sound <=0; sound_id <= 0;
                                    end
             4'b0100      :  begin rgb <= multiplayer[1]? pixel_out4+pixel_out_fpga+pixel_out_fpgaop : pixel_out4+pixel_out_fpga;
                                   {led16_r, led16_g, led16_b} <= 0;
-                                  play_sound <=0; stop_sound <=0; sound_id <= 0;
                                   end
             4'b0101      :  begin rgb <= multiplayer[1]? pixel_out5+pixel_out_fpga+pixel_out_fpgaop : pixel_out5+pixel_out_fpga;
                                   {led16_r, led16_g, led16_b} <= 0;
-                                  play_sound <=0; stop_sound <=0; sound_id <= 0;
                                   end
             4'b0110      : begin rgb <= multiplayer[1]? gengine_pixel_out+pixel_out_fpga+pixel_out_fpgaop : gengine_pixel_out +pixel_out_fpga;
                                   {led16_r, led16_g, led16_b} <= 0;
-                                  play_sound <=0; stop_sound <=0; sound_id <= 0;
                                   end
             4'b0111      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //LOSE, change to pixel_out_lose
                             {led16_r, led16_g, led16_b} <= 3'b100; end 
@@ -662,8 +659,8 @@ module top_level( input clk_100mhz,
 
 //        .play(play_sound),
 //        .stop(stop_sound),
-        .play,
-        .stop,
+        .play(play_sound),
+        .stop(stop_sound || stop_sound_between_minigames),
         .sound_id,
 
         .audio_header_raddr,
@@ -773,9 +770,11 @@ module top_level( input clk_100mhz,
     always_ff @(posedge system_clock) begin
         minigame_last <= minigame;
         if (minigame_reset) minigame_reset <= 1'b0;
+        if (stop_sound_between_minigames) stop_sound_between_minigames <= 1'b0;
 
         if (minigame_last != minigame) begin
             minigame_reset <= 1'b1;
+            stop_sound_between_minigames <= 1'b1;
         end
 
         case (minigame)
