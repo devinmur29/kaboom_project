@@ -47,27 +47,38 @@ module homescreen_graphics (
    logic [9:0] xval;
    
    always_comb begin
-    if (select == 400) begin
-        xval = 740;
+    if (select == 253) begin
+        xval = 470;
     end else begin
-        xval = 730;
+        xval = 468;
     end
+   end
+   
+   logic prev_confirm;
+   logic prev_up;
+   logic prev_down;
+   
+   always_ff @(posedge vclock_in) begin
+        prev_confirm <= confirm;
+        prev_up <= up_in;
+        prev_down <= down_in;
+   
    end
    
    always_ff @(posedge vclock_in)begin
         if (reset_in) begin
-            select <= 400;
+            select <= 253;
         end else begin
-            if (down_in) begin
-                if (select == 400) begin
-                    select <= 513;
+            if (down_in & !prev_down) begin
+                if (select == 253) begin
+                    select <= 353;
                 end else begin
                     select <= select;
                 end
             end else begin
-                if (up_in) begin
-                    if (select == 513) begin
-                        select <= 400;
+                if (up_in & !prev_up) begin
+                    if (select == 353) begin
+                        select <= 253;
                     end else begin
                         select <= select;
                     end
@@ -77,8 +88,10 @@ module homescreen_graphics (
     end
     
     always_ff @(posedge vclock_in)begin
-        if (confirm) begin
-            if (select == 400) begin
+    if(reset_in) begin mode <= 2'b00; end
+    else begin
+        if (confirm &!prev_confirm) begin
+            if (select == 253) begin
                 mode <= 2'b01;
             end else begin
                 mode <= 2'b10;
@@ -86,6 +99,7 @@ module homescreen_graphics (
        end else begin
             mode <= 2'b00;
        end
+    end
    end
   
    logic color_switch;
@@ -96,7 +110,7 @@ module homescreen_graphics (
             color_switch <= 0;
             counter <= 0;
         end else begin                
-            if (counter > 40_000_000)begin
+            if (counter > 20_000_000)begin
                 color_switch <= ~color_switch;
                 counter <= 0;
             end else begin
@@ -106,22 +120,22 @@ module homescreen_graphics (
     end
         
    logic [11:0] paddle_pixel;
-   blob #(.WIDTH(42),.HEIGHT(60),.COLOR(12'b0100_1111_0000))   
+   blob #(.WIDTH(32),.HEIGHT(45),.COLOR(12'b0100_1111_0000))   
           paddle1(.x_in(xval),.y_in(select),.hcount_in(hcount_in),.vcount_in(vcount_in),
           .pixel_out(paddle_pixel));
           
    //logic [11:0] kaboom_pixel;
    logic [11:0] kaboom_pixel;
-   kaboom_blob kb (.pixel_clk_in(vclock_in),.x_in(210),.hcount_in(hcount_in), 
-           .y_in(110), .vcount_in(vcount_in), .pixel_out(kaboom_pixel));
+   kaboom_blob kb (.pixel_clk_in(vclock_in),.x_in(140),.hcount_in(hcount_in), 
+           .y_in(50), .vcount_in(vcount_in), .pixel_out(kaboom_pixel));
            
    logic [11:0] sing_pixel;
-   sing_blob sb (.pixel_clk_in(vclock_in),.x_in(274),.hcount_in(hcount_in), 
-           .y_in(395), .vcount_in(vcount_in), .pixel_out(sing_pixel));
+   sing_blob sb (.pixel_clk_in(vclock_in),.x_in(183),.hcount_in(hcount_in), 
+           .y_in(250), .vcount_in(vcount_in), .pixel_out(sing_pixel));
    
    logic [11:0] mult_pixel;
-   mult_blob mb (.pixel_clk_in(vclock_in),.x_in(277),.hcount_in(hcount_in), 
-           .y_in(505), .vcount_in(vcount_in), .pixel_out(mult_pixel));
+   mult_blob mb (.pixel_clk_in(vclock_in),.x_in(180),.hcount_in(hcount_in), 
+           .y_in(350), .vcount_in(vcount_in), .pixel_out(mult_pixel));
    
    always_comb begin
         if (color_switch == 0) begin

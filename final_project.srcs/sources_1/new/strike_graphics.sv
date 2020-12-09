@@ -43,31 +43,31 @@ module strike_graphics(
     assign pblank_out = blank_in;
     
     logic [11:0] strike1_pixel;
-    circle_blob  #(.RADIUS(32)) circle1 (.x_in(780), .y_in(650), .vclock_in(vclock_in), 
+    circle_blob  #(.RADIUS(8)) circle1 (.x_in(540), .y_in(440), .vclock_in(vclock_in), 
                 .vcount_in(vcount_in), .hcount_in(hcount_in), .color(12'hF00), .pixel_out(strike1_pixel));
     
     logic [11:0] strike2_pixel;
-    circle_blob  #(.RADIUS(32)) circle2 (.x_in(860), .y_in(650), .vclock_in(vclock_in), 
+    circle_blob  #(.RADIUS(8)) circle2 (.x_in(564), .y_in(440), .vclock_in(vclock_in), 
                 .vcount_in(vcount_in), .hcount_in(hcount_in), .color(12'hF00), .pixel_out(strike2_pixel));
                 
     logic [11:0] strike3_pixel;
-    circle_blob  #(.RADIUS(32)) circle3 (.x_in(940), .y_in(650), .vclock_in(vclock_in), 
+    circle_blob  #(.RADIUS(8)) circle3 (.x_in(588), .y_in(440), .vclock_in(vclock_in), 
                 .vcount_in(vcount_in), .hcount_in(hcount_in), .color(12'hF00), .pixel_out(strike3_pixel));
     
     logic [11:0] blank;
-    circle_blob  #(.RADIUS(32)) circle4 (.x_in(10), .y_in(650), .vclock_in(vclock_in), 
+    circle_blob  #(.RADIUS(8)) circle4 (.x_in(612), .y_in(440), .vclock_in(vclock_in), 
                 .vcount_in(vcount_in), .hcount_in(hcount_in), .color(12'h000), .pixel_out(blank_pixel));
     
     always_comb begin
         if (num_strikes == 2'b01) begin
             pixel_out = strike1_pixel;
-            new_one_hz = 52_000_000;
+            new_one_hz = 20_000_000;
         end if (num_strikes == 2'b10) begin
             pixel_out = strike2_pixel | strike1_pixel;
-            new_one_hz = 37_000_000;
+            new_one_hz = 10_000_000;
         end if (num_strikes == 2'b11) begin
             pixel_out = strike3_pixel | strike2_pixel | strike1_pixel;
-            new_one_hz = 65_000_000;
+            new_one_hz = 25_000_000;
         end
     end
             

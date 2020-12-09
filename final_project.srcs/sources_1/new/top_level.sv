@@ -24,10 +24,10 @@ module top_level( input clk_100mhz,
                   input[15:0] sw,
                   input btnc, btnu, btnl, btnr, btnd,
                   ////mic inputs
-                  ///input vauxp3,
-                  //input vauxn3,
-                  //input vn_in,
-                  //input vp_in, 
+                  input vauxp3,
+                  input vauxn3,
+                  input vn_in,
+                  input vp_in, 
                   
                   input serial_rx,
                   output serial_tx,
@@ -111,156 +111,156 @@ module top_level( input clk_100mhz,
     
  /////////////////////////////MICROPHONE WILL BE INCORPORATED BEFORE CHECKOFF///////////////////////////////////////////////////////////
     
-//    ///////////////////MIC AND FFT VARIABLES//////////////////////
-//    parameter SAMPLE_COUNT = 4164; //2082;//gets approximately (will generate audio at approx 21 kHz sample rate.
+    ///////////////////MIC AND FFT VARIABLES//////////////////////
+    parameter SAMPLE_COUNT = 4164; //2082;//gets approximately (will generate audio at approx 21 kHz sample rate.
     
-//    logic [15:0] sample_counter;
-//    logic [11:0] adc_data;
-//    logic [11:0] sampled_adc_data;
-//    logic sample_trigger;
-//    logic adc_ready;
-//    logic enable;
-//    logic [7:0] recorder_data;             
-//    logic [7:0] vol_out;
-//    logic pwm_val; //pwm signal (HI/LO)
-//    logic [15:0] scaled_adc_data;
-//    logic [15:0] scaled_signed_adc_data;
-//    logic [15:0] fft_data;
-//    logic       fft_ready;
-//    logic       fft_valid;
-//    logic       fft_last;
-//    logic [9:0] fft_data_counter;
+    logic [15:0] sample_counter;
+    logic [11:0] adc_data;
+    logic [11:0] sampled_adc_data;
+    logic sample_trigger;
+    logic adc_ready;
+    logic enable;
+    logic [7:0] recorder_data;             
+    logic [7:0] vol_out;
+    logic pwm_val; //pwm signal (HI/LO)
+    logic [15:0] scaled_adc_data;
+    logic [15:0] scaled_signed_adc_data;
+    logic [15:0] fft_data;
+    logic       fft_ready;
+    logic       fft_valid;
+    logic       fft_last;
+    logic [9:0] fft_data_counter;
     
-//    logic fft_out_ready;
-//    logic fft_out_valid;
-//    logic fft_out_last;
-//    logic [31:0] fft_out_data;
+    logic fft_out_ready;
+    logic fft_out_valid;
+    logic fft_out_last;
+    logic [31:0] fft_out_data;
     
-//    logic sqsum_valid;
-//    logic sqsum_last;
-//    logic sqsum_ready;
-//    logic [31:0] sqsum_data;
+    logic sqsum_valid;
+    logic sqsum_last;
+    logic sqsum_ready;
+    logic [31:0] sqsum_data;
     
-//    logic fifo_valid;
-//    logic fifo_last;
-//    logic fifo_ready;
-//    logic [31:0] fifo_data;
+    logic fifo_valid;
+    logic fifo_last;
+    logic fifo_ready;
+    logic [31:0] fifo_data;
     
-//    logic [23:0] sqrt_data;
-//    logic sqrt_valid;
-//    logic sqrt_last;
+    logic [23:0] sqrt_data;
+    logic sqrt_valid;
+    logic sqrt_last;
     
-//    logic pixel_clk;
-//    ///////////////////////////////////////////////////////////////////////
+    logic pixel_clk;
+    ///////////////////////////////////////////////////////////////////////
     
-//    assign sample_trigger = (sample_counter == SAMPLE_COUNT);
+    assign sample_trigger = (sample_counter == SAMPLE_COUNT);
 
-//    always_ff @(posedge clk_100mhz)begin
-//        if (sample_counter == SAMPLE_COUNT)begin
-//            sample_counter <= 16'b0;
-//        end else begin
-//            sample_counter <= sample_counter + 16'b1;
-//        end
-//        if (sample_trigger) begin
-//            scaled_adc_data <= 16*adc_data;
-//            scaled_signed_adc_data <= {~scaled_adc_data[15],scaled_adc_data[14:0]};
-//            sampled_adc_data <= {~adc_data[11],adc_data[10:0]}; //convert to signed. incoming data is offset binary
-//            if (fft_ready)begin
-//                fft_data_counter <= fft_data_counter +1;
-//                fft_last <= fft_data_counter==1023;
-//                fft_valid <= 1'b1;
-//                fft_data <= {~scaled_adc_data[15],scaled_adc_data[14:0]}; //set the FFT DATA here!
-//            end
-//            //https://en.wikipedia.org/wiki/Offset_binary
-//        end else begin
-//            fft_data <= 0;
-//            fft_last <= 0;
-//            fft_valid <= 0;
-//        end
-//    end
+    always_ff @(posedge clk_100mhz)begin
+        if (sample_counter == SAMPLE_COUNT)begin
+            sample_counter <= 16'b0;
+        end else begin
+            sample_counter <= sample_counter + 16'b1;
+        end
+        if (sample_trigger) begin
+            scaled_adc_data <= 16*adc_data;
+            scaled_signed_adc_data <= {~scaled_adc_data[15],scaled_adc_data[14:0]};
+            sampled_adc_data <= {~adc_data[11],adc_data[10:0]}; //convert to signed. incoming data is offset binary
+            if (fft_ready)begin
+                fft_data_counter <= fft_data_counter +1;
+                fft_last <= fft_data_counter==1023;
+                fft_valid <= 1'b1;
+                fft_data <= {~scaled_adc_data[15],scaled_adc_data[14:0]}; //set the FFT DATA here!
+            end
+            //https://en.wikipedia.org/wiki/Offset_binary
+        end else begin
+            fft_data <= 0;
+            fft_last <= 0;
+            fft_valid <= 0;
+        end
+    end
 
-//    //ADC uncomment when activating!
-//    xadc_wiz_0 my_adc ( .dclk_in(clk_100mhz), .daddr_in(8'h13), //read from 0x13 for a
-//                        .vauxn3(vauxn3),.vauxp3(vauxp3),
-//                        .vp_in(1),.vn_in(1),
-//                        .di_in(16'b0),
-//                        .do_out(adc_data),.drdy_out(adc_ready),
-//                        .den_in(1), .dwe_in(0));
+    //ADC uncomment when activating!
+    xadc_wiz_0 my_adc ( .dclk_in(clk_100mhz), .daddr_in(8'h13), //read from 0x13 for a
+                        .vauxn3(vauxn3),.vauxp3(vauxp3),
+                        .vp_in(1),.vn_in(1),
+                        .di_in(16'b0),
+                        .do_out(adc_data),.drdy_out(adc_ready),
+                        .den_in(1), .dwe_in(0));
  
  
     
     
-    //FFT module:
-    //CONFIGURATION:
-    //1 channel
-    //transform length: 1024
-    //target clock frequency: 100 MHz
-    //target Data throughput: 50 Msps
-    //Auto-select architecture
-    //IMPLEMENTATION:
-    //Fixed Point, Scaled, Truncation
-    //MAKE SURE TO SET NATURAL ORDER FOR OUTPUT ORDERING
-    //Input Data Width, Phase Factor Width: Both 16 bits
-    //Result uses 12 DSP48 Slices and 6 Block RAMs (under Impl Details)
-//    xfft_0 my_fft (.aclk(clk_100mhz), .s_axis_data_tdata(fft_data), 
-//                    .s_axis_data_tvalid(fft_valid),
-//                    .s_axis_data_tlast(fft_last), .s_axis_data_tready(fft_ready),
-//                    .s_axis_config_tdata(0), 
-//                     .s_axis_config_tvalid(0),
-//                     .s_axis_config_tready(),
-//                    .m_axis_data_tdata(fft_out_data), .m_axis_data_tvalid(fft_out_valid),
-//                    .m_axis_data_tlast(fft_out_last), .m_axis_data_tready(fft_out_ready));
+//    FFT module:
+//    CONFIGURATION:
+//    1 channel
+//    transform length: 1024
+//    target clock frequency: 100 MHz
+//    target Data throughput: 50 Msps
+//    Auto-select architecture
+//    IMPLEMENTATION:
+//    Fixed Point, Scaled, Truncation
+//    MAKE SURE TO SET NATURAL ORDER FOR OUTPUT ORDERING
+//    Input Data Width, Phase Factor Width: Both 16 bits
+//    Result uses 12 DSP48 Slices and 6 Block RAMs (under Impl Details)
+    xfft_0 my_fft (.aclk(clk_100mhz), .s_axis_data_tdata(fft_data), 
+                    .s_axis_data_tvalid(fft_valid),
+                    .s_axis_data_tlast(fft_last), .s_axis_data_tready(fft_ready),
+                    .s_axis_config_tdata(0), 
+                     .s_axis_config_tvalid(0),
+                     .s_axis_config_tready(),
+                    .m_axis_data_tdata(fft_out_data), .m_axis_data_tvalid(fft_out_valid),
+                    .m_axis_data_tlast(fft_out_last), .m_axis_data_tready(fft_out_ready));
     
-    //for debugging commented out, make this whatever size,detail you want:
-    //ila_0 myila (.clk(clk_100mhz), .probe0(fifo_data), .probe1(sqrt_data), .probe2(sqsum_data), .probe3(fft_out_data));
+//    for debugging commented out, make this whatever size,detail you want:
+//    ila_0 myila (.clk(clk_100mhz), .probe0(fifo_data), .probe1(sqrt_data), .probe2(sqsum_data), .probe3(fft_out_data));
     
-    //custom module (was written with a Vivado AXI-Streaming Wizard so format looks inhuman
-    //this is because it was a template I customized.
-//    square_and_sum_v1_0 mysq(.s00_axis_aclk(clk_100mhz), .s00_axis_aresetn(1'b1),
-//                            .s00_axis_tready(fft_out_ready),
-//                            .s00_axis_tdata(fft_out_data),.s00_axis_tlast(fft_out_last),
-//                            .s00_axis_tvalid(fft_out_valid),.m00_axis_aclk(clk_100mhz),
-//                            .m00_axis_aresetn(1'b1),. m00_axis_tvalid(sqsum_valid),
-//                            .m00_axis_tdata(sqsum_data),.m00_axis_tlast(sqsum_last),
-//                            .m00_axis_tready(sqsum_ready));
+//    custom module (was written with a Vivado AXI-Streaming Wizard so format looks inhuman
+//    this is because it was a template I customized.
+    square_and_sum_v1_0 mysq(.s00_axis_aclk(clk_100mhz), .s00_axis_aresetn(1'b1),
+                            .s00_axis_tready(fft_out_ready),
+                            .s00_axis_tdata(fft_out_data),.s00_axis_tlast(fft_out_last),
+                            .s00_axis_tvalid(fft_out_valid),.m00_axis_aclk(clk_100mhz),
+                            .m00_axis_aresetn(1'b1),. m00_axis_tvalid(sqsum_valid),
+                            .m00_axis_tdata(sqsum_data),.m00_axis_tlast(sqsum_last),
+                            .m00_axis_tready(sqsum_ready));
     
-//    //Didn't really need this fifo but put it in for because I felt like it and for practice:
-//    //This is an AXI4-Stream Data FIFO
-//    //FIFO Depth: 1024
-//    //No packet mode, no async clock, 2 sycn stages for clock domain crossing
-//    //no aclken conversion
-//    //TDATA Width: 4 bytes
-//    //Enable TSTRB: No...isn't needed
-//    //Enable TKEEP: No...isn't needed
-//    //Enable TLAST: Yes...use this for frame alignment
-//    //TID Width, TDEST Width, and TUSER width: all 0
-//    axis_data_fifo_0 myfifo (.s_axis_aclk(clk_100mhz), .s_axis_aresetn(1'b1),
-//                             .s_axis_tvalid(sqsum_valid), .s_axis_tready(sqsum_ready),
-//                             .s_axis_tdata(sqsum_data), .s_axis_tlast(sqsum_last),
-//                             .m_axis_tvalid(fifo_valid), .m_axis_tdata(fifo_data),
-//                             .m_axis_tready(fifo_ready), .m_axis_tlast(fifo_last));    
-    //AXI4-STREAMING Square Root Calculator:
-    //CONFIGUATION OPTIONS:
-    // Functional Selection: Square Root
-    //Architec Config: Parallel (can't change anyways)
-    //Pipelining: Max
-    //Data Format: UnsignedInteger
-    //Phase Format: Radians, the way God intended.
-    //Input Width: 32
-    //Output Width: 17
-    //Round Mode: Truncate
-    //0 on the others, and no scale compensation
-    //AXI4 STREAM OPTIONS:
-    //Has TLAST!!! need to propagate that
-    //Don't need a TUSER
-    //Flow Control: Blocking
-//    //optimize Goal: Performance
-//    //leave other things unchecked.
-//    cordic_0 mysqrt (.aclk(clk_100mhz), .s_axis_cartesian_tdata(fifo_data),
-//                     .s_axis_cartesian_tvalid(fifo_valid), .s_axis_cartesian_tlast(fifo_last),
-//                     .s_axis_cartesian_tready(fifo_ready),.m_axis_dout_tdata(sqrt_data),
-//                     .m_axis_dout_tvalid(sqrt_valid), .m_axis_dout_tlast(sqrt_last));
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Didn't really need this fifo but put it in for because I felt like it and for practice:
+    //This is an AXI4-Stream Data FIFO
+    //FIFO Depth: 1024
+    //No packet mode, no async clock, 2 sycn stages for clock domain crossing
+    //no aclken conversion
+    //TDATA Width: 4 bytes
+    //Enable TSTRB: No...isn't needed
+    //Enable TKEEP: No...isn't needed
+    //Enable TLAST: Yes...use this for frame alignment
+    //TID Width, TDEST Width, and TUSER width: all 0
+    axis_data_fifo_0 myfifo (.s_axis_aclk(clk_100mhz), .s_axis_aresetn(1'b1),
+                             .s_axis_tvalid(sqsum_valid), .s_axis_tready(sqsum_ready),
+                             .s_axis_tdata(sqsum_data), .s_axis_tlast(sqsum_last),
+                             .m_axis_tvalid(fifo_valid), .m_axis_tdata(fifo_data),
+                             .m_axis_tready(fifo_ready), .m_axis_tlast(fifo_last));    
+//    AXI4-STREAMING Square Root Calculator:
+//    CONFIGUATION OPTIONS:
+//     Functional Selection: Square Root
+//    Architec Config: Parallel (can't change anyways)
+//    Pipelining: Max
+//    Data Format: UnsignedInteger
+//    Phase Format: Radians, the way God intended.
+//    Input Width: 32
+//    Output Width: 17
+//    Round Mode: Truncate
+//    0 on the others, and no scale compensation
+//    AXI4 STREAM OPTIONS:
+//    Has TLAST!!! need to propagate that
+//    Don't need a TUSER
+//    Flow Control: Blocking
+    //optimize Goal: Performance
+    //leave other things unchecked.
+    cordic_0 mysqrt (.aclk(clk_100mhz), .s_axis_cartesian_tdata(fifo_data),
+                     .s_axis_cartesian_tvalid(fifo_valid), .s_axis_cartesian_tlast(fifo_last),
+                     .s_axis_cartesian_tready(fifo_ready),.m_axis_dout_tdata(sqrt_data),
+                     .m_axis_dout_tvalid(sqrt_valid), .m_axis_dout_tlast(sqrt_last));
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
     
 
    
@@ -270,7 +270,7 @@ module top_level( input clk_100mhz,
     
  //   assign minigame_order_in = {4'b0010, 4'b0100, 4'b0101, 4'b0001, 4'b0101, 4'b0100};
 //    assign minigame_order_in = {4'b0010, 4'b0010, 4'b0001, 4'b0001, 4'b0010, 4'b0001};
-    assign minigame_order_in = {4'b0010, 4'b0010, 4'b0001, 4'b0001, 4'b0010, 4'b0001};
+    assign minigame_order_in = {4'b0011, 4'b0100, 4'b0001, 4'b0010, 4'b0101, 4'b0101};
     
     always_comb begin
         case(minigame)
@@ -361,15 +361,15 @@ module top_level( input clk_100mhz,
 	 .btnr(right),  .random(rand_out[1:0]), .led_r(ledout_mg2[2]), .led_b(ledout_mg2[0]), 
 	 .led_g(ledout_mg2[1]), .timer_count(count_mg2), .state(mg2_state), .fail(mg_fail2), .success(mg_success2));
 	 
-	 ///////////////////////minigame 3/////////////////////////////////////////////////
-//	 logic [9:0] led_minigame3;
+	 /////////////////////minigame 3/////////////////////////////////////////////////
+	 logic [9:0] led_minigame3;
 	 
-//	     micr_minigame minigame_3 (.vclock_in(clk_25mhz), .hcount_in(hcount), .vcount_in(vcount), .hsync_in(hsync),
-//            .vsync_in(vsync), .blank_in(blanking), .button(center), .sqrt_data(sqrt_data), 
-//            .sqrt_valid(sqrt_valid), .sqrt_last(sqrt_last), .minigame_number(minigame),
-//            .completed(mg_success3), .phsync_out(phsync), .pvsync_out(pvsync), 
-//            .pblank_out(pblank), .pixel_out(pixel_out3), .cool_led(led_minigame3));
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////
+	     micr_minigame minigame_3 (.vclock_in(clk_25mhz), .reset_in(mg_start), .hcount_in(hcount), .vcount_in(vcount), .hsync_in(hsync),
+            .vsync_in(vsync), .blank_in(blanking), .button(center), .sqrt_data(sqrt_data), 
+            .sqrt_valid(sqrt_valid), .sqrt_last(sqrt_last), .minigame_number(minigame),
+            .completed(mg_success3), .phsync_out(phsync), .pvsync_out(pvsync), 
+            .pblank_out(pblank), .pixel_out(pixel_out3), .cool_led(led_minigame3));
+   /////////////////////////////////////////////////////////////////////////////////////////////////////
    
    
    ////////////////////minigame_4////////////////////////////////////////////////
@@ -386,9 +386,9 @@ module top_level( input clk_100mhz,
      ///////////////////////////////////////////minigame_5//////////////////////////////////////////////////////////////
      button_game bg(.vclock_in(clk_25mhz),.reset_in(mg_start), .ones(ones[3:0]), .tens(tens[3:0]), .minutes(minutes),
                 .hcount_in(hcount),.vcount_in(vcount), .pushed_button(up), .rand_has_text(rand_out[0]),
-                .rand_button_color(rand_out[2:1]), .rand_strip_color(rand_out[3]), .completed(mg5_success), .failed(mg5_fail),
+                .rand_button_color(rand_out[2:1]), .rand_strip_color(rand_out[3]), .completed(mg_success5), .failed(mg_fail5),
                 .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
-                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(button_pixel));
+                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(pixel_out5));
      
 
 	FPGA_graphics fpga_s (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
@@ -396,6 +396,31 @@ module top_level( input clk_100mhz,
 
 	FPGA_graphics_op fpga_m (.vclock_in(clk_25mhz), .reset_in(system_reset), .hcount_in(hcount), .vcount_in(vcount),
 	 .mg_completed(i_op), .pixel_out(pixel_out_fpgaop));
+	 
+	 //////////////////////////////////////////////////////////////////////////////////////////////////
+	 logic [11:0] pixel_strikes;
+	 strike_graphics strikes (.vclock_in(clock_25mhz), .hcount_in(hcount), .vcount_in(vcount), .num_strikes(strike_count),
+	 .pixel_out(pixel_strikes));
+	 
+	 logic [11:0] homescreen_out;
+	 logic homescreen_start;
+	 homescreen_graphics home (.vclock_in(clock_25mhz), .reset_in(homescreen_start), .hcount_in(hcount), .vcount_in(vcount), .up_in(up), 
+	 .down_in(down), .confirm(center), .mode(multiplayer), .pixel_out(homescreen_out));
+	 
+	 logic [11:0] win_pixel;
+	 logic play_again_win;
+	 win_graphics win_screen (.vclock_in(clock_25mhz), .reset_in(win_start), .hcount_in(hcount), .vcount_in(vcount), .confirm(center), 
+	 .pixel_out(win_pixel), .confirmed(play_again_win));
+	 
+	 logic [11:0] lose_pixel;
+	 logic play_again_lose;
+	 
+	 lose_graphics lose_screen (.vclock_in(clock_25mhz), .reset_in(lose_start), .hcount_in(hcount), .vcount_in(vcount), .confirm(center), 
+	 .pixel_out(lose_pixel), .confirmed(play_again_lose));
+	 
+	 
+	 
+	 
 	
 	////////////////////////MULTIPLAYER FUNCTIONALITY//////////////////////////////////////////////
 	logic multiplayer_reset;
@@ -417,17 +442,18 @@ module top_level( input clk_100mhz,
      
      ////////////////////////////////////////////////////////GAMEPLAY FSM///////////////////////////////////////////////
      assign reset = sw[15];
-     assign multiplayer = sw[13:12];
+     //assign multiplayer = sw[13:12];
      //assign minigame = 3'b010; //choose which minigame is playing
-     assign play_again = sw[11];
+     //assign play_again = sw[11];
  
      always_ff @(posedge clk_25mhz) begin
         if(system_reset) begin
             game_state <= SHUFFLE;
             minigame <= 4'b0000;
+            homescreen_start <= 1;
         end else begin
             case(game_state)
-                SHUFFLE :   begin start_shuffle <=1; game_state <= HOME;
+                SHUFFLE :   begin start_shuffle <=1; game_state <= HOME; homescreen_start <= 0;
                                   i <= 3'b000;
                                   strike_count <= 2'b00;end
                 HOME    :   begin  game_state <= (multiplayer!=2'b00 &done_shuffle)? multiplayer[1]?SYNC:  START : HOME;
@@ -454,11 +480,13 @@ module top_level( input clk_100mhz,
                                    else if(mg_success&i==3'd5) win_start <=1;   end
                 LOSE    :   begin lose_start<=0; 
                                     minigame <= (play_again)?4'b0000: 4'b0111;
-                                    game_state <= (play_again)?SHUFFLE:LOSE;
+                                    game_state <= (play_again_lose)?SHUFFLE:LOSE;
+                                    if(play_again_lose) homescreen_start <=1;
                                    end
                 WIN     :   begin win_start <= 0; 
                                    minigame <= (play_again)?4'b0000:4'b1000;
-                                   game_state <= (play_again)?SHUFFLE:WIN; end
+                                   game_state <= (play_again_win)?SHUFFLE:WIN; 
+                                   if(play_again_win) homescreen_start <=1;end
                 
             endcase
          end
@@ -484,31 +512,31 @@ module top_level( input clk_100mhz,
          end
 
           case(minigame)
-//            4'b0000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //home, change to pixel_out_home
-//                            {led16_r, led16_g, led16_b} <= 3'b0; end 
-            4'b0000      :   begin rgb <= gengine_pixel_out; //home, change to pixel_out_home
+            4'b0000      :   begin rgb <= homescreen_out; //home, change to pixel_out_home
                             {led16_r, led16_g, led16_b} <= 3'b0; end 
-            4'b0001      :   begin rgb <= multiplayer[1]? pixel_out1+pixel_out_fpga+pixel_out_fpgaop : pixel_out1+pixel_out_fpga;
+            //4'b0000      :   begin rgb <= gengine_pixel_out; //home, change to pixel_out_home
+              //              {led16_r, led16_g, led16_b} <= 3'b0; end 
+            4'b0001      :   begin rgb <= multiplayer[1]? pixel_out1+pixel_out_fpga+pixel_out_fpgaop + pixel_strikes : pixel_out1+pixel_out_fpga+pixel_strikes;
                             {led16_r, led16_g, led16_b} <= 3'b0; 
                            end
-            4'b0010      :   begin rgb <= multiplayer[1]? pixel_out2+pixel_out_fpga+pixel_out_fpgaop : pixel_out2+pixel_out_fpga;
+            4'b0010      :   begin rgb <= multiplayer[1]? pixel_out2+pixel_out_fpga+pixel_out_fpgaop + pixel_strikes : pixel_out2+pixel_out_fpga+pixel_strikes;
                                   {led16_r, led16_g, led16_b} <= ledout_mg2; 
                                   ; end
-            4'b0011      :   begin rgb <= multiplayer[1]? pixel_out3+pixel_out_fpga+pixel_out_fpgaop : pixel_out3+pixel_out_fpga;
+            4'b0011      :   begin rgb <= multiplayer[1]? pixel_out3+pixel_out_fpga+pixel_out_fpgaop+pixel_strikes : pixel_out3+pixel_out_fpga+pixel_strikes;
                                   {led16_r, led16_g, led16_b} <= 0;
                                    end
-            4'b0100      :  begin rgb <= multiplayer[1]? pixel_out4+pixel_out_fpga+pixel_out_fpgaop : pixel_out4+pixel_out_fpga;
+            4'b0100      :  begin rgb <= multiplayer[1]? pixel_out4+pixel_out_fpga+pixel_out_fpgaop+pixel_strikes : pixel_out4+pixel_out_fpga+pixel_strikes;
                                   {led16_r, led16_g, led16_b} <= 0;
                                   end
-            4'b0101      :  begin rgb <= multiplayer[1]? pixel_out5+pixel_out_fpga+pixel_out_fpgaop : pixel_out5+pixel_out_fpga;
+            4'b0101      :  begin rgb <= multiplayer[1]? pixel_out5+pixel_out_fpga+pixel_out_fpgaop+pixel_strikes : pixel_out5+pixel_out_fpga+pixel_strikes;
                                   {led16_r, led16_g, led16_b} <= 0;
                                   end
-            4'b0110      : begin rgb <= multiplayer[1]? gengine_pixel_out+pixel_out_fpga+pixel_out_fpgaop : gengine_pixel_out +pixel_out_fpga;
+            4'b0110      : begin rgb <= multiplayer[1]? gengine_pixel_out+pixel_out_fpga+pixel_out_fpgaop+pixel_strikes : gengine_pixel_out +pixel_out_fpga+pixel_strikes;
                                   {led16_r, led16_g, led16_b} <= 0;
                                   end
             4'b0111      :   begin rgb <= gengine_pixel_out; //LOSE, change to pixel_out_lose
                             {led16_r, led16_g, led16_b} <= 3'b100; end 
-            4'b1000      :   begin rgb <= gengine_pixel_out; //WIN, change to pixel_out_win
+            4'b1000      :   begin rgb <= win_pixel; //WIN, change to pixel_out_win
                             {led16_r, led16_g, led16_b} <= 3'b111; end 
             4'b1001      :  begin rgb <= pixel_out_sync;
                                   {led16_r, led16_g, led16_b} <= 3'b000;end //SYNC STATE
@@ -621,33 +649,33 @@ module top_level( input clk_100mhz,
         .graphics_req_dout
     );
 
-    graphics_engine gengine(
-        .clk(system_clock),
-        .reset(system_reset),
+//    graphics_engine gengine(
+//        .clk(system_clock),
+//        .reset(system_reset),
 
-        .hcount,
-        .vcount,
+//        .hcount,
+//        .vcount,
 
-        .pixel_out(gengine_pixel_out),
+//        .pixel_out(gengine_pixel_out),
 
-        .should_render,
-        .render_dirty,
-        .num_objects,
-        .new_object_waddr,
-        .new_object_we,
-        .new_object_properties,
-        .render_ack,
+//        .should_render,
+//        .render_dirty,
+//        .num_objects,
+//        .new_object_waddr,
+//        .new_object_we,
+//        .new_object_properties,
+//        .render_ack,
 
-        .texturemap_id,
-        .should_load_texturemap,
-        .texturemap_load_ack,
+//        .texturemap_id,
+//        .should_load_texturemap,
+//        .texturemap_load_ack,
 
-        .graphics_req,
-        .graphics_req_addr,
-        .graphics_req_ack,
-        .graphics_req_we,
-        .graphics_req_dout
-    );
+//        .graphics_req,
+//        .graphics_req_addr,
+//        .graphics_req_ack,
+//        .graphics_req_we,
+//        .graphics_req_dout
+//    );
 
     sound_engine sengine(
         .clk(system_clock),
@@ -668,9 +696,12 @@ module top_level( input clk_100mhz,
         .audio_req_dout,
         .audio_out
     );
+    
+   
 
     assign aud_sd = 1'b1;
-    assign aud_pwm = audio_out ? 1'bZ : 1'b0;
+    assign aud_pwm = pwm_val?1'bZ:1'b0; 
+   // assign aud_pwm = (minigame==3)?(pwm_val?1'bZ:1'b0):audio_out ? 1'bZ : 1'b0;
 
 
 //confirm is button to press to confirm single/multiplayer
@@ -720,246 +751,246 @@ module top_level( input clk_100mhz,
     // This is a horrible, giant multiplexer to resolve conflicts between different modules that use gengine/sengine
     // the sight of this is actually truly awful
 
-    logic morse_should_render;
-    logic morse_render_dirty;
-    logic [7:0] morse_num_objects;
-    logic [7:0] morse_new_object_waddr;
-    logic morse_new_object_we;
-    logic [35:0] morse_new_object_properties;
+//    logic morse_should_render;
+//    logic morse_render_dirty;
+//    logic [7:0] morse_num_objects;
+//    logic [7:0] morse_new_object_waddr;
+//    logic morse_new_object_we;
+//    logic [35:0] morse_new_object_properties;
 
-    logic [7:0] morse_texturemap_id;
-    logic morse_should_load_texturemap;
+//    logic [7:0] morse_texturemap_id;
+//    logic morse_should_load_texturemap;
 
-    logic title_screen_should_render;
-    logic title_screen_render_dirty;
-    logic [7:0] title_screen_num_objects;
-    logic [7:0] title_screen_new_object_waddr;
-    logic title_screen_new_object_we;
-    logic [35:0] title_screen_new_object_properties;
+//    logic title_screen_should_render;
+//    logic title_screen_render_dirty;
+//    logic [7:0] title_screen_num_objects;
+//    logic [7:0] title_screen_new_object_waddr;
+//    logic title_screen_new_object_we;
+//    logic [35:0] title_screen_new_object_properties;
 
-    logic [7:0] title_screen_texturemap_id;
-    logic title_screen_should_load_texturemap;
+//    logic [7:0] title_screen_texturemap_id;
+//    logic title_screen_should_load_texturemap;
 
-    logic lose_screen_should_render;
-    logic lose_screen_render_dirty;
-    logic [7:0] lose_screen_num_objects;
-    logic [7:0] lose_screen_new_object_waddr;
-    logic lose_screen_new_object_we;
-    logic [35:0] lose_screen_new_object_properties;
+//    logic lose_screen_should_render;
+//    logic lose_screen_render_dirty;
+//    logic [7:0] lose_screen_num_objects;
+//    logic [7:0] lose_screen_new_object_waddr;
+//    logic lose_screen_new_object_we;
+//    logic [35:0] lose_screen_new_object_properties;
 
-    logic [7:0] lose_screen_texturemap_id;
-    logic lose_screen_should_load_texturemap;
+//    logic [7:0] lose_screen_texturemap_id;
+//    logic lose_screen_should_load_texturemap;
 
-    logic win_screen_should_render;
-    logic win_screen_render_dirty;
-    logic [7:0] win_screen_num_objects;
-    logic [7:0] win_screen_new_object_waddr;
-    logic win_screen_new_object_we;
-    logic [35:0] win_screen_new_object_properties;
+//    logic win_screen_should_render;
+//    logic win_screen_render_dirty;
+//    logic [7:0] win_screen_num_objects;
+//    logic [7:0] win_screen_new_object_waddr;
+//    logic win_screen_new_object_we;
+//    logic [35:0] win_screen_new_object_properties;
 
-    logic [7:0] win_screen_texturemap_id;
-    logic win_screen_should_load_texturemap;
+//    logic [7:0] win_screen_texturemap_id;
+//    logic win_screen_should_load_texturemap;
 
-    logic minigame_reset;
-    logic [3:0] minigame_last;
+//    logic minigame_reset;
+//    logic [3:0] minigame_last;
 
-    always_ff @(posedge system_clock) begin
-        minigame_last <= minigame;
-        if (minigame_reset) minigame_reset <= 1'b0;
-        if (stop_sound_between_minigames) stop_sound_between_minigames <= 1'b0;
+//    always_ff @(posedge system_clock) begin
+//        minigame_last <= minigame;
+//        if (minigame_reset) minigame_reset <= 1'b0;
+//        if (stop_sound_between_minigames) stop_sound_between_minigames <= 1'b0;
 
-        if (minigame_last != minigame) begin
-            minigame_reset <= 1'b1;
-            stop_sound_between_minigames <= 1'b1;
-        end
+//        if (minigame_last != minigame) begin
+//            minigame_reset <= 1'b1;
+//            stop_sound_between_minigames <= 1'b1;
+//        end
 
-        case (minigame)
-            MORSE_MINIGAME: begin
-                should_render <= morse_should_render;
-                render_dirty <= morse_render_dirty;
-                num_objects <= morse_num_objects;
-                new_object_waddr <= morse_new_object_waddr;
-                new_object_we <= morse_new_object_we;
-                new_object_properties <= morse_new_object_properties;
+//        case (minigame)
+//            MORSE_MINIGAME: begin
+//                should_render <= morse_should_render;
+//                render_dirty <= morse_render_dirty;
+//                num_objects <= morse_num_objects;
+//                new_object_waddr <= morse_new_object_waddr;
+//                new_object_we <= morse_new_object_we;
+//                new_object_properties <= morse_new_object_properties;
         
-                texturemap_id <= morse_texturemap_id;
-                should_load_texturemap <= morse_should_load_texturemap;
-            end
+//                texturemap_id <= morse_texturemap_id;
+//                should_load_texturemap <= morse_should_load_texturemap;
+//            end
 
-            TITLE_SCREEN: begin
-                should_render <= title_screen_should_render;
-                render_dirty <= title_screen_render_dirty;
-                num_objects <= title_screen_num_objects;
-                new_object_waddr <= title_screen_new_object_waddr;
-                new_object_we <= title_screen_new_object_we;
-                new_object_properties <= title_screen_new_object_properties;
+//            TITLE_SCREEN: begin
+//                should_render <= title_screen_should_render;
+//                render_dirty <= title_screen_render_dirty;
+//                num_objects <= title_screen_num_objects;
+//                new_object_waddr <= title_screen_new_object_waddr;
+//                new_object_we <= title_screen_new_object_we;
+//                new_object_properties <= title_screen_new_object_properties;
         
-                texturemap_id <= title_screen_texturemap_id;
-                should_load_texturemap <= title_screen_should_load_texturemap;
-            end
+//                texturemap_id <= title_screen_texturemap_id;
+//                should_load_texturemap <= title_screen_should_load_texturemap;
+//            end
 
-            WIN_SCREEN: begin
-                should_render <= win_screen_should_render;
-                render_dirty <= win_screen_render_dirty;
-                num_objects <= win_screen_num_objects;
-                new_object_waddr <= win_screen_new_object_waddr;
-                new_object_we <= win_screen_new_object_we;
-                new_object_properties <= win_screen_new_object_properties;
+//            WIN_SCREEN: begin
+//                should_render <= win_screen_should_render;
+//                render_dirty <= win_screen_render_dirty;
+//                num_objects <= win_screen_num_objects;
+//                new_object_waddr <= win_screen_new_object_waddr;
+//                new_object_we <= win_screen_new_object_we;
+//                new_object_properties <= win_screen_new_object_properties;
         
-                texturemap_id <= win_screen_texturemap_id;
-                should_load_texturemap <= win_screen_should_load_texturemap;
-            end
+//                texturemap_id <= win_screen_texturemap_id;
+//                should_load_texturemap <= win_screen_should_load_texturemap;
+//            end
 
-            LOSE_SCREEN: begin
-                should_render <= lose_screen_should_render;
-                render_dirty <= lose_screen_render_dirty;
-                num_objects <= lose_screen_num_objects;
-                new_object_waddr <= lose_screen_new_object_waddr;
-                new_object_we <= lose_screen_new_object_we;
-                new_object_properties <= lose_screen_new_object_properties;
+//            LOSE_SCREEN: begin
+//                should_render <= lose_screen_should_render;
+//                render_dirty <= lose_screen_render_dirty;
+//                num_objects <= lose_screen_num_objects;
+//                new_object_waddr <= lose_screen_new_object_waddr;
+//                new_object_we <= lose_screen_new_object_we;
+//                new_object_properties <= lose_screen_new_object_properties;
         
-                texturemap_id <= lose_screen_texturemap_id;
-                should_load_texturemap <= lose_screen_should_load_texturemap;
-            end
-        endcase
-    end
+//                texturemap_id <= lose_screen_texturemap_id;
+//                should_load_texturemap <= lose_screen_should_load_texturemap;
+//            end
+//        endcase
+//    end
 
-    logic morse_play_sound;
-    logic morse_stop_sound;
-    logic [4:0] morse_sound_id;
+//    logic morse_play_sound;
+//    logic morse_stop_sound;
+//    logic [4:0] morse_sound_id;
 
-    logic title_screen_play_sound;
-    logic title_screen_stop_sound;
-    logic [4:0] title_screen_sound_id;
+//    logic title_screen_play_sound;
+//    logic title_screen_stop_sound;
+//    logic [4:0] title_screen_sound_id;
 
-    always_ff @(posedge system_clock) begin
-        case (minigame)
-            MORSE_MINIGAME: begin
-                play_sound <= morse_play_sound;
-                stop_sound <= morse_stop_sound;
-                sound_id <= morse_sound_id;
-            end
+//    always_ff @(posedge system_clock) begin
+//        case (minigame)
+//            MORSE_MINIGAME: begin
+//                play_sound <= morse_play_sound;
+//                stop_sound <= morse_stop_sound;
+//                sound_id <= morse_sound_id;
+//            end
 
-            TITLE_SCREEN: begin
-                play_sound <= title_screen_play_sound;
-                stop_sound <= title_screen_stop_sound;
-                sound_id <= title_screen_sound_id;
-            end
-        endcase
-    end
+//            TITLE_SCREEN: begin
+//                play_sound <= title_screen_play_sound;
+//                stop_sound <= title_screen_stop_sound;
+//                sound_id <= title_screen_sound_id;
+//            end
+//        endcase
+//    end
 
-    minigame_morse minigame_morse_inst(
-        .clk(system_clock),
-        .reset(minigame_reset || system_reset),
+//    minigame_morse minigame_morse_inst(
+//        .clk(system_clock),
+//        .reset(minigame_reset || system_reset),
 
-        .play(morse_play_sound),
-        .stop(morse_stop_sound),
-        .sound_id(morse_sound_id),
+//        .play(morse_play_sound),
+//        .stop(morse_stop_sound),
+//        .sound_id(morse_sound_id),
 
-        .should_render(morse_should_render),
-        .render_dirty(morse_render_dirty),
-        .num_objects(morse_num_objects),
-        .new_object_waddr(morse_new_object_waddr),
-        .new_object_we(morse_new_object_we),
-        .new_object_properties(morse_new_object_properties),
-        .render_ack,
+//        .should_render(morse_should_render),
+//        .render_dirty(morse_render_dirty),
+//        .num_objects(morse_num_objects),
+//        .new_object_waddr(morse_new_object_waddr),
+//        .new_object_we(morse_new_object_we),
+//        .new_object_properties(morse_new_object_properties),
+//        .render_ack,
 
-        .texturemap_id(morse_texturemap_id),
-        .should_load_texturemap(morse_should_load_texturemap),
-        .texturemap_load_ack,
+//        .texturemap_id(morse_texturemap_id),
+//        .should_load_texturemap(morse_should_load_texturemap),
+//        .texturemap_load_ack,
 
-        .failure(mg_fail6),
-        .success(mg_success6),
+//        .failure(mg_fail6),
+//        .success(mg_success6),
 
-        .random(rand_out[3:0]),
-        .sw(sw[3:0]),
-        .btnc(center)
-    );
+//        .random(rand_out[3:0]),
+//        .sw(sw[3:0]),
+//        .btnc(center)
+//    );
 
-    title_screen_graphics title_screen(
-        .clk(system_clock),
-        .reset,
-        .reset(minigame_reset || system_reset),
+//    title_screen_graphics title_screen(
+//        .clk(system_clock),
+        
+//        .reset(minigame_reset || system_reset),
 
-        .play(title_screen_play_sound),
-        .stop(title_screen_stop_sound),
-        .sound_id(title_screen_sound_id),
+//        .play(title_screen_play_sound),
+//        .stop(title_screen_stop_sound),
+//        .sound_id(title_screen_sound_id),
 
-        .should_render,
-        .should_render(title_screen_should_render),
-        .render_dirty(title_screen_render_dirty),
-        .num_objects(title_screen_num_objects),
-        .new_object_waddr(title_screen_new_object_waddr),
-        .new_object_we(title_screen_new_object_we),
-        .new_object_properties(title_screen_new_object_properties),
-        .render_ack,
+        
+//        .should_render(title_screen_should_render),
+//        .render_dirty(title_screen_render_dirty),
+//        .num_objects(title_screen_num_objects),
+//        .new_object_waddr(title_screen_new_object_waddr),
+//        .new_object_we(title_screen_new_object_we),
+//        .new_object_properties(title_screen_new_object_properties),
+//        .render_ack,
 
-        .texturemap_id,
-        .texturemap_id(title_screen_texturemap_id),
-        .should_load_texturemap(title_screen_should_load_texturemap),
-        .texturemap_load_ack,
+      
+//        .texturemap_id(title_screen_texturemap_id),
+//        .should_load_texturemap(title_screen_should_load_texturemap),
+//        .texturemap_load_ack,
 
-        .up,
-        .down,
-        .confirm(center),
-        .mode()
-    );
-/*
+//        .up,
+//        .down,
+//        .confirm(center),
+//        .mode()
+//    );
+///*
 
-    lose_graphics lose_screen(
-        .clk(system_clock),
-        .reset,
-        .reset(minigame_reset || system_reset),
+//    lose_graphics lose_screen(
+//        .clk(system_clock),
+//        .reset,
+//        .reset(minigame_reset || system_reset),
 
-//        .play,
-//        .stop,
-//        .sound_id,
+////        .play,
+////        .stop,
+////        .sound_id,
 
-        .should_render,
-        .should_render(lose_screen_should_render),
-        .render_dirty(lose_screen_render_dirty),
-        .num_objects(lose_screen_num_objects),
-        .new_object_waddr(lose_screen_new_object_waddr),
-        .new_object_we(lose_screen_new_object_we),
-        .new_object_properties(lose_screen_new_object_properties),
-        .render_ack,
+//        .should_render,
+//        .should_render(lose_screen_should_render),
+//        .render_dirty(lose_screen_render_dirty),
+//        .num_objects(lose_screen_num_objects),
+//        .new_object_waddr(lose_screen_new_object_waddr),
+//        .new_object_we(lose_screen_new_object_we),
+//        .new_object_properties(lose_screen_new_object_properties),
+//        .render_ack,
 
-        .texturemap_id,
-        .texturemap_id(lose_screen_texturemap_id),
-        .should_load_texturemap(lose_screen_should_load_texturemap),
-        .texturemap_load_ack,
+//        .texturemap_id,
+//        .texturemap_id(lose_screen_texturemap_id),
+//        .should_load_texturemap(lose_screen_should_load_texturemap),
+//        .texturemap_load_ack,
 
-        .confirm(down),
-        .confirmed()
-    );
+//        .confirm(down),
+//        .confirmed()
+//    );
 
-    win_graphics win_screen(
-        .clk(system_clock),
-        .reset,
-        .reset(minigame_reset || system_reset),
+//    win_graphics win_screen(
+//        .clk(system_clock),
+//        .reset,
+//        .reset(minigame_reset || system_reset),
 
-//        .play,
-//        .stop,
-//        .sound_id,
+////        .play,
+////        .stop,
+////        .sound_id,
 
-        .should_render,
-        .should_render(win_screen_should_render),
-        .render_dirty(win_screen_render_dirty),
-        .num_objects(win_screen_num_objects),
-        .new_object_waddr(win_screen_new_object_waddr),
-        .new_object_we(win_screen_new_object_we),
-        .new_object_properties(win_screen_new_object_properties),
-        .render_ack,
+//        .should_render,
+//        .should_render(win_screen_should_render),
+//        .render_dirty(win_screen_render_dirty),
+//        .num_objects(win_screen_num_objects),
+//        .new_object_waddr(win_screen_new_object_waddr),
+//        .new_object_we(win_screen_new_object_we),
+//        .new_object_properties(win_screen_new_object_properties),
+//        .render_ack,
 
-        .texturemap_id,
-        .texturemap_id(win_screen_texturemap_id),
-        .should_load_texturemap(win_screen_should_load_texturemap),
-        .texturemap_load_ack,
+//        .texturemap_id,
+//        .texturemap_id(win_screen_texturemap_id),
+//        .should_load_texturemap(win_screen_should_load_texturemap),
+//        .texturemap_load_ack,
 
-        .confirm(down),
-        .confirmed()
-    );
-*/
+//        .confirm(down),
+//        .confirmed()
+//    );
+//*/
 
 endmodule
 
@@ -1136,7 +1167,7 @@ module minigame_1( input vclock_in,
                    blob_D #(.WIDTH(40), .HEIGHT(40)) square_1(.x_in(11'd220), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_ll), .color(color_sq1));
                    blob_D #(.WIDTH(40), .HEIGHT(40)) square_2(.x_in(11'd300), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_lc), .color(color_sq2));
                    blob_D #(.WIDTH(40), .HEIGHT(40)) square_3(.x_in(11'd380), .hcount_in(hcount_in), .y_in(10'd400), .vcount_in(vcount_in), .pixel_out(pixel_lr), .color(color_sq3));
-                  // fingerprint(.pixel_clk_in(vclock_in), .x_in(11'd386), .y_in(10'd351), .hcount_in(hcount_in), .vcount_in(vcount_in), .pixel_out(pixel_f));
+                  fingerprint(.pixel_clk_in(vclock_in), .x_in(11'd386), .y_in(10'd351), .hcount_in(hcount_in), .vcount_in(vcount_in), .pixel_out(pixel_f));
                    
                    logic[11:0] diff1;
                    logic[11:0] diff2;
@@ -1167,7 +1198,7 @@ module minigame_1( input vclock_in,
                         //diff_out <= temp_in[11:0] - start_temp
                         case(state)
                             START           :      begin color_sq1<= col_start_sq1; color_sq2 <= col_start_sq2; color_sq3 <= col_start_sq3; state <= FIRST_SQUARE; end
-                            FIRST_SQUARE    :      begin if ((diff1 > 12'h00F || diff1==12'h00F) & !diff1[11]) begin
+                            FIRST_SQUARE    :      begin if ((diff1 > 12'h008 || diff1==12'h008) & !diff1[11]) begin
                                                                 color_sq1 <= col_start_sq2;
                                                                 state <= SECOND_SQUARE;
                                                                 start_temp <= temp_in;
@@ -1177,7 +1208,7 @@ module minigame_1( input vclock_in,
                                                           end
                                                     end
                                                     
-                             SECOND_SQUARE  :     begin if ((diff2 > 12'h00A || diff2==12'h00A) & !diff2[11]) begin
+                             SECOND_SQUARE  :     begin if ((diff2 > 12'h004 || diff2==12'h004) & !diff2[11]) begin
                                                                 color_sq2 <= col_start_sq3;
                                                                 state <= THIRD_SQUARE;
                                                                 start_temp <= temp_in;
@@ -1186,7 +1217,7 @@ module minigame_1( input vclock_in,
                                                                 state <= SECOND_SQUARE;
                                                           end
                                                     end
-                             THIRD_SQUARE   :     begin if ((diff1 > 12'h00F || diff1==12'h00F) & !diff1[11]) begin
+                             THIRD_SQUARE   :     begin if ((diff1 > 12'h008 || diff1==12'h008) & !diff1[11]) begin
                                                                 color_sq3 <= final_col;
                                                                 state <= DECODE;
                                                           end else begin
@@ -1308,7 +1339,7 @@ module minigame_2( input vclock_in,
                    
                    
                    
-                   timer timer_mg2(.clock(vclock_in), .start_timer(timer_start), .value(12'd2), .count_out(timer_count), .expired_pulse(expired));
+                   timer #(.ONE_HZ_PERIOD(25_000_000)) timer_mg2(.clock(vclock_in), .start_timer(timer_start), .value(12'd2), .count_out(timer_count), .expired_pulse(expired));
                    Lut_mg2 lutmg2 (.rn(chosen_rand), .led_col(lut_out));
                    logic vsync_prev;
                    
@@ -1331,12 +1362,12 @@ module minigame_2( input vclock_in,
                             color_count <=0;
                         end else begin
                         
-                        if(color_count == 27'd65_000_00) begin
+                        if(color_count == 27'd25_000_00) begin
                             color_rand <= random;
                             color_count <= 0;
                         end else color_count <= color_count + 1;
                             
-                         if(clock_count == 27'd6_500_000) begin
+                         if(clock_count == 27'd2_500_000) begin
                             case(color_rand)
                                 2'b00   : begin color_1<=(state_count>4'b0000 & state != INIT)?color_1:{color_1[11:8], color_1[7:4], color_1[3:0]+1}; 
                                                 color_2<= (state_count>4'b0010 & state != INIT)? color_2: {color_2[11:8], color_2[7:4], color_2[3:0]+1};

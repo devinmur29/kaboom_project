@@ -19,167 +19,74 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module win_graphics(
-    input clk,
-    input reset,
 
-//    output logic play,
-//    output logic stop,
-//    output logic [4:0] sound_id,
+module win_graphics (
+   input vclock_in,        // 65MHz clock
+   input reset_in,         // 1 to initialize module
+   input [10:0] hcount_in, // horizontal index of current pixel (0..1023)
+   input [9:0]  vcount_in, // vertical index of current pixel (0..767)
+   input hsync_in,         // XVGA horizontal sync signal (active low)
+   input vsync_in,         // XVGA vertical sync signal (active low)
+   input blank_in,         // XVGA blanking (1 means output black pixel)
+   input confirm,
+   
+   output logic confirmed,
+   output logic phsync_out,       // pong game's horizontal sync
+   output logic pvsync_out,       // pong game's vertical sync
+   output logic pblank_out,       // pong game's blanking
+   output logic [11:0] pixel_out  // pong game's pixel  // r=11:8, g=7:4, b=3:0
+   );
 
-    output logic should_render,
-    output logic render_dirty,
-    output logic [7:0] num_objects,
-    output logic [7:0] new_object_waddr,
-    output logic new_object_we,
-    output logic [35:0] new_object_properties,
-    input render_ack,
-
-    output logic [7:0] texturemap_id,
-    output logic should_load_texturemap,
-    input texturemap_load_ack,
-
-    input confirm,
-
-    output logic confirmed
-);
-
-    assign confirmed = confirm;
-
-    // GRAPHICS CODE
-    logic [0:0] to_draw;
-
-    localparam BLINK_DELAY = 12_000_000;    // approx half a second
-    logic [31:0] blink_counter;
-    logic blink, blink_last;    // if HIGH, show the cursor
-    always_ff @(posedge clk) begin
-        blink_last <= blink;
-
-        if (reset) begin
-            blink_counter <= BLINK_DELAY;
-            blink <= 1'b1;
-        end else begin
-            if (!blink_counter) begin
-                blink_counter <= BLINK_DELAY;
-                blink <= ~blink;
+   assign phsync_out = hsync_in;
+   assign pvsync_out = vsync_in;
+   assign pblank_out = blank_in;
+   
+   
+   logic prev_confirm;
+   always_ff @(posedge vclock_in) begin
+        prev_confirm <= confirm;
+        confirmed <= (confirm & !prev_confirm)? 1:0;
+   end
+   
+   
+   logic color_switch;
+   logic [31:0] counter;
+   always_ff @(posedge vclock_in)begin
+        prev_confirm <= confirm;
+        if (reset_in) begin
+            color_switch <= 0;
+            counter <= 0;
+        end else begin                
+            if (counter > 20000000)begin
+                color_switch <= ~color_switch;
+                counter <= 0;
             end else begin
-                blink_counter <= blink_counter - 1;
+                counter <= counter + 1;
             end
         end
     end
-
-    localparam FIRST_BACKGROUND_TEXTUREMAP = 11;
-
-    logic [2:0] backgrounds_loaded;
-    logic [1:0] background_state, background_state_last;
-
-    always_ff @(posedge clk) begin
-        background_state_last <= background_state;
-    end
-
-    localparam BACKGROUND_STATE_WAITING = 2'b00;
-    localparam BACKGROUND_STATE_LOADING_TEXTUREMAP = 2'b01;
-    localparam BACKGROUND_STATE_RENDERING = 2'b10;
-    // we need to load the bg, then wait for an ack
-    logic background_should_render;
-    logic background_should_load_texturemap;
-
-    logic texturemap_loaded;    // have we loaded the texturemap yet?
-    logic texturemap_ready;    // has the texturemap been fully loaded?
-    localparam TEXTUREMAP_ID = 15;
-
-    // handle background state
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            backgrounds_loaded <= 3'd0;
-            background_state <= BACKGROUND_STATE_WAITING;
-        end else if (backgrounds_loaded < 4) begin
-            // load backgrounds
-            case (background_state)
-                BACKGROUND_STATE_WAITING: begin
-                    background_state <= BACKGROUND_STATE_LOADING_TEXTUREMAP;
-                end
-
-                BACKGROUND_STATE_LOADING_TEXTUREMAP: begin
-                    if (texturemap_load_ack) begin
-                        background_state <= BACKGROUND_STATE_RENDERING;
-                    end
-                end
-
-                BACKGROUND_STATE_RENDERING: begin
-                    if (render_ack) begin
-                        backgrounds_loaded <= backgrounds_loaded + 1;
-                        background_state <= BACKGROUND_STATE_LOADING_TEXTUREMAP;
-                    end
-                end
-            endcase
-        end
-    end
-
-    // load the right texturemap!
-    always_ff @(posedge clk) begin
-        if (should_load_texturemap) should_load_texturemap <= 0;    // should be a pulse
-
-        if (reset) begin
-            texturemap_loaded <= 1'b0;
-            texturemap_ready <= 1'b0;
-
-            should_load_texturemap <= 1'b0;
-        end else if (backgrounds_loaded < 4) begin
-            if (background_state == BACKGROUND_STATE_LOADING_TEXTUREMAP &&
-                background_state != background_state_last) begin
-                texturemap_id <= FIRST_BACKGROUND_TEXTUREMAP + backgrounds_loaded;
-                should_load_texturemap <= 1'b1;
-            end
+   
+   logic [11:0] win_pixel;
+   win_blob wb (.pixel_clk_in(vclock_in),.x_in(101),.hcount_in(hcount_in), 
+           .y_in(80), .vcount_in(vcount_in), .pixel_out(win_pixel));
+           
+   logic [11:0] try_pixel;
+   try_blob_graphics tryb (.pixel_clk_in(vclock_in),.x_in(211),.hcount_in(hcount_in), 
+           .y_in(290), .vcount_in(vcount_in), .pixel_out(try_pixel));
+   
+   logic [11:0] blink_pixel;
+   blob #(.WIDTH(30),.HEIGHT(43),.COLOR(12'b0100_1111_0000))   
+          paddle1(.x_in(440),.y_in(293),.hcount_in(hcount_in),.vcount_in(vcount_in),
+          .pixel_out(blink_pixel));
+   
+   always_comb begin
+        if (color_switch == 0) begin
+            pixel_out = blink_pixel | win_pixel | try_pixel;
         end else begin
-            if (!texturemap_loaded) begin
-                // TODO THIS SHOULD BE THE TEXTUREMAP YOU WANT
-                texturemap_id <= TEXTUREMAP_ID;
-                texturemap_loaded <= 1'b1;
-                texturemap_ready <= 1'b0;
-
-                should_load_texturemap <= 1'b1;
-            end else if (texturemap_load_ack) begin
-                texturemap_ready <= 1'b1;
-            end
+            pixel_out = win_pixel | try_pixel;
         end
-    end
-
-    // configuration stuff
-//    assign render_dirty = 1'b0;
-    assign render_dirty = 1'b1;
-//    assign num_objects = 8'd2;
-
-    // draw things!
-    always_ff @(posedge clk) begin
-        if (new_object_we) new_object_we <= 0;
-        if (should_render) should_render <= 0;
-
-        if (reset) begin
-            to_draw <= 1'b1;
-        end else if (backgrounds_loaded < 4) begin
-            num_objects <= 1;
-
-            if (background_state == BACKGROUND_STATE_RENDERING &&
-                background_state != background_state_last) begin
-                new_object_we <= 1;
-                new_object_waddr <= 0;
-                new_object_properties <= {backgrounds_loaded[0] ? 10'd320 : 10'd0, backgrounds_loaded[1] ? 10'd240 : 10'd0, 10'h2FF, 4'h00, backgrounds_loaded[1:0]};
-                should_render <= 1'b1;
-            end
-        end else begin
-            num_objects <= 1;
-            if (blink != blink_last) begin
-                to_draw <= 1'b1;
-            end else if (to_draw && texturemap_ready) begin
-                new_object_we <= 1;
-                should_render <= 1'b1;
-
-                new_object_waddr <= 0;
-                new_object_properties <= {10'd441, 10'd365, 10'h2FF, blink ? 6'h00: 6'h01};
-                to_draw <= 0;
-            end
-        end
-    end
-
+   end
+   
+   
+     
 endmodule

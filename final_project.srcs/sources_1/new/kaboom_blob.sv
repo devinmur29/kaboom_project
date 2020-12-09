@@ -21,8 +21,8 @@
 
 
 module kaboom_blob
-#(parameter WIDTH = 578,     // default picture width
-               HEIGHT = 200)    // default picture height
+#(parameter WIDTH = 361,     // default picture width
+               HEIGHT = 125)    // default picture height
    (input pixel_clk_in,
     input [10:0] x_in,hcount_in,
     input [9:0] y_in,vcount_in,

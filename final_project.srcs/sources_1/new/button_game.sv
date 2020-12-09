@@ -78,8 +78,8 @@ module button_game (
    
    logic [11:0] strip_pixel;
    always_comb begin
-      if  (((hcount_in >= 400 && hcount_in < 500)) &&
-            ((vcount_in >= 550 && vcount_in < 580))&& pushed_button)
+      if  (((hcount_in >= 260 && hcount_in < 380)) &&
+            ((vcount_in >= 400 && vcount_in < 420))&& pushed_button)
         strip_pixel = strip_color;
       else 
         strip_pixel = 0;
@@ -379,12 +379,12 @@ module button_game (
               
    
    logic [11:0] blbutton_pixel;
-   circle_blob  #(.RADIUS(60)) blankbutton (.x_in(380), .y_in(300), .vclock_in(vclock_in), 
+   circle_blob  #(.RADIUS(60)) blankbutton (.x_in(260), .y_in(200), .vclock_in(vclock_in), 
                 .vcount_in(vcount_in), .hcount_in(hcount_in), .color(button_color), .pixel_out(blbutton_pixel));
    
    logic [11:0] button_pixel;
-   textbutton_blob buttonblob (.pixel_clk_in(vclock_in),.x_in(380),.hcount_in(hcount_in), 
-           .y_in(300), .vcount_in(vcount_in), .color(button_color), .pixel_out(button_pixel));
+   textbutton_blob buttonblob (.pixel_clk_in(vclock_in),.x_in(260),.hcount_in(hcount_in), 
+           .y_in(200), .vcount_in(vcount_in), .color(button_color), .pixel_out(button_pixel));
    
    always_comb begin
     if (has_text) begin

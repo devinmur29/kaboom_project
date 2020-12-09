@@ -21,8 +21,8 @@
 
 
 module lose_blob
-#(parameter WIDTH = 543,     // default picture width
-               HEIGHT = 82)    // default picture height
+#(parameter WIDTH = 339,     // default picture width
+               HEIGHT = 51)    // default picture height
    (input pixel_clk_in,
     input [10:0] x_in,hcount_in,
     input [9:0] y_in,vcount_in,

@@ -32,7 +32,7 @@ module micr_minigame(
     input [23:0] sqrt_data,
     input sqrt_valid,
     input sqrt_last,
-    input [2:0] minigame_number,
+    input [3:0] minigame_number,
     input [2:0] rand_addr_num,
     
     output logic completed,
@@ -96,6 +96,8 @@ module micr_minigame(
     assign cool_led = highest_addr_output;
     logic [9:0] highest_addr;
     logic [23:0] max_peak;
+    
+    
 
     always_ff @(posedge vclock_in)begin
         if (sqrt_valid)begin
@@ -148,8 +150,8 @@ module micr_minigame(
     logic [11:0] pixel;
     
     always_comb begin
-        if  ((hcount_in >= 900 && hcount_in < (950)) &&
-          (vcount_in >= 200 && vcount_in < (400)))
+        if  ((hcount_in >= 580 && hcount_in < (610)) &&
+          (vcount_in >= 200 && vcount_in < (300)))
             pixel = color;
         else 
             pixel = 0;
@@ -159,14 +161,14 @@ module micr_minigame(
      logic [11:0] cracked_pixel;
      logic [11:0] uncovered_pixel;
      
-     picture_blob covered (.pixel_clk_in(vclock_in),.x_in(350),.hcount_in(hcount_in), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(covered_pixel));
+     picture_blob covered (.pixel_clk_in(vclock_in),.x_in(244),.hcount_in(hcount_in), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(covered_pixel));
                  
-     cracked_blob cracked (.pixel_clk_in(vclock_in),.x_in(350),.hcount_in(hcount_in), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(cracked_pixel));
+     cracked_blob cracked (.pixel_clk_in(vclock_in),.x_in(244),.hcount_in(hcount_in), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(cracked_pixel));
    
-     uncovered_blob uncovered (.pixel_clk_in(vclock_in),.x_in(350),.hcount_in(hcount_in), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(uncovered_pixel));
+     uncovered_blob uncovered (.pixel_clk_in(vclock_in),.x_in(244),.hcount_in(hcount_in), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(uncovered_pixel));
            
      always_comb begin
         if (counter >= 200_000_000) begin

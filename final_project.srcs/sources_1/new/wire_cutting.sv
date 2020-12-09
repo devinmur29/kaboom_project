@@ -297,7 +297,7 @@ module wire_cutting (
     end
     
     always_comb begin
-        if (delay >= 100000000) begin
+        if (delay >= 24_000_000) begin
             if (correct_cut == 3'b010)begin
                 completed = 1;
                 failed = 0;
@@ -354,43 +354,43 @@ module wire_cutting (
 //   logic [11:0] color1;
 //   assign color1 = 12'b1111_0000_0000;
    
-   wire_blob wb (.pixel_clk_in(vclock_in),.x_in(277),.hcount_in(hcount_in), .color(blobcolor1), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(wire_pixel));
+   wire_blob wb (.pixel_clk_in(vclock_in),.x_in(173),.hcount_in(hcount_in), .color(blobcolor1), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(wire_pixel));
    
    logic [11:0] wire_pixel2;
    //logic [11:0] color2;
 //   assign color2 = 12'b0000_1111_0000;
    
-   wire_blob wb2 (.pixel_clk_in(vclock_in),.x_in(317),.hcount_in(hcount_in), .color(blobcolor2), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(wire_pixel2));
+   wire_blob wb2 (.pixel_clk_in(vclock_in),.x_in(213),.hcount_in(hcount_in), .color(blobcolor2), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(wire_pixel2));
    
    logic [11:0] wire_pixel3;
    //logic [11:0] color3;
 //   assign color3 = 12'b0000_0000_1111;
    
-   wire_blob wb3 (.pixel_clk_in(vclock_in),.x_in(357),.hcount_in(hcount_in), .color(blobcolor3), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(wire_pixel3));
+   wire_blob wb3 (.pixel_clk_in(vclock_in),.x_in(253),.hcount_in(hcount_in), .color(blobcolor3), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(wire_pixel3));
    
    logic [11:0] wire_pixel4;
    //logic [11:0] color4;
 //   assign color4 = 12'b1111_1111_0000;
    
-   wire_blob wb4 (.pixel_clk_in(vclock_in),.x_in(397),.hcount_in(hcount_in), .color(blobcolor4), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(wire_pixel4));
+   wire_blob wb4 (.pixel_clk_in(vclock_in),.x_in(293),.hcount_in(hcount_in), .color(blobcolor4), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(wire_pixel4));
    
    logic [11:0] wire_pixel5;
    //logic [11:0] color5;
 //   assign color5 = 12'b0100_0000_0100;
    
-   wire_blob wb5 (.pixel_clk_in(vclock_in),.x_in(437),.hcount_in(hcount_in), .color(blobcolor5), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(wire_pixel5));
+   wire_blob wb5 (.pixel_clk_in(vclock_in),.x_in(333),.hcount_in(hcount_in), .color(blobcolor5), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(wire_pixel5));
    
    logic [11:0] wire_pixel6;
    //logic [11:0] color6;
 //   assign color6 = 12'b0100_0100_0100;
    
-   wire_blob wb6 (.pixel_clk_in(vclock_in),.x_in(477),.hcount_in(hcount_in), .color(blobcolor6), 
-           .y_in(300), .vcount_in(vcount_in), .pixel_out(wire_pixel6));
+   wire_blob wb6 (.pixel_clk_in(vclock_in),.x_in(373),.hcount_in(hcount_in), .color(blobcolor6), 
+           .y_in(200), .vcount_in(vcount_in), .pixel_out(wire_pixel6));
    
    assign pixel_out = wire_pixel | wire_pixel | wire_pixel2 | wire_pixel3 | wire_pixel4
                         | wire_pixel5 | wire_pixel6;
