@@ -506,9 +506,9 @@ module top_level( input clk_100mhz,
             4'b0110      : begin rgb <= multiplayer[1]? gengine_pixel_out+pixel_out_fpga+pixel_out_fpgaop : gengine_pixel_out +pixel_out_fpga;
                                   {led16_r, led16_g, led16_b} <= 0;
                                   end
-            4'b0111      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //LOSE, change to pixel_out_lose
+            4'b0111      :   begin rgb <= gengine_pixel_out; //LOSE, change to pixel_out_lose
                             {led16_r, led16_g, led16_b} <= 3'b100; end 
-            4'b1000      :   begin rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}}; //WIN, change to pixel_out_win
+            4'b1000      :   begin rgb <= gengine_pixel_out; //WIN, change to pixel_out_win
                             {led16_r, led16_g, led16_b} <= 3'b111; end 
             4'b1001      :  begin rgb <= pixel_out_sync;
                                   {led16_r, led16_g, led16_b} <= 3'b000;end //SYNC STATE
@@ -560,9 +560,6 @@ module top_level( input clk_100mhz,
     logic system_clock;
     assign system_clock = clk_25mhz;
 
-    //logic system_reset;
-    //assign system_reset = sw[15];
-
     logic should_render;
     logic render_dirty;
     logic [7:0] num_objects;    // TODO do we need num_objects if we have flags?
@@ -577,7 +574,6 @@ module top_level( input clk_100mhz,
     
     logic play;
     logic stop;
-    //logic [4:0] sound_id;
 
     logic graphics_req;
     logic [31:0] graphics_req_addr;
@@ -883,21 +879,24 @@ module top_level( input clk_100mhz,
     title_screen_graphics title_screen(
         .clk(system_clock),
         .reset,
+        .reset(minigame_reset || system_reset),
 
         .play(title_screen_play_sound),
         .stop(title_screen_stop_sound),
         .sound_id(title_screen_sound_id),
 
         .should_render,
-        .render_dirty,
-        .num_objects,
-        .new_object_waddr,
-        .new_object_we,
-        .new_object_properties,
+        .should_render(title_screen_should_render),
+        .render_dirty(title_screen_render_dirty),
+        .num_objects(title_screen_num_objects),
+        .new_object_waddr(title_screen_new_object_waddr),
+        .new_object_we(title_screen_new_object_we),
+        .new_object_properties(title_screen_new_object_properties),
         .render_ack,
 
         .texturemap_id,
-        .should_load_texturemap,
+        .texturemap_id(title_screen_texturemap_id),
+        .should_load_texturemap(title_screen_should_load_texturemap),
         .texturemap_load_ack,
 
         .up,
@@ -906,24 +905,28 @@ module top_level( input clk_100mhz,
         .mode()
     );
 /*
+
     lose_graphics lose_screen(
         .clk(system_clock),
         .reset,
+        .reset(minigame_reset || system_reset),
 
 //        .play,
 //        .stop,
 //        .sound_id,
 
         .should_render,
-        .render_dirty,
-        .num_objects,
-        .new_object_waddr,
-        .new_object_we,
-        .new_object_properties,
+        .should_render(lose_screen_should_render),
+        .render_dirty(lose_screen_render_dirty),
+        .num_objects(lose_screen_num_objects),
+        .new_object_waddr(lose_screen_new_object_waddr),
+        .new_object_we(lose_screen_new_object_we),
+        .new_object_properties(lose_screen_new_object_properties),
         .render_ack,
 
         .texturemap_id,
-        .should_load_texturemap,
+        .texturemap_id(lose_screen_texturemap_id),
+        .should_load_texturemap(lose_screen_should_load_texturemap),
         .texturemap_load_ack,
 
         .confirm(down),
@@ -933,27 +936,31 @@ module top_level( input clk_100mhz,
     win_graphics win_screen(
         .clk(system_clock),
         .reset,
+        .reset(minigame_reset || system_reset),
 
 //        .play,
 //        .stop,
 //        .sound_id,
 
         .should_render,
-        .render_dirty,
-        .num_objects,
-        .new_object_waddr,
-        .new_object_we,
-        .new_object_properties,
+        .should_render(win_screen_should_render),
+        .render_dirty(win_screen_render_dirty),
+        .num_objects(win_screen_num_objects),
+        .new_object_waddr(win_screen_new_object_waddr),
+        .new_object_we(win_screen_new_object_we),
+        .new_object_properties(win_screen_new_object_properties),
         .render_ack,
 
         .texturemap_id,
-        .should_load_texturemap,
+        .texturemap_id(win_screen_texturemap_id),
+        .should_load_texturemap(win_screen_should_load_texturemap),
         .texturemap_load_ack,
 
         .confirm(down),
         .confirmed()
     );
 */
+
 endmodule
 
 
