@@ -468,6 +468,11 @@ module top_level( input clk_100mhz,
      logic prev_onehz;
      logic [11:0] gengine_pixel_out;
 
+     localparam TITLE_SCREEN = 4'b0000;
+     localparam LOSE_SCREEN = 4'b0111;
+     localparam WIN_SCREEN = 4'b1000;
+     localparam MORSE_MINIGAME = 4'b0110;
+
     always_ff @(posedge clk_25mhz) begin
          hs <= hsync;
          vs <= vsync;
@@ -500,7 +505,7 @@ module top_level( input clk_100mhz,
                                   {led16_r, led16_g, led16_b} <= 0;
                                   play_sound <=0; stop_sound <=0; sound_id <= 0;
                                   end
-            4'b0110      : begin rgb <= multiplayer[1]? pixel_out6+pixel_out_fpga+pixel_out_fpgaop : pixel_out6+pixel_out_fpga;
+            4'b0110      : begin rgb <= multiplayer[1]? gengine_pixel_out+pixel_out_fpga+pixel_out_fpgaop : gengine_pixel_out +pixel_out_fpga;
                                   {led16_r, led16_g, led16_b} <= 0;
                                   play_sound <=0; stop_sound <=0; sound_id <= 0;
                                   end
@@ -719,38 +724,167 @@ module top_level( input clk_100mhz,
 //                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank), 
 //                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(wire_pixel));
 
-//    minigame_morse minigame_morse_inst(
-//        .clk(system_clock),
-//        .reset,
+    // This is a horrible, giant multiplexer to resolve conflicts between different modules that use gengine/sengine
+    // the sight of this is actually truly awful
 
-////        .play,
-////        .stop,
-////        .sound_id,
+    logic morse_should_render;
+    logic morse_render_dirty;
+    logic [7:0] morse_num_objects;
+    logic [7:0] morse_new_object_waddr;
+    logic morse_new_object_we;
+    logic [35:0] morse_new_object_properties;
 
-//        .should_render,
-//        .render_dirty,
-//        .num_objects,
-//        .new_object_waddr,
-//        .new_object_we,
-//        .new_object_properties,
-//        .render_ack,
+    logic [7:0] morse_texturemap_id;
+    logic morse_should_load_texturemap;
 
-//        .texturemap_id,
-//        .should_load_texturemap,
-//        .texturemap_load_ack,
+    logic title_screen_should_render;
+    logic title_screen_render_dirty;
+    logic [7:0] title_screen_num_objects;
+    logic [7:0] title_screen_new_object_waddr;
+    logic title_screen_new_object_we;
+    logic [35:0] title_screen_new_object_properties;
 
-//        .random(rand_out[3:0]),
-//        .sw(sw[3:0]),
-//        .btnc(center)
-//    );
-    
+    logic [7:0] title_screen_texturemap_id;
+    logic title_screen_should_load_texturemap;
+
+    logic lose_screen_should_render;
+    logic lose_screen_render_dirty;
+    logic [7:0] lose_screen_num_objects;
+    logic [7:0] lose_screen_new_object_waddr;
+    logic lose_screen_new_object_we;
+    logic [35:0] lose_screen_new_object_properties;
+
+    logic [7:0] lose_screen_texturemap_id;
+    logic lose_screen_should_load_texturemap;
+
+    logic win_screen_should_render;
+    logic win_screen_render_dirty;
+    logic [7:0] win_screen_num_objects;
+    logic [7:0] win_screen_new_object_waddr;
+    logic win_screen_new_object_we;
+    logic [35:0] win_screen_new_object_properties;
+
+    logic [7:0] win_screen_texturemap_id;
+    logic win_screen_should_load_texturemap;
+
+    logic minigame_reset;
+    logic [3:0] minigame_last;
+
+    always_ff @(posedge system_clock) begin
+        minigame_last <= minigame;
+        if (minigame_reset) minigame_reset <= 1'b0;
+
+        if (minigame_last != minigame) begin
+            minigame_reset <= 1'b1;
+        end
+
+        case (minigame)
+            MORSE_MINIGAME: begin
+                should_render <= morse_should_render;
+                render_dirty <= morse_render_dirty;
+                num_objects <= morse_num_objects;
+                new_object_waddr <= morse_new_object_waddr;
+                new_object_we <= morse_new_object_we;
+                new_object_properties <= morse_new_object_properties;
+        
+                texturemap_id <= morse_texturemap_id;
+                should_load_texturemap <= morse_should_load_texturemap;
+            end
+
+            TITLE_SCREEN: begin
+                should_render <= title_screen_should_render;
+                render_dirty <= title_screen_render_dirty;
+                num_objects <= title_screen_num_objects;
+                new_object_waddr <= title_screen_new_object_waddr;
+                new_object_we <= title_screen_new_object_we;
+                new_object_properties <= title_screen_new_object_properties;
+        
+                texturemap_id <= title_screen_texturemap_id;
+                should_load_texturemap <= title_screen_should_load_texturemap;
+            end
+
+            WIN_SCREEN: begin
+                should_render <= win_screen_should_render;
+                render_dirty <= win_screen_render_dirty;
+                num_objects <= win_screen_num_objects;
+                new_object_waddr <= win_screen_new_object_waddr;
+                new_object_we <= win_screen_new_object_we;
+                new_object_properties <= win_screen_new_object_properties;
+        
+                texturemap_id <= win_screen_texturemap_id;
+                should_load_texturemap <= win_screen_should_load_texturemap;
+            end
+
+            LOSE_SCREEN: begin
+                should_render <= lose_screen_should_render;
+                render_dirty <= lose_screen_render_dirty;
+                num_objects <= lose_screen_num_objects;
+                new_object_waddr <= lose_screen_new_object_waddr;
+                new_object_we <= lose_screen_new_object_we;
+                new_object_properties <= lose_screen_new_object_properties;
+        
+                texturemap_id <= lose_screen_texturemap_id;
+                should_load_texturemap <= lose_screen_should_load_texturemap;
+            end
+        endcase
+    end
+
+    logic morse_play_sound;
+    logic morse_stop_sound;
+    logic [4:0] morse_sound_id;
+
+    logic title_screen_play_sound;
+    logic title_screen_stop_sound;
+    logic [4:0] title_screen_sound_id;
+
+    always_ff @(posedge system_clock) begin
+        case (minigame)
+            MORSE_MINIGAME: begin
+                play_sound <= morse_play_sound;
+                stop_sound <= morse_stop_sound;
+                sound_id <= morse_sound_id;
+            end
+
+            TITLE_SCREEN: begin
+                play_sound <= title_screen_play_sound;
+                stop_sound <= title_screen_stop_sound;
+                sound_id <= title_screen_sound_id;
+            end
+        endcase
+    end
+
+    minigame_morse minigame_morse_inst(
+        .clk(system_clock),
+        .reset(minigame_reset || system_reset),
+
+        .play(morse_play_sound),
+        .stop(morse_stop_sound),
+        .sound_id(morse_sound_id),
+
+        .should_render(morse_should_render),
+        .render_dirty(morse_render_dirty),
+        .num_objects(morse_num_objects),
+        .new_object_waddr(morse_new_object_waddr),
+        .new_object_we(morse_new_object_we),
+        .new_object_properties(morse_new_object_properties),
+        .render_ack,
+
+        .texturemap_id(morse_texturemap_id),
+        .should_load_texturemap(morse_should_load_texturemap),
+        .texturemap_load_ack,
+
+        .random(rand_out[3:0]),
+        .sw(sw[3:0]),
+        .btnc(center)
+    );
+
     title_screen_graphics title_screen(
         .clk(system_clock),
         .reset,
 
-//        .play,
-//        .stop,
-//        .sound_id,
+        .play(title_screen_play_sound),
+        .stop(title_screen_stop_sound),
+        .sound_id(title_screen_sound_id),
 
         .should_render,
         .render_dirty,

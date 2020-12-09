@@ -144,7 +144,6 @@ with open(OUTPUT_FILE, 'wb') as f:
     # for texturemap, palette in texturemaps:
     # HACK remove two bytes from the beginning to fix a graphical glitch
     for texturemap in texturemaps:
-        print(head_addr)
         # print(palette[0][0])
         # bytes_written = write_with_padding(bytes(texturemap[8:]) + bytes(texturemap[:8]))
         # bytes_written = write_with_padding(bytes(texturemap[-8:]) + bytes(texturemap[:-8]))
